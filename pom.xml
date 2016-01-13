@@ -16,7 +16,26 @@
 		<module>common</module>
 		<module>service</module>
 		<module>web</module>
+		<module>core</module>
 	</modules>
+
+	<properties>
+		<slf4j>1.7.13</slf4j>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j}</version>
+		</dependency>
+	</dependencies>
 
 
 	<build>
