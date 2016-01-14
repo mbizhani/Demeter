@@ -12,8 +12,13 @@
 	<artifactId>demeter-module</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Demeter Module Base</name>
+	<name>Demeter Module</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.devocative</groupId>
+			<artifactId>demeter-common</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -1,0 +1,24 @@
+<module
+		shortName="DMT"
+		mainClass="org.devocative.demeter.module.DemeterDModule">
+
+	<!--
+	constraintsClass=""
+	errorCodesClass=""
+	localPersistorService=""
+	-->
+
+	<!--<dependencies>
+		<dependency>A</dependency>
+	</dependencies>-->
+
+	<entities>
+		<entity type="org.devocative.demeter.entity.Person"/>
+		<entity type="org.devocative.demeter.entity.User"/>
+	</entities>
+
+	<!--<configKeys>
+		<key name="asd" type="Boolean" required="true"/>
+		<key name="wsx" type="String"/>
+	</configKeys>-->
+</module>
