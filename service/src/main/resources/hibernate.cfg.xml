@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="connection.autocommit">false</property>
+		<property name="connection.isolation">2</property>
+		<property name="connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</property>
+		<property name="javax.persistence.validation.mode">NONE</property>
+
+		<property name="jdbc.batch_size">5</property>
+		<property name="jdbc.fetch_size">100</property>
+		<property name="jdbc.wrap_result_sets">true</property>
+
+		<property name="org.hibernate.envers.audit_table_prefix">a_</property>
+		<property name="org.hibernate.envers.audit_table_suffix"/>
+		<property name="org.hibernate.envers.revision_field_name">r_num</property>
+		<property name="org.hibernate.envers.revision_type_field_name">r_type</property>
+	</session-factory>
+</hibernate-configuration>
