@@ -4,14 +4,20 @@ import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.core.xml.Entity;
 import org.devocative.demeter.core.xml.Module;
+import org.devocative.demeter.imodule.DModule;
 import org.devocative.demeter.iservice.IPersistorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ModuleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(ModuleLoader.class);
@@ -19,32 +25,45 @@ public class ModuleLoader {
 	private static final Map<String, Module> MODULES = new HashMap<>();
 	private static ApplicationContext appCtx;
 
-	public static ApplicationContext getAppCtx() {
+	public static ApplicationContext getApplicationContext() {
 		return appCtx;
 	}
 
+	public static void registerSpringBean(String beanName, Object bean) {
+		ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) appCtx).getBeanFactory();
+		beanFactory.registerSingleton(beanName, bean);
+	}
 
-	public static void start() {
-		init();
+	public static void init() {
+		initModules();
 		initSpringContext();
 		initPersistorServices();
+		initDModules();
+
+		logger.info("### MODULE LOADER INITED");
 	}
 
-	public static void stop() {
+	public static void shutdown() {
 		shutdownPersistorServices();
+		shutdownDModules();
 	}
 
-	private static void init() {
+	private static void initModules() {
 		XStream xStream = new XStream();
 		xStream.processAnnotations(Module.class);
 		xStream.alias("dependency", String.class);
 
-		List<String> modulesName = ConfigUtil.getList("dmt.modules", Collections.singletonList("Demeter"));
+		List<String> modulesName = ConfigUtil.getList(false, "dmt.modules");
+		if (!modulesName.contains("Demeter")) {
+			modulesName.add(0, "Demeter");
+		}
 		for (String moduleName : modulesName) {
 			InputStream moduleXMLResource = ModuleLoader.class.getResourceAsStream(String.format("/%s.xml", moduleName));
 			Module module = (Module) xStream.fromXML(moduleXMLResource);
 			logger.info("Module Found: {}", moduleName);
 			MODULES.put(moduleName, module);
+
+			//TODO check module shot-name-clash
 		}
 	}
 
@@ -81,13 +100,9 @@ public class ModuleLoader {
 				if (localModulePersistor != null) {
 					if (module.getEntities() != null && module.getEntities().size() > 0) {
 						String prefix = module.getShortName().toLowerCase();
-						localModulePersistor.init(
-							loadEntities(module.getEntities()),
-							ConfigUtil.getString(true, String.format("%s.db.driver", prefix)),
-							ConfigUtil.getString(true, String.format("%s.db.url", prefix)),
-							ConfigUtil.getString(true, String.format("%s.db.username", prefix)),
-							ConfigUtil.getString(true, String.format("%s.db.password", prefix))
-						);
+						localModulePersistor.init(loadEntities(module.getEntities()), prefix);
+						logger.info("Local persistor for module [{}] initialized with [{}] entities.",
+							moduleName, module.getEntities().size());
 					} else {
 						throw new RuntimeException("Module has local persistor but no entities: " + moduleName);
 					}
@@ -97,17 +112,29 @@ public class ModuleLoader {
 			} else {
 				if (module.getEntities() != null && module.getEntities().size() > 0) {
 					dmtPersistorServiceEntities.addAll(loadEntities(module.getEntities()));
+					logger.info("Module has {} entities.", module.getEntities().size());
 				}
 			}
 		}
 
-		persistors.get("dmtPersistorService").init(
-			dmtPersistorServiceEntities,
-			ConfigUtil.getString(true, "dmt.db.driver"),
-			ConfigUtil.getString(true, "dmt.db.url"),
-			ConfigUtil.getString(true, "dmt.db.username"),
-			ConfigUtil.getString(true, "dmt.db.password")
-		);
+		persistors.get("dmtPersistorService").init(dmtPersistorServiceEntities, "dmt");
+		logger.info("Demeter persistor initialized with [{}] entities.", dmtPersistorServiceEntities.size());
+	}
+
+	private static void initDModules() {
+		for (Module module : MODULES.values()) {
+			try {
+				String beanName = String.format("%sDModule", module.getShortName().toLowerCase());
+				Class<?> moduleMainClass = Class.forName(module.getMainClass());
+				DModule dModule = (DModule) moduleMainClass.newInstance();
+				registerSpringBean(beanName, dModule);
+				logger.info("DModule bean created: {}", beanName);
+				dModule.onInit();
+				logger.info("DModule bean inited: {}", beanName);
+			} catch (Exception e) {
+				throw new RuntimeException("DModule class: " + module.getMainClass(), e);
+			}
+		}
 	}
 
 	private static List<Class> loadEntities(List<Entity> entities) {
@@ -124,8 +151,17 @@ public class ModuleLoader {
 
 	private static void shutdownPersistorServices() {
 		Map<String, IPersistorService> persistors = appCtx.getBeansOfType(IPersistorService.class);
-		for (IPersistorService persistorService : persistors.values()) {
-			persistorService.shutdown();
+		for (Map.Entry<String, IPersistorService> entry : persistors.entrySet()) {
+			entry.getValue().shutdown();
+			logger.info("Persistor service shutdown: {}", entry.getKey());
+		}
+	}
+
+	private static void shutdownDModules() {
+		Map<String, DModule> beans = appCtx.getBeansOfType(DModule.class);
+		for (Map.Entry<String, DModule> entry : beans.entrySet()) {
+			entry.getValue().onShutdown();
+			logger.info("Shutdown DModule: {}", entry.getKey());
 		}
 	}
 }
