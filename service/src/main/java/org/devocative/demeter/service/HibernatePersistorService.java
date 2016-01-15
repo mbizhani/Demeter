@@ -5,9 +5,10 @@ import org.devocative.demeter.entity.ICreationDate;
 import org.devocative.demeter.entity.ICreatorUser;
 import org.devocative.demeter.entity.IModificationDate;
 import org.devocative.demeter.entity.IModifierUser;
-import org.devocative.demeter.iservice.ELockMode;
-import org.devocative.demeter.iservice.IPersistorService;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.iservice.persistor.ELockMode;
+import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -174,6 +175,73 @@ public class HibernatePersistorService implements IPersistorService {
 		}
 	}
 
+	@Override
+	public void executeUpdate(String simpleQuery) {
+		Session session = getCurrentSession();
+		checkTransaction(session);
+		session.createQuery(simpleQuery).executeUpdate();
+		session.flush();
+	}
+
+	@Override
+	public IQueryBuilder createQueryBuilder() {
+		return new HibernateQueryBuilder(this);
+	}
+
+	//----------------------------- PACKAGE METHODS
+
+	Session getCurrentSession() {
+		Session session = currentSession.get();
+		if (session == null || !session.isOpen()) {
+			session = getSession();
+			currentSession.set(session);
+		} else {
+			try {
+				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+			} catch (HibernateException e) {
+				logger.warn("Check current session error", e);
+				currentSession.remove();
+				session = getCurrentSession();
+			}
+		}
+		return session;
+	}
+
+	Session getSession() {
+		int noOfRetry = 0;
+		while (true) {
+			try {
+				Session session = sessionFactory.openSession();
+				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				return session;
+			} catch (HibernateException e) {
+				logger.error("Problem getting new session", e);
+				try {
+					sessionFactory.close();
+				} catch (HibernateException e1) {
+					logger.warn("Problem closing SessionFactory", e);
+				}
+				noOfRetry++;
+				if (noOfRetry > 3) {
+					//TODO SMSUtil.sendSMS("hibernate.connection");
+					throw e;
+				}
+
+				init();
+			}
+		}
+	}
+
+	void checkTransaction(Session session) {
+		Transaction trx = session.getTransaction();
+		if (trx == null || !trx.isActive()) {
+			session.beginTransaction();
+		}
+	}
+
+	String getConfig(String key) {
+		return String.format("%s.%s", prefix, key);
+	}
 
 	//----------------------------- PRIVATE METHODS
 
@@ -211,60 +279,6 @@ public class HibernatePersistorService implements IPersistorService {
 		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
 		logger.info("HibernatePersistorService init()");
 	}
-
-	private Session getCurrentSession() {
-		Session session = currentSession.get();
-		if (session == null || !session.isOpen()) {
-			session = getSession();
-			currentSession.set(session);
-		} else {
-			try {
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
-			} catch (HibernateException e) {
-				logger.warn("Check current session error", e);
-				currentSession.remove();
-				session = getCurrentSession();
-			}
-		}
-		return session;
-	}
-
-	private Session getSession() {
-		int noOfRetry = 0;
-		while (true) {
-			try {
-				Session session = sessionFactory.openSession();
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
-				return session;
-			} catch (HibernateException e) {
-				logger.error("Problem getting new session", e);
-				try {
-					sessionFactory.close();
-				} catch (HibernateException e1) {
-					logger.warn("Problem closing SessionFactory", e);
-				}
-				noOfRetry++;
-				if (noOfRetry > 3) {
-					//TODO SMSUtil.sendSMS("hibernate.connection");
-					throw e;
-				}
-
-				init();
-			}
-		}
-	}
-
-	private void checkTransaction(Session session) {
-		Transaction trx = session.getTransaction();
-		if (trx == null || !trx.isActive()) {
-			session.beginTransaction();
-		}
-	}
-
-	private String getConfig(String key) {
-		return String.format("%s.%s", prefix, key);
-	}
-
 
 	//----------------------------- INNER CLASSES
 
