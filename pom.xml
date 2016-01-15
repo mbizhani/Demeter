@@ -20,20 +20,36 @@
 	</modules>
 
 	<properties>
-		<slf4j>1.7.13</slf4j>
+		<adroit.version>1.0-SNAPSHOT</adroit.version>
+		<wickop.version>1.0-SNAPSHOT</wickop.version>
+
+		<slf4j.version>1.7.13</slf4j.version>
+		<hibernate.version>4.3.11.Final</hibernate.version>
+		<spring.version>4.2.4.RELEASE</spring.version>
+		<wicket.version>6.20.0</wicket.version>
+
+		<jetty.version>8.1.16.v20140903</jetty.version>
+		<servlet.version>2.5</servlet.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j}</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j}</version>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
