@@ -1,4 +1,4 @@
-package org.devocative.demeter.iservice;
+package org.devocative.demeter.iservice.persistor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,4 +35,8 @@ public interface IPersistorService {
 	<T> List<T> list(String simpleQuery);
 
 	void refresh(Object entity);
+
+	void executeUpdate(String simpleQuery);
+
+	IQueryBuilder createQueryBuilder();
 }

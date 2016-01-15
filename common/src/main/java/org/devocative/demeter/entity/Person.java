@@ -51,6 +51,8 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "person")
 	private User user;
 
+	//----------------------------- CREATE / MODIFY
+
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
 	private Date creationDate;
