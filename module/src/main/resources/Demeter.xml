@@ -1,16 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE module PUBLIC
+		"Devocative/Demeter Module"
+		"http://www.devocative.org/dtd/demeter-module.dtd">
+
 <module
 		shortName="DMT"
 		mainClass="org.devocative.demeter.module.DemeterDModule">
-
-	<!--
-	constraintsClass=""
-	errorCodesClass=""
-	localPersistorService=""
-	-->
-
-	<!--<dependencies>
-		<dependency>A</dependency>
-	</dependencies>-->
 
 	<entities>
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>

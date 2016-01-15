@@ -1,0 +1,19 @@
+<!ELEMENT module (dependencies|entities|dPages)*>
+		<!ATTLIST module
+				shortName CDATA #REQUIRED
+				mainClass CDATA #REQUIRED
+				constraintsClass CDATA #IMPLIED
+				errorCodesClass CDATA #IMPLIED
+				localPersistorService (true|false)>
+		<!ELEMENT dependencies (dependency)*>
+		<!ELEMENT dependency (#PCDATA)>
+		<!ELEMENT entities (entity)*>
+		<!ELEMENT entity (#PCDATA)>
+		<!ATTLIST entity
+				type CDATA #REQUIRED>
+		<!ELEMENT dPages (dPage)*>
+		<!ELEMENT dPage (#PCDATA)>
+		<!ATTLIST dPage
+				type CDATA #REQUIRED
+				title CDATA #REQUIRED
+				uri CDATA #REQUIRED>
