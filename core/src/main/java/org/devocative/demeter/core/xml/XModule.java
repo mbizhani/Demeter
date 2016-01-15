@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.List;
 
 @XStreamAlias("module")
-public class Module {
+public class XModule {
 
 	@XStreamAsAttribute
 	private String shortName;
@@ -25,9 +25,11 @@ public class Module {
 
 	private List<String> dependencies;
 
-	private List<Entity> entities;
+	private List<XEntity> entities;
 
-	private List<Key> configKeys;
+	private List<XDPage> dPages;
+
+	private List<XKey> configKeys;
 
 	public String getShortName() {
 		return shortName;
@@ -77,19 +79,28 @@ public class Module {
 		this.dependencies = dependencies;
 	}
 
-	public List<Entity> getEntities() {
+	public List<XEntity> getEntities() {
 		return entities;
 	}
 
-	public void setEntities(List<Entity> entities) {
+	public void setEntities(List<XEntity> entities) {
 		this.entities = entities;
 	}
 
-	public List<Key> getConfigKeys() {
+	public List<XDPage> getDPages() {
+		return dPages;
+	}
+
+	public XModule setDPages(List<XDPage> dPages) {
+		this.dPages = dPages;
+		return this;
+	}
+
+	public List<XKey> getConfigKeys() {
 		return configKeys;
 	}
 
-	public void setConfigKeys(List<Key> configKeys) {
+	public void setConfigKeys(List<XKey> configKeys) {
 		this.configKeys = configKeys;
 	}
 }

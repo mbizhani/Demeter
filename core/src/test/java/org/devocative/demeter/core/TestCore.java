@@ -1,7 +1,7 @@
 package org.devocative.demeter.core;
 
 import org.devocative.demeter.entity.Person;
-import org.devocative.demeter.iservice.IPersistorService;
+import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.junit.Test;
 
 import java.util.List;

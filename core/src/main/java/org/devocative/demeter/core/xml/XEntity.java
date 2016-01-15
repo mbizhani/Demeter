@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("entity")
-public class Entity {
+public class XEntity {
 	@XStreamAsAttribute
 	private String type;
 

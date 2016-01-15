@@ -2,10 +2,10 @@ package org.devocative.demeter.core;
 
 import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
-import org.devocative.demeter.core.xml.Entity;
-import org.devocative.demeter.core.xml.Module;
+import org.devocative.demeter.core.xml.XEntity;
+import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
-import org.devocative.demeter.iservice.IPersistorService;
+import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,11 +22,16 @@ import java.util.Map;
 public class ModuleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(ModuleLoader.class);
 
-	private static final Map<String, Module> MODULES = new HashMap<>();
+	private static final Map<String, XModule> MODULES = new HashMap<>();
 	private static ApplicationContext appCtx;
 
 	public static ApplicationContext getApplicationContext() {
 		return appCtx;
+	}
+
+	// TODO
+	public static Map<String, XModule> getModules() {
+		return MODULES;
 	}
 
 	public static void registerSpringBean(String beanName, Object bean) {
@@ -50,7 +55,7 @@ public class ModuleLoader {
 
 	private static void initModules() {
 		XStream xStream = new XStream();
-		xStream.processAnnotations(Module.class);
+		xStream.processAnnotations(XModule.class);
 		xStream.alias("dependency", String.class);
 
 		List<String> modulesName = ConfigUtil.getList(false, "dmt.modules");
@@ -59,7 +64,7 @@ public class ModuleLoader {
 		}
 		for (String moduleName : modulesName) {
 			InputStream moduleXMLResource = ModuleLoader.class.getResourceAsStream(String.format("/%s.xml", moduleName));
-			Module module = (Module) xStream.fromXML(moduleXMLResource);
+			XModule module = (XModule) xStream.fromXML(moduleXMLResource);
 			logger.info("Module Found: {}", moduleName);
 			MODULES.put(moduleName, module);
 
@@ -74,7 +79,7 @@ public class ModuleLoader {
 		String[] springConfigLocations = new String[MODULES.size()];
 		String springPrefixConfig = clientMode ? "client" : "local";
 		int i = 0;
-		for (Map.Entry<String, Module> moduleEntry : MODULES.entrySet()) {
+		for (Map.Entry<String, XModule> moduleEntry : MODULES.entrySet()) {
 			String springXML = String.format("/%s%s.xml", springPrefixConfig, moduleEntry.getValue().getShortName());
 			logger.info("Loading Spring Config Location: {}", springXML);
 			springConfigLocations[i] = springXML;
@@ -92,9 +97,9 @@ public class ModuleLoader {
 		Map<String, IPersistorService> persistors = appCtx.getBeansOfType(IPersistorService.class);
 
 		List<Class> dmtPersistorServiceEntities = new ArrayList<>();
-		for (Map.Entry<String, Module> moduleEntry : MODULES.entrySet()) {
+		for (Map.Entry<String, XModule> moduleEntry : MODULES.entrySet()) {
 			String moduleName = moduleEntry.getKey();
-			Module module = moduleEntry.getValue();
+			XModule module = moduleEntry.getValue();
 			if (module.isLocalPersistorService()) {
 				IPersistorService localModulePersistor = persistors.get(String.format("%sPersistorService", module.getShortName().toLowerCase()));
 				if (localModulePersistor != null) {
@@ -122,7 +127,7 @@ public class ModuleLoader {
 	}
 
 	private static void initDModules() {
-		for (Module module : MODULES.values()) {
+		for (XModule module : MODULES.values()) {
 			try {
 				String beanName = String.format("%sDModule", module.getShortName().toLowerCase());
 				Class<?> moduleMainClass = Class.forName(module.getMainClass());
@@ -137,9 +142,9 @@ public class ModuleLoader {
 		}
 	}
 
-	private static List<Class> loadEntities(List<Entity> entities) {
+	private static List<Class> loadEntities(List<XEntity> entities) {
 		List<Class> classes = new ArrayList<>();
-		for (Entity entity : entities) {
+		for (XEntity entity : entities) {
 			try {
 				classes.add(Class.forName(entity.getType()));
 			} catch (ClassNotFoundException e) {

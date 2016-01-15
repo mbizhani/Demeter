@@ -1,5 +1,5 @@
 package org.devocative.demeter.core.xml;
 
-public enum KeyType {
+public enum EKeyType {
 	Integer, String, Boolean, Long
 }

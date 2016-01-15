@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("key")
-public class Key {
+public class XKey {
 	@XStreamAsAttribute
 	private String name;
 
@@ -12,7 +12,7 @@ public class Key {
 	private Boolean required;
 
 	@XStreamAsAttribute
-	private KeyType type;
+	private EKeyType type;
 
 	public String getName() {
 		return name;
@@ -30,11 +30,11 @@ public class Key {
 		this.required = required;
 	}
 
-	public KeyType getType() {
+	public EKeyType getType() {
 		return type;
 	}
 
-	public void setType(KeyType type) {
+	public void setType(EKeyType type) {
 		this.type = type;
 	}
 }
