@@ -13,9 +13,15 @@
 	</dependencies>-->
 
 	<entities>
+		<entity type="org.devocative.demeter.entity.DPageInfo"/>
+		<entity type="org.devocative.demeter.entity.DPageInstance"/>
 		<entity type="org.devocative.demeter.entity.Person"/>
 		<entity type="org.devocative.demeter.entity.User"/>
 	</entities>
+
+	<dPages>
+		<dPage type="org.devocative.demeter.web.dPage.InfoDPage" title="Test" uri="/info"/>
+	</dPages>
 
 	<!--<configKeys>
 		<key name="asd" type="Boolean" required="true"/>
