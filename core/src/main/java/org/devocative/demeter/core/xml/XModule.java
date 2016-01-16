@@ -15,6 +15,9 @@ public class XModule {
 	private String mainClass;
 
 	@XStreamAsAttribute
+	private String mainResource;
+
+	@XStreamAsAttribute
 	private String constraintsClass;
 
 	@XStreamAsAttribute
@@ -45,6 +48,14 @@ public class XModule {
 
 	public void setMainClass(String mainClass) {
 		this.mainClass = mainClass;
+	}
+
+	public String getMainResource() {
+		return mainResource;
+	}
+
+	public void setMainResource(String mainResource) {
+		this.mainResource = mainResource;
 	}
 
 	public String getConstraintsClass() {

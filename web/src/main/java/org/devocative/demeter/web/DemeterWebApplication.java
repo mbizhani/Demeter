@@ -5,6 +5,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
@@ -32,6 +33,9 @@ public class DemeterWebApplication extends WebApplication {
 		logger.info("** Demeter Application **");
 		logger.info("** Context Path: {}", getServletContext().getContextPath());
 
+		ModuleLoader.init();
+		getComponentInstantiationListeners().add(new SpringComponentInjector(this, ModuleLoader.getApplicationContext()));
+
 		getMarkupSettings().setStripWicketTags(true);
 		getMarkupSettings().setStripComments(true);
 		getMarkupSettings().setCompressWhitespace(true);
@@ -39,29 +43,29 @@ public class DemeterWebApplication extends WebApplication {
 
 		//getRequestCycleListeners().add(new WPortalRequestCycleListener(portalService, isClientMode));
 		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger("dmt.web.request.timeout", 10)));
-
-		//getResourceSettings().getStringResourceLoaders().add(0, new ClassStringResourceLoader(portalModule.getClass()));
 		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean("dmt.web.ignore.missed.resource", false));
 
 		mountPage("/", Index.class);
-		ModuleLoader.init();
-		getComponentInstantiationListeners().add(new SpringComponentInjector(this, ModuleLoader.getApplicationContext()));
 
-		initDPages();
+		initModulesForWeb();
 	}
 
-	private void initDPages() {
+	private void initModulesForWeb() {
 		IPageService pageService = ModuleLoader.getApplicationContext().getBean(IPageService.class);
 		pageService.disableAllPageInfo();
 
 		Map<String, XModule> modules = ModuleLoader.getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule module = moduleEntry.getValue();
+			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(module.getMainResource()));
+
 			List<XDPage> dPages = module.getDPages();
 			for (XDPage dPage : dPages) {
 				pageService.addOrUpdatePageInfo(dPage.getType(), module.getShortName().toLowerCase(),
 					dPage.getUri(), dPage.getTitle());
 			}
+
+			logger.info("Module [{}] inited for web", moduleEntry.getKey());
 		}
 	}
 

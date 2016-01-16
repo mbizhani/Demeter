@@ -2,6 +2,7 @@
 		<!ATTLIST module
 				shortName CDATA #REQUIRED
 				mainClass CDATA #REQUIRED
+				mainResource CDATA #REQUIRED
 				constraintsClass CDATA #IMPLIED
 				errorCodesClass CDATA #IMPLIED
 				localPersistorService (true|false)>

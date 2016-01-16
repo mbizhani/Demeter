@@ -6,7 +6,8 @@
 
 <module
 		shortName="DMT"
-		mainClass="org.devocative.demeter.module.DemeterDModule">
+		mainClass="org.devocative.demeter.module.DemeterDModule"
+		mainResource="org.devocative.demeter.web.DemeterDModule">
 
 	<entities>
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>

@@ -60,7 +60,7 @@ public class ModuleLoader {
 
 		List<String> modulesName = ConfigUtil.getList(false, "dmt.modules");
 		if (!modulesName.contains("Demeter")) {
-			modulesName.add(0, "Demeter");
+			modulesName.add("Demeter");
 		}
 		for (String moduleName : modulesName) {
 			InputStream moduleXMLResource = ModuleLoader.class.getResourceAsStream(String.format("/%s.xml", moduleName));
