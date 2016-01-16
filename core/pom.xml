@@ -15,13 +15,6 @@
 	<name>Demeter Core</name>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>org.devocative</groupId>
-			<artifactId>adroit</artifactId>
-			<version>${adroit.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-common</artifactId>

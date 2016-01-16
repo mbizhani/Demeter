@@ -21,7 +21,7 @@
 
 	<properties>
 		<adroit.version>1.0-SNAPSHOT</adroit.version>
-		<wickop.version>1.0-SNAPSHOT</wickop.version>
+		<wickomp.version>1.0-SNAPSHOT</wickomp.version>
 
 		<slf4j.version>1.7.13</slf4j.version>
 		<hibernate.version>4.3.11.Final</hibernate.version>

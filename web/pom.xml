@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>wickomp</artifactId>
-			<version>${wickop.version}</version>
+			<version>${wickomp.version}</version>
 		</dependency>
 
 		<dependency>
@@ -44,6 +44,8 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>-->
+
+		<!-- TEST SCOPED -->
 
 		<dependency>
 			<groupId>org.devocative</groupId>
