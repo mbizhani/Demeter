@@ -4,12 +4,10 @@ import org.devocative.demeter.imodule.DModule;
 
 public class DemeterDModule implements DModule {
 	@Override
-	public void onInit() {
-
+	public void init() {
 	}
 
 	@Override
-	public void onShutdown() {
-
+	public void shutdown() {
 	}
 }

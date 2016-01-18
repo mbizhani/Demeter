@@ -5,6 +5,7 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
+import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,12 @@ public class ModuleLoader {
 	private static final Map<String, XModule> MODULES = new HashMap<>();
 	private static ApplicationContext appCtx;
 
+	private static Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS;
+
 	public static ApplicationContext getApplicationContext() {
 		return appCtx;
 	}
 
-	// TODO
 	public static Map<String, XModule> getModules() {
 		return MODULES;
 	}
@@ -45,13 +47,17 @@ public class ModuleLoader {
 		initPersistorServices();
 		initDModules();
 
+		initApplicationLifecycle();
+
 		logger.info("### MODULE LOADER INITED");
 	}
 
 	public static void shutdown() {
-		shutdownPersistorServices();
-		shutdownDModules();
+		shutdownApplicationLifecycle();
+		logger.info("### MODULE LOADER SHUTDOWNED");
 	}
+
+	// ---------------------------- LIFECYCLIC METHODS
 
 	private static void initModules() {
 		XStream xStream = new XStream();
@@ -68,7 +74,7 @@ public class ModuleLoader {
 			logger.info("Module Found: {}", moduleName);
 			MODULES.put(moduleName, module);
 
-			//TODO check module shot-name-clash
+			//TODO check module short-name-clash
 		}
 	}
 
@@ -105,7 +111,7 @@ public class ModuleLoader {
 				if (localModulePersistor != null) {
 					if (module.getEntities() != null && module.getEntities().size() > 0) {
 						String prefix = module.getShortName().toLowerCase();
-						localModulePersistor.init(loadEntities(module.getEntities()), prefix);
+						localModulePersistor.setInitData(loadEntities(module.getEntities()), prefix);
 						logger.info("Local persistor for module [{}] initialized with [{}] entities.",
 							moduleName, module.getEntities().size());
 					} else {
@@ -122,7 +128,7 @@ public class ModuleLoader {
 			}
 		}
 
-		persistors.get("dmtPersistorService").init(dmtPersistorServiceEntities, "dmt");
+		persistors.get("dmtPersistorService").setInitData(dmtPersistorServiceEntities, "dmt");
 		logger.info("Demeter persistor initialized with [{}] entities.", dmtPersistorServiceEntities.size());
 	}
 
@@ -134,13 +140,29 @@ public class ModuleLoader {
 				DModule dModule = (DModule) moduleMainClass.newInstance();
 				registerSpringBean(beanName, dModule);
 				logger.info("DModule bean created: {}", beanName);
-				dModule.onInit();
-				logger.info("DModule bean inited: {}", beanName);
 			} catch (Exception e) {
 				throw new RuntimeException("DModule class: " + module.getMainClass(), e);
 			}
 		}
 	}
+
+	private static void initApplicationLifecycle() {
+		APP_LIFECYCLE_BEANS = appCtx.getBeansOfType(IApplicationLifecycle.class);
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS.entrySet()) {
+			entry.getValue().init();
+			logger.info("Application lifecycle bean init(): {}", entry.getKey());
+		}
+	}
+
+	private static void shutdownApplicationLifecycle() {
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS.entrySet()) {
+			entry.getValue().shutdown();
+			logger.info("Application lifecycle bean shutdown(): {}", entry.getKey());
+		}
+	}
+
+	// ------------------------- PRIVATE METHODS
 
 	private static List<Class> loadEntities(List<XEntity> entities) {
 		List<Class> classes = new ArrayList<>();
@@ -152,21 +174,5 @@ public class ModuleLoader {
 			}
 		}
 		return classes;
-	}
-
-	private static void shutdownPersistorServices() {
-		Map<String, IPersistorService> persistors = appCtx.getBeansOfType(IPersistorService.class);
-		for (Map.Entry<String, IPersistorService> entry : persistors.entrySet()) {
-			entry.getValue().shutdown();
-			logger.info("Persistor service shutdown: {}", entry.getKey());
-		}
-	}
-
-	private static void shutdownDModules() {
-		Map<String, DModule> beans = appCtx.getBeansOfType(DModule.class);
-		for (Map.Entry<String, DModule> entry : beans.entrySet()) {
-			entry.getValue().onShutdown();
-			logger.info("Shutdown DModule: {}", entry.getKey());
-		}
 	}
 }

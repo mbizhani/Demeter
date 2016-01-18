@@ -1,10 +1,13 @@
 package org.devocative.demeter.iservice.persistor;
 
+import org.devocative.demeter.iservice.IApplicationLifecycle;
+import org.devocative.demeter.iservice.IRequestLifecycle;
+
 import java.io.Serializable;
 import java.util.List;
 
-public interface IPersistorService {
-	void init(List<Class> entities, String prefix);
+public interface IPersistorService extends IApplicationLifecycle, IRequestLifecycle {
+	void setInitData(List<Class> entities, String prefix);
 
 	void shutdown();
 

@@ -48,16 +48,16 @@
 		<!-- TEST SCOPED -->
 
 		<dependency>
-			<groupId>org.devocative</groupId>
-			<artifactId>demeter-service</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>connectorj</artifactId>
+			<version>5.1.36</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>1.3.175</version>
+			<groupId>org.devocative</groupId>
+			<artifactId>demeter-service</artifactId>
+			<version>1.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -123,6 +123,8 @@
 				<configuration>
 					<useTestClasspath>true</useTestClasspath>
 					<webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
+					<stopKey/>
+					<stopPort/>
 					<connectors>
 						<connector implementation="org.eclipse.jetty.server.bio.SocketConnector">
 							<port>8080</port>
@@ -130,12 +132,6 @@
 						</connector>
 					</connectors>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>com.edugility</groupId>
-				<artifactId>h2-maven-plugin</artifactId>
-				<version>1.0</version>
 			</plugin>
 
 		</plugins>

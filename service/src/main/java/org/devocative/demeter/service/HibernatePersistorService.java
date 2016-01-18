@@ -34,16 +34,66 @@ public class HibernatePersistorService implements IPersistorService {
 	@Autowired
 	private ISecurityService securityService;
 
+	// -------------------------- IApplicationLifecycle implementation
+
 	@Override
-	public void init(List<Class> entities, String prefix) {
-		this.entities = entities;
-		this.prefix = prefix;
-		init();
+	public void init() {
+		config = new Configuration();
+		for (Class entity : entities) {
+			config.addAnnotatedClass(entity);
+		}
+
+		config.setInterceptor(new CreateModifyInterceptor());
+
+		String username = ConfigUtil.getString(true, getConfig("db.username"));
+
+		config.configure("hibernate.cfg.xml")
+			.setProperty("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
+			.setProperty("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
+			.setProperty("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
+			.setProperty("hibernate.connection.username", username)
+			.setProperty("hibernate.connection.password", ConfigUtil.getString(getConfig("db.password"), ""))
+			.setProperty("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
+
+		String schema = ConfigUtil.getString(false, getConfig("db.schema"));
+		if (schema != null) {
+			config.setProperty("hibernate.default_schema", schema);
+		}
+
+		Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.apply.ddl"), false);
+		if (applyDDL) {
+			config.setProperty("hibernate.hbm2ddl.auto", "update");
+		}
+
+		// In Hibernate 4.3:
+		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
+		serviceRegistryBuilder.applySettings(config.getProperties());
+		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
+		logger.info("HibernatePersistorService init()");
 	}
 
 	@Override
 	public void shutdown() {
 		sessionFactory.close();
+	}
+
+	// -------------------------- IRequestLifecycle implementation
+
+	@Override
+	public void beforeRequest() {
+	}
+
+	@Override
+	public void afterResponse() {
+		endSession();
+	}
+
+	// -------------------------- IPersistorService implementation
+
+	@Override
+	public void setInitData(List<Class> entities, String prefix) {
+		this.entities = entities;
+		this.prefix = prefix;
 	}
 
 	@Override
@@ -244,41 +294,6 @@ public class HibernatePersistorService implements IPersistorService {
 	}
 
 	//----------------------------- PRIVATE METHODS
-
-	private void init() {
-		config = new Configuration();
-		for (Class entity : entities) {
-			config.addAnnotatedClass(entity);
-		}
-
-		config.setInterceptor(new CreateModifyInterceptor());
-
-		String username = ConfigUtil.getString(true, getConfig("db.username"));
-
-		config.configure("hibernate.cfg.xml")
-			.setProperty("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
-			.setProperty("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
-			.setProperty("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
-			.setProperty("hibernate.connection.username", username)
-			.setProperty("hibernate.connection.password", ConfigUtil.getString(true, getConfig("db.password")))
-			.setProperty("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
-
-		String schema = ConfigUtil.getString(false, getConfig("db.schema"));
-		if (schema != null) {
-			config.setProperty("hibernate.default_schema", schema);
-		}
-
-		Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.apply.ddl"), false);
-		if (applyDDL) {
-			config.setProperty("hibernate.hbm2ddl.auto", "update");
-		}
-
-		// In Hibernate 4.3:
-		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
-		serviceRegistryBuilder.applySettings(config.getProperties());
-		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
-		logger.info("HibernatePersistorService init()");
-	}
 
 	//----------------------------- INNER CLASSES
 

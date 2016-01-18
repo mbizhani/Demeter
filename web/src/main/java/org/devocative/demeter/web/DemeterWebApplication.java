@@ -41,7 +41,7 @@ public class DemeterWebApplication extends WebApplication {
 		getMarkupSettings().setCompressWhitespace(true);
 		getMarkupSettings().setDefaultMarkupEncoding("UTF-8");
 
-		//getRequestCycleListeners().add(new WPortalRequestCycleListener(portalService, isClientMode));
+		getRequestCycleListeners().add(new DemeterRequestCycleListener());
 		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger("dmt.web.request.timeout", 10)));
 		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean("dmt.web.ignore.missed.resource", false));
 

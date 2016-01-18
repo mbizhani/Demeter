@@ -1,7 +1,6 @@
 package org.devocative.demeter.imodule;
 
-public interface DModule {
-	void onInit();
+import org.devocative.demeter.iservice.IApplicationLifecycle;
 
-	void onShutdown();
+public interface DModule extends IApplicationLifecycle {
 }
