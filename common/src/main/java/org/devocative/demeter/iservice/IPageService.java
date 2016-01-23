@@ -13,4 +13,6 @@ public interface IPageService {
 	DPageInstance getPageInstanceByURI(String uri);
 
 	Map<String, List<DPageInstance>> getDefaultPages();
+
+	String getUriByPage(Class dPageClass);
 }

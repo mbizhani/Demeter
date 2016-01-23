@@ -99,4 +99,19 @@ public class DemeterPageService implements IPageService {
 		}
 		return result;
 	}
+
+	@Override
+	public String getUriByPage(Class dPageClass) {
+		DPageInfo pageInfo = persistorService
+			.createQueryBuilder()
+			.addFrom(DPageInfo.class, "ent")
+			.addWhere("and ent.type = :type")
+			.addParam("type", dPageClass.getName())
+			.object();
+		if (pageInfo != null) {
+			return pageInfo.getBaseUri();
+		}
+
+		return null;
+	}
 }
