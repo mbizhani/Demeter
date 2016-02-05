@@ -8,6 +8,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
 import org.devocative.wickomp.html.menu.OMenuItem;
@@ -68,7 +69,7 @@ public class Index extends WebPage {
 			Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
 			return (DPage) constructor.newInstance("content", params);
 		} catch (Exception e) {
-			throw new RuntimeException("Can't create DPage: " + type, e);
+			throw new DSystemException("Can't create DPage: " + type, e);
 		}
 	}
 

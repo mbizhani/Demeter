@@ -2,6 +2,7 @@ package org.devocative.demeter.core;
 
 import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
@@ -15,10 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ModuleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(ModuleLoader.class);
@@ -68,13 +66,19 @@ public class ModuleLoader {
 		if (!modulesName.contains("Demeter")) {
 			modulesName.add("Demeter");
 		}
+
+		Set<String> moduleShortNames = new HashSet<>();
 		for (String moduleName : modulesName) {
 			InputStream moduleXMLResource = ModuleLoader.class.getResourceAsStream(String.format("/%s.xml", moduleName));
-			XModule module = (XModule) xStream.fromXML(moduleXMLResource);
+			XModule xModule = (XModule) xStream.fromXML(moduleXMLResource);
 			logger.info("Module Found: {}", moduleName);
-			MODULES.put(moduleName, module);
 
-			//TODO check module short-name-clash
+			if (moduleShortNames.contains(xModule.getShortName())) {
+				throw new DSystemException("Duplicate module short name: " + xModule.getShortName());
+			}
+			moduleShortNames.add(xModule.getShortName());
+
+			MODULES.put(moduleName, xModule);
 		}
 	}
 
@@ -115,10 +119,10 @@ public class ModuleLoader {
 						logger.info("Local persistor for module [{}] initialized with [{}] entities.",
 							moduleName, module.getEntities().size());
 					} else {
-						throw new RuntimeException("Module has local persistor but no entities: " + moduleName);
+						throw new DSystemException("Module has local persistor but no entities: " + moduleName);
 					}
 				} else {
-					throw new RuntimeException("No local persistor for module: " + moduleName);
+					throw new DSystemException("No local persistor for module: " + moduleName);
 				}
 			} else {
 				if (module.getEntities() != null && module.getEntities().size() > 0) {
@@ -141,7 +145,7 @@ public class ModuleLoader {
 				registerSpringBean(beanName, dModule);
 				logger.info("DModule bean created: {}", beanName);
 			} catch (Exception e) {
-				throw new RuntimeException("DModule class: " + module.getMainClass(), e);
+				throw new DSystemException("DModule class: " + module.getMainClass(), e);
 			}
 		}
 	}
@@ -170,7 +174,7 @@ public class ModuleLoader {
 			try {
 				classes.add(Class.forName(entity.getType()));
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException("Entity class not found: " + entity);
+				throw new DSystemException("Entity class not found: " + entity);
 			}
 		}
 		return classes;
