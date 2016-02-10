@@ -16,11 +16,21 @@ import org.devocative.demeter.iservice.IPageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class DemeterWebApplication extends WebApplication {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebApplication.class);
+
+	private static final String APP_INNER_CTX = "/dvc";
+
+	private List<String> modulesRelatedCSS = new ArrayList<>();
+
+	public static DemeterWebApplication get() {
+		return (DemeterWebApplication) WebApplication.get();
+	}
 
 	@Override
 	public Class<? extends Page> getHomePage() {
@@ -45,28 +55,19 @@ public class DemeterWebApplication extends WebApplication {
 		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger("dmt.web.request.timeout", 10)));
 		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean("dmt.web.ignore.missed.resource", false));
 
-		mountPage("/", Index.class);
+		mountPage(APP_INNER_CTX, Index.class);
 
 		initModulesForWeb();
+
+		getServletContext().getRealPath(".");
 	}
 
-	private void initModulesForWeb() {
-		IPageService pageService = ModuleLoader.getApplicationContext().getBean(IPageService.class);
-		pageService.disableAllPageInfo();
+	public String getInnerContext() {
+		return APP_INNER_CTX;
+	}
 
-		Map<String, XModule> modules = ModuleLoader.getModules();
-		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
-			XModule module = moduleEntry.getValue();
-			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(module.getMainResource()));
-
-			List<XDPage> dPages = module.getDPages();
-			for (XDPage dPage : dPages) {
-				pageService.addOrUpdatePageInfo(dPage.getType(), module.getShortName().toLowerCase(),
-					dPage.getUri(), dPage.getTitle());
-			}
-
-			logger.info("Module [{}] inited for web", moduleEntry.getKey());
-		}
+	public List<String> getModulesRelatedCSS() {
+		return modulesRelatedCSS;
 	}
 
 	@Override
@@ -77,5 +78,33 @@ public class DemeterWebApplication extends WebApplication {
 	@Override
 	protected void onDestroy() {
 		ModuleLoader.shutdown();
+	}
+
+	private void initModulesForWeb() {
+		IPageService pageService = ModuleLoader.getApplicationContext().getBean(IPageService.class);
+		pageService.disableAllPageInfo();
+
+		String appBaseDir = getServletContext().getRealPath(".");
+
+		Map<String, XModule> modules = ModuleLoader.getModules();
+		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
+			XModule xModule = moduleEntry.getValue();
+			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(xModule.getMainResource()));
+
+			List<XDPage> dPages = xModule.getDPages();
+			for (XDPage dPage : dPages) {
+				pageService.addOrUpdatePageInfo(dPage.getType(), xModule.getShortName().toLowerCase(),
+					dPage.getUri(), dPage.getTitle());
+			}
+
+			// TODO theme-based CSS finding & loading
+			String moduleRelatedCSS = String.format("/styles/main/d_%s.css", xModule.getShortName().toLowerCase());
+			if (new File(appBaseDir + moduleRelatedCSS).exists()) {
+				modulesRelatedCSS.add(moduleRelatedCSS);
+				logger.info("Module related CSS: {}", moduleRelatedCSS);
+			}
+
+			logger.info("Module [{}] inited for web", moduleEntry.getKey());
+		}
 	}
 }

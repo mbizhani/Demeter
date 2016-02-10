@@ -1,68 +1,28 @@
 <!DOCTYPE html>
 <html wicket:id="html" xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 
-    <title wicket:id="headerTitle">[Demeter]</title>
-
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-
-        #ajaxVeil {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            font-weight: bold;
-            width: 100%;
-            text-align: center;
-        }
-
-        #ajaxVeilSign {
-            background-color: #aa1111;
-            color: #d5d59d;
-            display: inline-block;
-        }
-    </style>
-
-    <script type="text/javascript">
-        window.onload = setupFunc;
-        function setupFunc() {
-            hideBusySign();
-            Wicket.Event.subscribe('/ajax/call/beforeSend', function (attributes, jqXHR, settings) {
-                showBusySign()
-            });
-            Wicket.Event.subscribe('/ajax/call/complete', function (attributes, jqXHR, textStatus) {
-                hideBusySign()
-            });
-        }
-        function hideBusySign() {
-            $("#ajaxVeil").css("display", "none");
-        }
-        function showBusySign() {
-            $("#ajaxVeil").css("display", "inline");
-        }
-    </script>
+	<title wicket:id="headerTitle">[Demeter]</title>
 </head>
 
 <body>
 
 <div id="ajaxVeil">
-    <div id="ajaxVeilSign">
-        <wicket:message key="icon.busy.sign"/>
-    </div>
+	<div id="ajaxVeilSign">
+		<wicket:message key="icon.busy.sign"/>
+	</div>
 </div>
-<div wicket:id="header" style="background-color:#CECECE">
-    <div style="font-size:20px;margin:0 10px;">
-        <wicket:message key="label.APP"/>
-    </div>
-    <div wicket:id="menu"></div>
+<div class="dmt-header" wicket:id="header" style="background-color:#CECECE">
+	<div class="dmt-header-brand" style="font-size:20px;margin:0 10px;">
+		<wicket:message key="label.APP"/>
+	</div>
+	<div class="dmt-header-menu" wicket:id="menu"></div>
 </div>
 
-<div style="margin: 5px;">
-    <div wicket:id="content"></div>
+<div class="dmt-body" style="margin: 5px;">
+	<div wicket:id="content"></div>
 </div>
 </body>
 </html>
