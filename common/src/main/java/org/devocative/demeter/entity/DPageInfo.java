@@ -23,7 +23,7 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 	@Column(name = "c_module", nullable = false)
 	private String module;
 
-	@Column(name = "c_base_uri", nullable = false)
+	@Column(name = "c_base_uri", nullable = false, unique = true)
 	private String baseUri;
 
 	@Column(name = "b_enabled", nullable = false)

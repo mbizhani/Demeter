@@ -26,24 +26,28 @@ public class DemeterPageService implements IPageService {
 
 	@Override
 	public void addOrUpdatePageInfo(String type, String module, String uriInModule, String title) {
+		String baseUri;
+		if (uriInModule.startsWith("/")) {
+			baseUri = String.format("/%s%s", module, uriInModule);
+		} else {
+			baseUri = String.format("/%s/%s", module, uriInModule);
+		}
+
 		DPageInfo pageInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInfo.class, "ent")
-			.addWhere("and ent.type = :type")
+			.addWhere("and (ent.type = :type or ent.baseUri = :uri)")
 			.addParam("type", type)
+			.addParam("uri", baseUri)
 			.object();
 
 		if (pageInfo == null) {
 			pageInfo = new DPageInfo();
-			pageInfo.setType(type);
-			pageInfo.setModule(module);
 		}
+		pageInfo.setType(type);
+		pageInfo.setModule(module);
 		pageInfo.setEnabled(true);
-		if (uriInModule.startsWith("/")) {
-			pageInfo.setBaseUri(String.format("/%s%s", module, uriInModule));
-		} else {
-			pageInfo.setBaseUri(String.format("/%s/%s", module, uriInModule));
-		}
+		pageInfo.setBaseUri(baseUri);
 		persistorService.saveOrUpdate(pageInfo);
 
 		DPageInstance pageInstance = persistorService
@@ -53,12 +57,17 @@ public class DemeterPageService implements IPageService {
 			.addWhere("and ent.refId is null")
 			.addParam("pageId", pageInfo.getId())
 			.object();
+
 		if (pageInstance == null) {
 			pageInstance = new DPageInstance();
 		}
+		if (title != null && title.startsWith(D_PAGE_RESOURCE_KEY_PREFIX)) {
+			title = String.format("%sdPage.%s.%s", D_PAGE_RESOURCE_KEY_PREFIX, module,
+				title.substring(D_PAGE_RESOURCE_KEY_PREFIX.length()));
+		}
 		pageInstance.setTitle(title);
 		pageInstance.setPageInfo(pageInfo);
-		pageInstance.setUri(pageInfo.getBaseUri());
+		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
 		persistorService.saveOrUpdate(pageInstance);
 
 		persistorService
