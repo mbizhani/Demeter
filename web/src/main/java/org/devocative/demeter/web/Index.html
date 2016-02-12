@@ -15,12 +15,16 @@
 	</div>
 </div>
 
-<div class="dmt-header" wicket:id="header">
-	<div class="dmt-header-brand">
-		<wicket:message key="label.APP"/>
-	</div>
-	<div class="dmt-header-menu" wicket:id="menu"></div>
-</div>
+<table cellspacing="0" class="dmt-header" wicket:id="header">
+	<tr>
+		<td class="dmt-header-brand">
+			<wicket:message key="label.APP"/>
+		</td>
+		<td class="dmt-header-menu">
+			<div wicket:id="menu"></div>
+		</td>
+	</tr>
+</table>
 
 <div class="dmt-content">
 	<div wicket:id="content"></div>
