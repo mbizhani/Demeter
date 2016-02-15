@@ -2,23 +2,35 @@ package org.devocative.demeter.web;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.TransparentWebMarkupContainer;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.ExternalLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.web.dPage.LoginDPage;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
+import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +49,13 @@ public class Index extends WebPage {
 	@Inject
 	private IPageService pageService;
 
+	@Inject
+	private ISecurityService securityService;
+
 	private Component content;
+	private UserVO currentUser;
+	private WebMarkupContainer signIn, signOut, editProfile;
+	private List<OMenuItem> oMenuItems = new ArrayList<>();
 
 	public Index(PageParameters pageParameters) {
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
@@ -75,9 +93,38 @@ public class Index extends WebPage {
 		html.add(content);
 
 		TransparentWebMarkupContainer header = new TransparentWebMarkupContainer("header");
-		header.add(new WMenuBar("menu", createDefaultMenus()));
+		header.add(new WMenuBar("menu", oMenuItems));
 		header.setVisible(pageParameters.get("printable").isNull());
 		html.add(header);
+
+		// ---------------------- User Menu: FullName, Sign In & Out
+
+		WebMarkupContainer userMenu = new WebMarkupContainer("userMenu");
+		userMenu.setVisible(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
+		html.add(userMenu);
+
+		userMenu.add(new Label("userInfo", new PropertyModel<>(this, "currentUser.fullName")));
+
+		editProfile = new AjaxLink("editProfile") {
+			@Override
+			public void onClick(AjaxRequestTarget target) {
+
+			}
+		};
+		userMenu.add(editProfile);
+
+		signOut = new Link("signOut") {
+			@Override
+			public void onClick() {
+				securityService.signOut();
+			}
+		};
+		signIn = new ExternalLink("signIn", UrlUtil.createBaseUri(LoginDPage.class));
+
+		userMenu.add(signIn);
+		userMenu.add(signOut);
+
+		add(new FontAwesomeBehavior());
 	}
 
 	@Override
@@ -92,7 +139,28 @@ public class Index extends WebPage {
 		}
 	}
 
+	@Override
+	protected void onBeforeRender() {
+		currentUser = securityService.getCurrentUser();
+
+		createDefaultMenus();
+
+		if (currentUser.isAuthenticated()) {
+			signIn.setVisible(false);
+			signOut.setVisible(true);
+			editProfile.setVisible(true);
+		} else {
+			signIn.setVisible(true);
+			signOut.setVisible(false);
+			editProfile.setVisible(false);
+		}
+
+		super.onBeforeRender();
+	}
+
 	private void createDPageFromType(String type, List<String> params) {
+		//TODO check security for creating DPage
+
 		try {
 			Class<?> dPageClass = Class.forName(type);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
@@ -111,22 +179,25 @@ public class Index extends WebPage {
 		}
 	}
 
-	private List<OMenuItem> createDefaultMenus() {
+	private void createDefaultMenus() {
 		String ctx = getRequest().getContextPath() + DemeterWebApplication.get().getInnerContext();
 
-		List<OMenuItem> result = new ArrayList<>();
-		result.add(new OMenuItem(ctx, new ResourceModel("label.home")));
-		Map<String, List<DPageInstance>> defaultPages = pageService.getDefaultPages();
-		for (Map.Entry<String, List<DPageInstance>> entry : defaultPages.entrySet()) {
-			OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));
-			List<OMenuItem> subMenus = new ArrayList<>();
-			for (DPageInstance pageInstance : entry.getValue()) {
-				subMenus.add(new OMenuItem(ctx + pageInstance.getUri(), getDPageTitle(pageInstance)));
+		oMenuItems.clear();
+		oMenuItems.add(new OMenuItem(ctx, new ResourceModel("label.home")));
+
+		// TODO replace DPageInstance with a VO
+		Map<String, List<DPageInstance>> defaultPages = currentUser.getDefaultPages();
+		if (defaultPages != null) {
+			for (Map.Entry<String, List<DPageInstance>> entry : defaultPages.entrySet()) {
+				OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));
+				List<OMenuItem> subMenus = new ArrayList<>();
+				for (DPageInstance pageInstance : entry.getValue()) {
+					subMenus.add(new OMenuItem(ctx + pageInstance.getUri(), getDPageTitle(pageInstance)));
+				}
+				moduleEntry.setSubMenus(subMenus);
+				oMenuItems.add(moduleEntry);
 			}
-			moduleEntry.setSubMenus(subMenus);
-			result.add(moduleEntry);
 		}
-		return result;
 	}
 
 	private IModel<String> getDPageTitle(DPageInstance dPageInstance) {

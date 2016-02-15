@@ -23,6 +23,13 @@
 		<td class="dmt-header-menu">
 			<div wicket:id="menu"></div>
 		</td>
+		<td wicket:id="userMenu" class="dmt-header-user">
+			<wicket:container wicket:id="userInfo"></wicket:container>
+			&nbsp;&nbsp;
+			<a wicket:id="editProfile" class="fa fa-pencil"></a>
+			<a wicket:id="signIn" class="fa fa-sign-in" wicket:message="title:User.sign.in"></a>
+			<a wicket:id="signOut" class="fa fa-sign-out" wicket:message="title:User.sign.out"></a>
+		</td>
 	</tr>
 </table>
 

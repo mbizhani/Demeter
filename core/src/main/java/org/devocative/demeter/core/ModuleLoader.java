@@ -3,6 +3,7 @@ package org.devocative.demeter.core;
 import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
@@ -62,7 +63,7 @@ public class ModuleLoader {
 		xStream.processAnnotations(XModule.class);
 		xStream.alias("dependency", String.class);
 
-		List<String> modulesName = ConfigUtil.getList(false, "dmt.modules");
+		List<String> modulesName = ConfigUtil.getList(DemeterConfigKey.Modules);
 		if (!modulesName.contains("Demeter")) {
 			modulesName.add("Demeter");
 		}
@@ -83,7 +84,7 @@ public class ModuleLoader {
 	}
 
 	private static void initSpringContext() {
-		boolean clientMode = ConfigUtil.getString("dmt.service.remote.host", null) != null;
+		boolean clientMode = ConfigUtil.getString(DemeterConfigKey.ServiceRemoteHost) != null;
 		logger.info("Client Mode: {}", clientMode);
 
 		String[] springConfigLocations = new String[MODULES.size()];

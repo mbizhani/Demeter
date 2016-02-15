@@ -18,7 +18,7 @@ public abstract class DModuleException extends RuntimeException {
 	}
 
 	public String getMessage() {
-		return String.format("Err.%s.%s", moduleName, errorCode.getCode());
+		return String.format("err.%s.%s", moduleName, errorCode.getCode());
 	}
 
 	public String getDefaultDescription() {

@@ -9,6 +9,7 @@ import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.core.xml.XDPage;
 import org.devocative.demeter.core.xml.XModule;
@@ -52,8 +53,8 @@ public class DemeterWebApplication extends WebApplication {
 		getMarkupSettings().setDefaultMarkupEncoding("UTF-8");
 
 		getRequestCycleListeners().add(new DemeterRequestCycleListener());
-		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger("dmt.web.request.timeout", 10)));
-		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean("dmt.web.ignore.missed.resource", false));
+		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger(DemeterConfigKey.WebRequestTimeout)));
+		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean(DemeterConfigKey.WebIgnoreMissedResource));
 
 		mountPage(APP_INNER_CTX, Index.class);
 

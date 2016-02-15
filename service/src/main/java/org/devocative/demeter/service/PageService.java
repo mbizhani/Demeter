@@ -1,5 +1,6 @@
 package org.devocative.demeter.service;
 
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service("dmtPageService")
-public class DemeterPageService implements IPageService {
+public class PageService implements IPageService {
 
 	@Autowired
 	private IPersistorService persistorService;
@@ -62,8 +63,10 @@ public class DemeterPageService implements IPageService {
 			pageInstance = new DPageInstance();
 		}
 		if (title != null && title.startsWith(D_PAGE_RESOURCE_KEY_PREFIX)) {
-			title = String.format("%sdPage.%s.%s", D_PAGE_RESOURCE_KEY_PREFIX, module,
-				title.substring(D_PAGE_RESOURCE_KEY_PREFIX.length()));
+			String prefix = String.format("%sdPage.%s.", D_PAGE_RESOURCE_KEY_PREFIX, module);
+			if (!title.startsWith(prefix)) {
+				throw new DSystemException("Invalid DPage title key: " + title);
+			}
 		}
 		pageInstance.setTitle(title);
 		pageInstance.setPageInfo(pageInfo);
@@ -121,6 +124,6 @@ public class DemeterPageService implements IPageService {
 			return pageInfo.getBaseUri();
 		}
 
-		return null;
+		return "";
 	}
 }

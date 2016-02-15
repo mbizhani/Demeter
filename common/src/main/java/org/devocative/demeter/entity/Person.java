@@ -201,11 +201,6 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 		this.version = version;
 	}
 
-	public String getFullname() {
-		return (getFirstName() != null ? getFirstName() : "") + " " +
-			(getLastName() != null ? getLastName() : "");
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

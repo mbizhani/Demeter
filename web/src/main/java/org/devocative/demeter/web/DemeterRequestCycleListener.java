@@ -5,6 +5,8 @@ import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +17,16 @@ import java.util.Map;
 public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private static Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
 
-	Map<String, IRequestLifecycle> requestLifecycleBeans;
+	private Map<String, IRequestLifecycle> requestLifecycleBeans;
+	private ISecurityService securityService;
 
 	public DemeterRequestCycleListener() {
 		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		for (String beanName : requestLifecycleBeans.keySet()) {
 			logger.info("IRequestLifecycle bean: {}", beanName);
 		}
+
+		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
 	}
 
 	@Override
@@ -32,7 +37,8 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 			}
 		}
 
-		//TODO current user from session to service
+		UserVO currentUser = DemeterWebSession.get().getUserVO();
+		securityService.authenticate(currentUser);
 	}
 
 	@Override
@@ -43,11 +49,13 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 			}
 		}
 
-		//TODO current user from service to session
+		UserVO currentUser = securityService.getCurrentUser();
+		DemeterWebSession.get().setUserVO(currentUser);
 	}
 
 	@Override
 	public IRequestHandler onException(RequestCycle cycle, Exception ex) {
+		//TODO an Exception Page
 		return super.onException(cycle, ex);
 	}
 

@@ -14,6 +14,6 @@ public class DemeterException extends DModuleException {
 
 	// Main Constructor
 	public DemeterException(DemeterErrorCode errorCode, String errorParameter, Throwable cause) {
-		super("DMT", errorCode, errorParameter, cause);
+		super("dmt", errorCode, errorParameter, cause);
 	}
 }

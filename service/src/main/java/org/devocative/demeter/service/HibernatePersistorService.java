@@ -341,7 +341,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 				if ("creatorUserId".equals(propertyNames[i])) {
 					if (securityService != null)
-						state[i] = securityService.getCurrentUserId();
+						state[i] = securityService.getCurrentUser().getUserId();
 					continue;
 				}
 
@@ -356,7 +356,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 				if ("modifierUserId".equals(propertyNames[i])) {
 					if (securityService != null)
-						state[i] = securityService.getCurrentUserId();
+						state[i] = securityService.getCurrentUser().getUserId();
 					continue;
 				}
 

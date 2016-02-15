@@ -17,7 +17,8 @@
 	</entities>
 
 	<dPages>
-		<dPage type="org.devocative.demeter.web.dPage.InfoDPage" title="KEY:Info" uri="/info"/>
+		<dPage type="org.devocative.demeter.web.dPage.InfoDPage" title="KEY:dPage.dmt.Info" uri="/info"/>
+		<dPage type="org.devocative.demeter.web.dPage.LoginDPage" title="KEY:dPage.dmt.Login" uri="/login"/>
 	</dPages>
 
 	<!--<configKeys>
