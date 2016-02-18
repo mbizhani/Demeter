@@ -27,6 +27,9 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@Column(name = "c_uri", nullable = false, unique = true)
 	private String uri;
 
+	@Column(name = "b_in_menu", nullable = false)
+	private Boolean inMenu;
+
 	@NotAudited
 	@Column(name = "c_ref_id")
 	private String refId;
@@ -90,6 +93,14 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public Boolean getInMenu() {
+		return inMenu;
+	}
+
+	public void setInMenu(Boolean inMenu) {
+		this.inMenu = inMenu;
 	}
 
 	public String getRefId() {
@@ -172,5 +183,21 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@Override
 	public void setVersion(Integer version) {
 		this.version = version;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof DPageInstance)) return false;
+
+		DPageInstance that = (DPageInstance) o;
+
+		return !(getId() != null ? !getId().equals(that.getId()) : that.getId() != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+		return getId() != null ? getId().hashCode() : 0;
 	}
 }

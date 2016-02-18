@@ -5,6 +5,7 @@ import org.devocative.demeter.entity.ICreationDate;
 import org.devocative.demeter.entity.ICreatorUser;
 import org.devocative.demeter.entity.IModificationDate;
 import org.devocative.demeter.entity.IModifierUser;
+import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.ELockMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -29,7 +30,6 @@ public class HibernatePersistorService implements IPersistorService {
 	private String prefix;
 
 	private SessionFactory sessionFactory;
-	private Configuration config;
 
 	@Autowired
 	private ISecurityService securityService;
@@ -38,7 +38,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void init() {
-		config = new Configuration();
+		Configuration config = new Configuration();
 		for (Class entity : entities) {
 			config.addAnnotatedClass(entity);
 		}
@@ -75,6 +75,11 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public void shutdown() {
 		sessionFactory.close();
+	}
+
+	@Override
+	public ApplicationLifecyclePriority getLifecyclePriority() {
+		return ApplicationLifecyclePriority.High;
 	}
 
 	// -------------------------- IRequestLifecycle implementation
@@ -257,7 +262,16 @@ public class HibernatePersistorService implements IPersistorService {
 		return session;
 	}
 
-	Session getSession() {
+	void checkTransaction(Session session) {
+		Transaction trx = session.getTransaction();
+		if (trx == null || !trx.isActive()) {
+			session.beginTransaction();
+		}
+	}
+
+	//----------------------------- PRIVATE METHODS
+
+	private Session getSession() {
 		int noOfRetry = 0;
 		while (true) {
 			try {
@@ -282,18 +296,9 @@ public class HibernatePersistorService implements IPersistorService {
 		}
 	}
 
-	void checkTransaction(Session session) {
-		Transaction trx = session.getTransaction();
-		if (trx == null || !trx.isActive()) {
-			session.beginTransaction();
-		}
-	}
-
-	String getConfig(String key) {
+	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
 	}
-
-	//----------------------------- PRIVATE METHODS
 
 	//----------------------------- INNER CLASSES
 

@@ -15,6 +15,7 @@
 		<!ELEMENT dPages (dPage)*>
 		<!ELEMENT dPage (#PCDATA)>
 		<!ATTLIST dPage
+				inMenu (true|false) #REQUIRED
 				type CDATA #REQUIRED
 				title CDATA #REQUIRED
 				uri CDATA #REQUIRED>

@@ -1,5 +1,6 @@
 package org.devocative.demeter.service;
 
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -85,8 +86,11 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 	}
 
 	public IQueryBuilder addJoin(String alias, String joinExpr) {
-		if (!join.containsKey(alias))
+		if (!join.containsKey(alias)) {
 			join.put(alias, joinExpr);
+		} else {
+			throw new DSystemException("Duplicate join alias: " + alias);
+		}
 		return this;
 	}
 
@@ -205,8 +209,12 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		}
 
 		if (join.size() > 0) {
-			for (String joinExpr : join.values())
-				concatAllBuilder.append(" ").append(joinExpr).append(" ");
+			for (Map.Entry<String, String> entry : join.entrySet()) {
+				concatAllBuilder
+					.append(" join ")
+					.append(entry.getValue()).append(" ") // join expression
+					.append(entry.getKey()).append(" "); // join alias
+			}
 		}
 
 		if (whereClauseBuilder.length() > 0) {

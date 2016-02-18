@@ -66,18 +66,30 @@ public class Index extends WebPage {
 		DPageInstance pageInstance;
 		IModel<String> headerTitle = new Model<>("");
 
+		// URI: [/<CONTEXT>]/<INNER CONTEXT>
+		// PARAMS: /<MODULE>/<D PAGE>[/REF ID PARAM]
+		// INDEX   0         1         2
+
 		if (pageParameters.getIndexedCount() > 0) {
 			StringBuilder uriBuilder = new StringBuilder();
 			for (int i = 0; i < pageParameters.getIndexedCount() && i < 2; i++) {
 				uriBuilder.append("/").append(pageParameters.get(i));
 			}
-			pageInstance = pageService.getPageInstanceByURI(uriBuilder.toString());
+			String refIdParam = pageParameters.getIndexedCount() >= 2 ? pageParameters.get(2).toString() : null;
+			pageInstance = pageService.getPageInstanceByURI(uriBuilder.toString(), refIdParam);
 			if (pageInstance != null) {
 				headerTitle = getDPageTitle(pageInstance);
 
 				List<String> params = new ArrayList<>();
-				for (int i = 2; i < pageParameters.getIndexedCount(); i++) {
-					params.add(pageParameters.get(i).toString());
+				if (pageInstance.getRefId() != null) {
+					params.add(pageInstance.getRefId());
+					for (int i = 3; i < pageParameters.getIndexedCount(); i++) {
+						params.add(pageParameters.get(i).toString());
+					}
+				} else {
+					for (int i = 2; i < pageParameters.getIndexedCount(); i++) {
+						params.add(pageParameters.get(i).toString());
+					}
 				}
 
 				createDPageFromType(pageInstance.getPageInfo().getType(), params);
@@ -108,7 +120,7 @@ public class Index extends WebPage {
 		editProfile = new AjaxLink("editProfile") {
 			@Override
 			public void onClick(AjaxRequestTarget target) {
-
+				//TODO implement it!!!
 			}
 		};
 		userMenu.add(editProfile);

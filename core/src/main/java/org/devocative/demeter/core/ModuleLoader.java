@@ -8,7 +8,9 @@ import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,10 +24,14 @@ import java.util.*;
 public class ModuleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(ModuleLoader.class);
 
-	private static final Map<String, XModule> MODULES = new HashMap<>();
+	private static final Map<String, XModule> MODULES = new LinkedHashMap<>();
+
+	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_HIGH = new HashMap<>();
+	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_MEDIUM = new HashMap<>();
+	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_LOW = new HashMap<>();
+
 	private static ApplicationContext appCtx;
 
-	private static Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS;
 
 	public static ApplicationContext getApplicationContext() {
 		return appCtx;
@@ -65,7 +71,7 @@ public class ModuleLoader {
 
 		List<String> modulesName = ConfigUtil.getList(DemeterConfigKey.Modules);
 		if (!modulesName.contains("Demeter")) {
-			modulesName.add("Demeter");
+			modulesName.add(0, "Demeter");
 		}
 
 		Set<String> moduleShortNames = new HashSet<>();
@@ -123,7 +129,7 @@ public class ModuleLoader {
 						throw new DSystemException("Module has local persistor but no entities: " + moduleName);
 					}
 				} else {
-					throw new DSystemException("No local persistor for module: " + moduleName);
+					throw new DSystemException("No local persistor bean for module: " + moduleName);
 				}
 			} else {
 				if (module.getEntities() != null && module.getEntities().size() > 0) {
@@ -152,18 +158,68 @@ public class ModuleLoader {
 	}
 
 	private static void initApplicationLifecycle() {
-		APP_LIFECYCLE_BEANS = appCtx.getBeansOfType(IApplicationLifecycle.class);
+		Map<String, IApplicationLifecycle> beansOfType = appCtx.getBeansOfType(IApplicationLifecycle.class);
+		for (Map.Entry<String, IApplicationLifecycle> entry : beansOfType.entrySet()) {
+			if(entry.getValue().getLifecyclePriority() == null) {
+				throw new DSystemException("IApplicationLifecycle has no priority: " + entry.getKey());
+			}
 
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS.entrySet()) {
+			switch (entry.getValue().getLifecyclePriority()) {
+				case High:
+					APP_LIFECYCLE_BEANS_HIGH.put(entry.getKey(), entry.getValue());
+					break;
+				case Medium:
+					APP_LIFECYCLE_BEANS_MEDIUM.put(entry.getKey(), entry.getValue());
+					break;
+				case Low:
+					APP_LIFECYCLE_BEANS_LOW.put(entry.getKey(), entry.getValue());
+					break;
+			}
+		}
+
+		//TODO it is "system" user as current user
+		ISecurityService iSecurityService = appCtx.getBean(ISecurityService.class);
+		if(iSecurityService != null) {
+			iSecurityService.authenticate(new UserVO());
+		}
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_HIGH.entrySet()) {
 			entry.getValue().init();
-			logger.info("Application lifecycle bean init(): {}", entry.getKey());
+			logger.info("Application lifecycle bean (High) init(): {}", entry.getKey());
+		}
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_MEDIUM.entrySet()) {
+			entry.getValue().init();
+			logger.info("Application lifecycle bean (Medium) init(): {}", entry.getKey());
+		}
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_LOW.entrySet()) {
+			entry.getValue().init();
+			logger.info("Application lifecycle bean (Low) init(): {}", entry.getKey());
+		}
+
+		Map<String, IPersistorService> iPersistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
+		for (IPersistorService persistorService : iPersistorServiceMap.values()) {
+			persistorService.endSession();
 		}
 	}
 
 	private static void shutdownApplicationLifecycle() {
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS.entrySet()) {
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_LOW.entrySet()) {
 			entry.getValue().shutdown();
-			logger.info("Application lifecycle bean shutdown(): {}", entry.getKey());
+			logger.info("Application lifecycle bean (Low) shutdown(): {}", entry.getKey());
+		}
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_MEDIUM.entrySet()) {
+			entry.getValue().shutdown();
+			logger.info("Application lifecycle bean (Medium) shutdown(): {}", entry.getKey());
+		}
+
+		//TODO Do we need IPersistorService.endSession() call here?
+
+		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_HIGH.entrySet()) {
+			entry.getValue().shutdown();
+			logger.info("Application lifecycle bean (High) shutdown(): {}", entry.getKey());
 		}
 	}
 

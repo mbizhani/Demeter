@@ -8,12 +8,7 @@ import java.util.Map;
 public interface IPageService {
 	String D_PAGE_RESOURCE_KEY_PREFIX = "KEY:";
 
-
-	void disableAllPageInfo();
-
-	void addOrUpdatePageInfo(String type, String module, String uriInModule, String title);
-
-	DPageInstance getPageInstanceByURI(String uri);
+	DPageInstance getPageInstanceByURI(String uri, String refIdParam);
 
 	Map<String, List<DPageInstance>> getDefaultPages();
 

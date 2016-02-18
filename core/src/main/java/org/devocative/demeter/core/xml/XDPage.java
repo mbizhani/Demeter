@@ -6,6 +6,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("dPage")
 public class XDPage {
 	@XStreamAsAttribute
+	private Boolean inMenu;
+
+	@XStreamAsAttribute
 	private String type;
 
 	@XStreamAsAttribute
@@ -14,8 +17,14 @@ public class XDPage {
 	@XStreamAsAttribute
 	private String uri;
 
-	@XStreamAsAttribute
-	private boolean singleton;
+	public Boolean getInMenu() {
+		return inMenu;
+	}
+
+	public XDPage setInMenu(Boolean inMenu) {
+		this.inMenu = inMenu;
+		return this;
+	}
 
 	public String getType() {
 		return type;
@@ -41,15 +50,6 @@ public class XDPage {
 
 	public XDPage setUri(String uri) {
 		this.uri = uri;
-		return this;
-	}
-
-	public boolean isSingleton() {
-		return singleton;
-	}
-
-	public XDPage setSingleton(boolean singleton) {
-		this.singleton = singleton;
 		return this;
 	}
 }

@@ -11,9 +11,7 @@ import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.ModuleLoader;
-import org.devocative.demeter.core.xml.XDPage;
 import org.devocative.demeter.core.xml.XModule;
-import org.devocative.demeter.iservice.IPageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +57,6 @@ public class DemeterWebApplication extends WebApplication {
 		mountPage(APP_INNER_CTX, Index.class);
 
 		initModulesForWeb();
-
-		getServletContext().getRealPath(".");
 	}
 
 	public String getInnerContext() {
@@ -82,21 +78,12 @@ public class DemeterWebApplication extends WebApplication {
 	}
 
 	private void initModulesForWeb() {
-		IPageService pageService = ModuleLoader.getApplicationContext().getBean(IPageService.class);
-		pageService.disableAllPageInfo();
-
 		String appBaseDir = getServletContext().getRealPath(".");
 
 		Map<String, XModule> modules = ModuleLoader.getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
 			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(xModule.getMainResource()));
-
-			List<XDPage> dPages = xModule.getDPages();
-			for (XDPage dPage : dPages) {
-				pageService.addOrUpdatePageInfo(dPage.getType(), xModule.getShortName().toLowerCase(),
-					dPage.getUri(), dPage.getTitle());
-			}
 
 			// TODO theme-based CSS finding & loading
 			String moduleRelatedCSS = String.format("/styles/main/d_%s.css", xModule.getShortName().toLowerCase());
