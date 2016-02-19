@@ -36,7 +36,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	@NotAudited
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_page_info", foreignKey = @ForeignKey(name = "page_inst2page_info"))
+	@JoinColumn(name = "f_page_info", foreignKey = @ForeignKey(name = "pageinst2pageinfo"))
 	private DPageInfo pageInfo;
 
 	//TODO private List<Role> roles;
@@ -49,7 +49,8 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	@NotAudited
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_creator_user", foreignKey = @ForeignKey(name = "prsn_crtrusr2user"), insertable = false, updatable = false)
+	@JoinColumn(name = "f_creator_user", insertable = false, updatable = false,
+		foreignKey = @ForeignKey(name = "pageinst_crtrusr2user"))
 	private User creatorUser;
 
 	@NotAudited
@@ -61,7 +62,8 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	private Date modificationDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_modifier_user", foreignKey = @ForeignKey(name = "prsn_mdfrusr2user"), insertable = false, updatable = false)
+	@JoinColumn(name = "f_modifier_user", insertable = false, updatable = false,
+		foreignKey = @ForeignKey(name = "pageinst_mdfrusr2user"))
 	private User modifierUser;
 
 	@Column(name = "f_modifier_user")

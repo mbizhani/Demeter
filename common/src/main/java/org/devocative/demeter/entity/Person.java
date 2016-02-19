@@ -59,7 +59,8 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 
 	@NotAudited
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_creator_user", foreignKey = @ForeignKey(name = "prsn_crtrusr2user"), insertable = false, updatable = false)
+	@JoinColumn(name = "f_creator_user", insertable = false, updatable = false,
+		foreignKey = @ForeignKey(name = "prsn_crtrusr2user"))
 	private User creatorUser;
 
 	@NotAudited
@@ -71,7 +72,8 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 	private Date modificationDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_modifier_user", foreignKey = @ForeignKey(name = "prsn_mdfrusr2user"), insertable = false, updatable = false)
+	@JoinColumn(name = "f_modifier_user", insertable = false, updatable = false,
+		foreignKey = @ForeignKey(name = "prsn_mdfrusr2user"))
 	private User modifierUser;
 
 	@Column(name = "f_modifier_user")
