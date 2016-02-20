@@ -34,8 +34,10 @@ public class PageService implements IPageService, IApplicationLifecycle {
 			XModule xModule = moduleEntry.getValue();
 
 			List<XDPage> dPages = xModule.getDPages();
-			for (XDPage dPage : dPages) {
-				addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
+			if (dPages != null) {
+				for (XDPage dPage : dPages) {
+					addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
+				}
 			}
 		}
 	}
