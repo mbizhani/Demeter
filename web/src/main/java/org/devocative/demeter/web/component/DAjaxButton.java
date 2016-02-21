@@ -7,11 +7,15 @@ import org.devocative.wickomp.form.WAjaxButton;
 import org.devocative.wickomp.html.HTMLBase;
 import org.devocative.wickomp.html.WMessager;
 import org.devocative.wickomp.wrcs.EasyUIBehavior;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
 
 public class DAjaxButton extends WAjaxButton {
+	private static final Logger logger = LoggerFactory.getLogger(DAjaxButton.class);
+
 	public DAjaxButton(String id) {
 		this(id, null, null);
 	}
@@ -34,6 +38,8 @@ public class DAjaxButton extends WAjaxButton {
 
 	@Override
 	protected void onException(AjaxRequestTarget target, Exception e) {
+		logger.error("DAjaxButton: " + getId(), e);
+
 		if (e instanceof DModuleException) {
 			DModuleException de = (DModuleException) e;
 			String error = getString(de.getMessage(), null, de.getDefaultDescription());
