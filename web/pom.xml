@@ -125,6 +125,9 @@
 				<configuration>
 					<useTestClasspath>true</useTestClasspath>
 					<webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
+					<webApp>
+						<contextPath>${jetty.context}</contextPath>
+					</webApp>
 					<stopKey/>
 					<stopPort/>
 					<connectors>
