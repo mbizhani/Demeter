@@ -58,6 +58,8 @@ public class Index extends WebPage {
 	private List<OMenuItem> oMenuItems = new ArrayList<>();
 
 	public Index(PageParameters pageParameters) {
+		currentUser = securityService.getCurrentUser();
+
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
 		html.add(new AttributeModifier("dir", DemeterWebSession.get().getLayoutDirection().toString()));
 		add(html);
@@ -129,6 +131,7 @@ public class Index extends WebPage {
 			@Override
 			public void onClick() {
 				securityService.signOut();
+				setResponsePage(Index.class);
 			}
 		};
 		signIn = new ExternalLink("signIn", UrlUtil.createBaseUri(LoginDPage.class));
@@ -176,18 +179,23 @@ public class Index extends WebPage {
 		try {
 			Class<?> dPageClass = Class.forName(type);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
-				Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
-				content = (DPage) constructor.newInstance("content", params);
+				//TODO handle authorization correctly
+				if (currentUser.isAuthenticated() || dPageClass.equals(LoginDPage.class)) {
+					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
+					content = (DPage) constructor.newInstance("content", params);
+				} else {
+					content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
+				}
 			} else {
 				logger.error("The class is not DPage: " + type);
-				content = new Label("content", new ResourceModel("err.DPageNotFound"));
+				content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 			}
 		} catch (ClassNotFoundException e) {
 			logger.error("DPage class not found: " + type);
-			content = new Label("content", new ResourceModel("err.DPageNotFound"));
+			content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 		} catch (Exception e) {
 			logger.error("DPage instantiation problem: " + type, e);
-			content = new Label("content", new ResourceModel("err.DPageInstantiation"));
+			content = new Label("content", new ResourceModel("err.dmt.DPageInstantiation"));
 		}
 	}
 
