@@ -40,4 +40,6 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 	void executeUpdate(String simpleQuery);
 
 	IQueryBuilder createQueryBuilder();
+
+	IQueryBuilder createQueryBuilderByFilter(Class entity, Serializable filter, String... ignoreProperties);
 }

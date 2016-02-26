@@ -50,5 +50,21 @@
 			<artifactId>hibernate-envers</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.2</version>
+		</dependency>
+
+		<!-- TEST SCOPED -->
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.38</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 </project>
