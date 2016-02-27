@@ -21,7 +21,7 @@ public class ORESTLinkColumn<T> extends OColumn<T> {
 
 	@Override
 	public String cellValue(T bean, String id, int colNo, String url) {
-		String baseUri = UrlUtil.createBaseUri(dPageClass);
+		String baseUri = UrlUtil.createUri(dPageClass, true);
 		Object firstParam = PropertyResolver.getValue(firstParamProperty, bean);
 		return String.format("<a href=\"%s/%s\">%s</a>", baseUri, firstParam, link.toString());
 	}

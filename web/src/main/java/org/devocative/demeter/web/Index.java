@@ -96,7 +96,7 @@ public class Index extends WebPage {
 
 				createDPageFromType(pageInstance.getPageInfo().getType(), params);
 			} else {
-				content = new Label("content", new ResourceModel("err.UnknownDPage"));
+				content = new Label("content", new ResourceModel("err.dmt.UnknownDPage"));
 			}
 		} else {
 			content = new Label("content", "");
@@ -134,7 +134,7 @@ public class Index extends WebPage {
 				setResponsePage(Index.class);
 			}
 		};
-		signIn = new ExternalLink("signIn", UrlUtil.createBaseUri(LoginDPage.class));
+		signIn = new ExternalLink("signIn", UrlUtil.createUri(LoginDPage.class, true));
 
 		userMenu.add(signIn);
 		userMenu.add(signOut);
@@ -200,10 +200,8 @@ public class Index extends WebPage {
 	}
 
 	private void createDefaultMenus() {
-		String ctx = getRequest().getContextPath() + DemeterWebApplication.get().getInnerContext();
-
 		oMenuItems.clear();
-		oMenuItems.add(new OMenuItem(ctx, new ResourceModel("label.home")));
+		oMenuItems.add(new OMenuItem(UrlUtil.createUri("", true), new ResourceModel("label.home")));
 
 		// TODO replace DPageInstance with a VO
 		Map<String, List<DPageInstance>> defaultPages = currentUser.getDefaultPages();
@@ -212,7 +210,7 @@ public class Index extends WebPage {
 				OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));
 				List<OMenuItem> subMenus = new ArrayList<>();
 				for (DPageInstance pageInstance : entry.getValue()) {
-					subMenus.add(new OMenuItem(ctx + pageInstance.getUri(), getDPageTitle(pageInstance)));
+					subMenus.add(new OMenuItem(UrlUtil.createUri(pageInstance, true), getDPageTitle(pageInstance)));
 				}
 				moduleEntry.setSubMenus(subMenus);
 				oMenuItems.add(moduleEntry);

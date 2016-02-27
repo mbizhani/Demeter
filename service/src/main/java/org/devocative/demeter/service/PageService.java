@@ -105,6 +105,8 @@ public class PageService implements IPageService, IApplicationLifecycle {
 
 	@Override
 	public String getUriByPage(Class dPageClass) {
+		// TODO using cache!!!
+
 		DPageInfo pageInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInfo.class, "ent")
@@ -115,6 +117,7 @@ public class PageService implements IPageService, IApplicationLifecycle {
 			return pageInfo.getBaseUri();
 		}
 
+		// TODO check this return or throws exception
 		return "";
 	}
 
