@@ -57,6 +57,9 @@ public class DemeterWebApplication extends WebApplication {
 		mountPage(APP_INNER_CTX, Index.class);
 
 		initModulesForWeb();
+
+		logger.info("** Demeter Application Up! **");
+		logger.info("*****************************");
 	}
 
 	public String getInnerContext() {

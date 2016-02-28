@@ -6,10 +6,17 @@ import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("dmtUserService")
 public class UserService implements IUserService {
 	@Autowired
 	private IPersistorService persistorService;
+
+	@Override
+	public List<User> list() {
+		return persistorService.list(User.class);
+	}
 
 	@Override
 	public User getUser(String username) {
