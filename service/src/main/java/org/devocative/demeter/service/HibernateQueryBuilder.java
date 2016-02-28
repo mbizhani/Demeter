@@ -1,6 +1,10 @@
 package org.devocative.demeter.service;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.DSystemException;
+import org.devocative.demeter.iservice.persistor.FilterOption;
+import org.devocative.demeter.iservice.persistor.Filterer;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -8,6 +12,11 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class HibernateQueryBuilder implements IQueryBuilder {
@@ -173,6 +182,140 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return result;
 	}
 
+	//----------------------------- PRIVATE METHODS - Search Builder
+
+	@Override
+	public IQueryBuilder applyFilter(Class entity, String alias, Serializable filter, String... ignoreProperties) {
+		PropertyDescriptor[] descriptors = PropertyUtils.getPropertyDescriptors(filter);
+
+		List<String> ignorePropsList = new ArrayList<>();
+		ignorePropsList.add("class");
+		Collections.addAll(ignorePropsList, ignoreProperties);
+
+		for (PropertyDescriptor descriptor : descriptors) {
+			String propName = descriptor.getName();
+			Method readMethod = descriptor.getReadMethod();
+			FilterOption search = findAnnotation(FilterOption.class, filter, descriptor);
+			if (search != null && search.property().length() > 0) {
+				propName = search.property();
+			}
+
+			if (ignorePropsList.contains(propName)) {
+				continue;
+			}
+
+			try {
+				Object value = readMethod.invoke(filter);
+
+				if (value == null) {
+					continue;
+				}
+
+				// ---------- Property: String
+				if (value instanceof String) {
+					if (search != null && !search.useLike()) {
+						addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
+						addParam(propName + "_", value);
+					} else {
+						addWhere(String.format("and %1$s.%2$s like :%2$s_", alias, propName));
+						addParam(propName + "_", "%" + value + "%");
+					}
+				}
+
+				// ---------- Property: RangeVO
+				else if (value instanceof RangeVO) {
+					RangeVO rangeVO = (RangeVO) value;
+					if (rangeVO.getLower() != null) {
+						addWhere(String.format("and %1$s.%2$s >= :%2$s_from", alias, propName));
+						addParam(propName + "_from", rangeVO.getLower());
+					}
+					if (rangeVO.getUpper() != null) {
+						addWhere(String.format("and %1$s.%2$s < :%2$s_to", alias, propName));
+						addParam(propName + "_to", rangeVO.getUpper());
+					}
+				}
+
+				// ---------- Property: an object of Filterer
+				else if (value.getClass().isAnnotationPresent(Filterer.class)) {
+					Class entityPropertyType;
+					String newAlias = alias + "_" + propName;
+					addJoin(newAlias, String.format("join %s.%s %s", alias, propName, newAlias));
+					PropertyDescriptor propertyDescriptor = getDescriptor(entity, propName);
+					if (propertyDescriptor == null) {
+						throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
+							propName, entity.getName()));
+					}
+					if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
+						entityPropertyType = (Class) propertyDescriptor.getReadMethod().getGenericParameterTypes()[0];
+					} else {
+						entityPropertyType = propertyDescriptor.getPropertyType();
+					}
+					applyFilter(entityPropertyType, newAlias, (Serializable) value);
+				}
+
+				// ---------- Property: Collection
+				else if (value instanceof Collection) {
+					Collection col = (Collection) value;
+					if (col.size() > 0) {
+						// Check the entity side if it is a collection, which implies that the association is
+						// one2many or many2many and it needs a join
+						PropertyDescriptor propertyDescriptor = getDescriptor(entity, propName);
+						if (propertyDescriptor == null) {
+							throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
+								propName, entity.getName()));
+						}
+						if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
+							String newAlias = alias + "_" + propName;
+							addJoin(newAlias, String.format("join %s.%s %s", alias, propName, newAlias));
+							addWhere(String.format("and %1$s in :p_%1$s", newAlias));
+							addParam("p_" + newAlias, value);
+						} else {
+							addWhere(String.format("and %1$s.%2$s in :%2$s_", alias, propName));
+							addParam(propName + "_", value);
+						}
+					}
+				}
+				// ---------- Property: other primitive types
+				else {
+					addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
+					addParam(propName + "_", value);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return this;
+	}
+
+	private PropertyDescriptor getDescriptor(Class<?> entity, String propName) throws Exception {
+		PropertyDescriptor result = null;
+		PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(entity);
+		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+			if (propertyDescriptor.getName().equals(propName)) {
+				result = propertyDescriptor;
+				break;
+			}
+		}
+		return result;
+	}
+
+	private <T extends Annotation> T findAnnotation(Class<? extends Annotation> annot, Object obj,
+													PropertyDescriptor propertyDescriptor) {
+		T result = null;
+		Method readMethod = propertyDescriptor.getReadMethod();
+		if (readMethod != null)
+			result = (T) readMethod.getAnnotation(annot);
+
+		if (result == null) {
+			try {
+				Field field = obj.getClass().getDeclaredField(propertyDescriptor.getName());
+				result = (T) field.getAnnotation(annot);
+			} catch (NoSuchFieldException e) {
+			}
+		}
+		return result;
+	}
 
 	// -------------------------- PRIVATE METHODS
 

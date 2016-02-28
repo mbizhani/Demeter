@@ -1,5 +1,6 @@
 package org.devocative.demeter.iservice.persistor;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -42,4 +43,6 @@ public interface IQueryBuilder {
 	<T> T object();
 
 	int update();
+
+	IQueryBuilder applyFilter(Class entity, String alias, Serializable filter, String... ignoreProperties);
 }

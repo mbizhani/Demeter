@@ -54,40 +54,80 @@ public class TestCore {
 
 	@Test
 	public void test02() {
+		if (skip) {
+			return;
+		}
+
 		PersonFVO f1 = new PersonFVO()
 			.setFirstName("Jo");
-		int sizeF1 = persistorService.createQueryBuilderByFilter(Person.class, f1).list().size();
+		int sizeF1 = persistorService
+			.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(Person.class, "ent")
+			.applyFilter(Person.class, "ent", f1)
+			.list()
+			.size();
 		logger.info("sizeF1 = {}", sizeF1);
 		Assert.assertTrue(sizeF1 > 0);
 
 		PersonFVO f2 = new PersonFVO()
 			.setLastName("Bl");
-		int sizeF2 = persistorService.createQueryBuilderByFilter(Person.class, f2).list().size();
+		int sizeF2 = persistorService
+			.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(Person.class, "ent")
+			.applyFilter(Person.class, "ent", f2)
+			.list()
+			.size();
 		logger.info("sizeF2 = {}", sizeF2);
 		Assert.assertTrue(sizeF2 == 0);
 
 		PersonFVO f3 = new PersonFVO()
 			.setHasUser(true);
-		int sizeF3 = persistorService.createQueryBuilderByFilter(Person.class, f3).list().size();
+		int sizeF3 = persistorService
+			.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(Person.class, "ent")
+			.applyFilter(Person.class, "ent", f3)
+			.list()
+			.size();
 		logger.info("sizeF3 = {}", sizeF3);
 		Assert.assertTrue(sizeF3 == 0);
 
 		PersonFVO f4 = new PersonFVO()
 			.setBirthRegDate(new RangeVO<>(null, new Date()));
-		int sizeF4 = persistorService.createQueryBuilderByFilter(Person.class, f4).list().size();
+		int sizeF4 = persistorService
+			.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(Person.class, "ent")
+			.applyFilter(Person.class, "ent", f4)
+			.list()
+			.size();
 		logger.info("sizeF4 = {}", sizeF4);
 		Assert.assertTrue(sizeF4 > 0);
 
 		PersonFVO f5 = new PersonFVO()
 			.setMyDate(new RangeVO<>(new Date(), null));
-		int sizeF5 = persistorService.createQueryBuilderByFilter(Person.class, f5).list().size();
+		int sizeF5 = persistorService
+			.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(Person.class, "ent")
+			.applyFilter(Person.class, "ent", f5)
+			.list()
+			.size();
 		logger.info("sizeF5 = {}", sizeF5);
 		Assert.assertTrue(sizeF5 == 0);
 
 		try {
 			PersonFVO f6 = new PersonFVO()
 				.setSillyProp("Hi");
-			persistorService.createQueryBuilderByFilter(Person.class, f6).list().size();
+			persistorService
+				.createQueryBuilder()
+				.addSelect("select ent")
+				.addFrom(Person.class, "ent")
+				.applyFilter(Person.class, "ent", f6)
+				.list()
+				.size();
 			Assert.assertTrue(false);
 		} catch (Exception e) {
 			logger.error("f6: Filter by 'sillyProp' = {}", e.getMessage());
