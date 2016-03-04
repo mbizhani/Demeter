@@ -32,7 +32,7 @@ public class XModule {
 
 	private List<XDPage> dPages;
 
-	private List<XKey> configKeys;
+	private List<XDTask> tasks;
 
 	public String getShortName() {
 		return shortName;
@@ -107,11 +107,11 @@ public class XModule {
 		return this;
 	}
 
-	public List<XKey> getConfigKeys() {
-		return configKeys;
+	public List<XDTask> getTasks() {
+		return tasks;
 	}
 
-	public void setConfigKeys(List<XKey> configKeys) {
-		this.configKeys = configKeys;
+	public void setTasks(List<XDTask> tasks) {
+		this.tasks = tasks;
 	}
 }

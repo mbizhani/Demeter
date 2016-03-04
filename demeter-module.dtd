@@ -1,4 +1,4 @@
-<!ELEMENT module (dependencies|entities|dPages)*>
+<!ELEMENT module (dependencies|entities|dPages|tasks)*>
 		<!ATTLIST module
 				shortName CDATA #REQUIRED
 				mainClass CDATA #REQUIRED
@@ -19,3 +19,9 @@
 				type CDATA #REQUIRED
 				title CDATA #REQUIRED
 				uri CDATA #REQUIRED>
+		<!ELEMENT tasks (task)*>
+		<!ELEMENT task (#PCDATA)>
+		<!ATTLIST task
+				type CDATA #REQUIRED
+				cronExpression CDATA
+				calendar (jalali|gregorian)>

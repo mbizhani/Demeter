@@ -12,7 +12,12 @@ public enum DemeterConfigKey implements IConfigKey {
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
 	LdapUrl(true, "dmt.ldap.url"),
 	LdapAttrFirstName("dmt.ldap.attr.firstname"),
-	LdapAttrLastName("dmt.ldap.attr.lastname");
+	LdapAttrLastName("dmt.ldap.attr.lastname"),
+
+	TaskEnabled("dmt.task.enabled", true),
+	TaskPoolSize("dmt.task.pool.size", 5),
+	TaskPoolMax("dmt.task.pool.max", 10),
+	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),;
 
 
 	private String key;

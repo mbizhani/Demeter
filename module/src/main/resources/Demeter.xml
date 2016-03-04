@@ -12,9 +12,18 @@
 	<entities>
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>
 		<entity type="org.devocative.demeter.entity.DPageInstance"/>
+
+		<entity type="org.devocative.demeter.entity.DTaskInfo"/>
+		<entity type="org.devocative.demeter.entity.DTaskSchedule"/>
+		<entity type="org.devocative.demeter.entity.DTaskLog"/>
+
 		<entity type="org.devocative.demeter.entity.Person"/>
 		<entity type="org.devocative.demeter.entity.User"/>
 	</entities>
+
+	<tasks>
+		<!--<task type="org.devocative.demeter.service.task.SimpleDTask" cronExpression="0 * * * * ?" />-->
+	</tasks>
 
 	<dPages>
 		<dPage type="org.devocative.demeter.web.dPage.InfoDPage"
@@ -27,9 +36,4 @@
 			   uri="/login"
 			   inMenu="false"/>
 	</dPages>
-
-	<!--<configKeys>
-		<key name="asd" type="Boolean" required="true"/>
-		<key name="wsx" type="String"/>
-	</configKeys>-->
 </module>
