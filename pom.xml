@@ -28,9 +28,9 @@
 		<spring.version>4.2.4.RELEASE</spring.version>
 		<wicket.version>7.2.0</wicket.version>
 
-		<jetty.version>8.1.16.v20140903</jetty.version>
+		<jetty.version>9.2.15.v20160210</jetty.version>
 		<jetty.context>/ctx</jetty.context>
-		<servlet.version>2.5</servlet.version>
+		<servlet.version>3.0.1</servlet.version>
 	</properties>
 
 	<dependencies>
@@ -61,7 +61,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.5.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>

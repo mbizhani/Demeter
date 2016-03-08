@@ -3,7 +3,7 @@ package org.devocative.demeter.web.component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
 import org.devocative.demeter.web.DemeterExceptionToMessageHandler;
-import org.devocative.wickomp.form.WAjaxButton;
+import org.devocative.wickomp.form.WAsyncAjaxButton;
 import org.devocative.wickomp.html.HTMLBase;
 import org.devocative.wickomp.html.WMessager;
 import org.devocative.wickomp.wrcs.EasyUIBehavior;
@@ -11,17 +11,17 @@ import org.devocative.wickomp.wrcs.EasyUIBehavior;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class DAjaxButton extends WAjaxButton {
-	public DAjaxButton(String id) {
+public abstract class DAsyncAjaxButton extends WAsyncAjaxButton {
+	public DAsyncAjaxButton(String id) {
 		this(id, null, null);
 	}
 
-	public DAjaxButton(String id, IModel<String> caption) {
+	public DAsyncAjaxButton(String id, IModel<String> caption) {
 		this(id, caption, null);
 	}
 
 	// Main Constructor
-	public DAjaxButton(String id, IModel<String> caption, HTMLBase icon) {
+	public DAsyncAjaxButton(String id, IModel<String> caption, HTMLBase icon) {
 		super(id, caption, icon);
 
 		setExceptionToMessageHandler(DemeterExceptionToMessageHandler.get());
