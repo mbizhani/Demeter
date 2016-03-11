@@ -62,6 +62,25 @@ public class ModuleLoader {
 		logger.info("### MODULE LOADER SHUTDOWNED");
 	}
 
+	public static void generatePersistorSchemaDiff() {
+		ConfigUtil.removeKey("dmt.db.apply.ddl");
+
+		initModules();
+		initSpringContext();
+		initPersistorServices();
+
+		Map<String, IPersistorService> persistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
+		for (Map.Entry<String, IPersistorService> entry : persistorServiceMap.entrySet()) {
+			logger.info("Persistor init: {}", entry.getKey());
+			entry.getValue().init();
+		}
+
+		for (Map.Entry<String, IPersistorService> entry : persistorServiceMap.entrySet()) {
+			logger.info("Persistor schema diff: {}", entry.getKey());
+			entry.getValue().generateSchemaDiff();
+		}
+	}
+
 	// ---------------------------- LIFECYCLIC METHODS
 
 	private static void initModules() {

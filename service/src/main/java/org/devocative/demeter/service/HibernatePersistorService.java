@@ -13,6 +13,7 @@ import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ public class HibernatePersistorService implements IPersistorService {
 	private List<Class> entities;
 	private String prefix;
 
+	private Configuration config;
 	private SessionFactory sessionFactory;
 
 	@Autowired
@@ -38,7 +40,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void init() {
-		Configuration config = new Configuration();
+		config = new Configuration();
 		for (Class entity : entities) {
 			config.addAnnotatedClass(entity);
 		}
@@ -239,6 +241,14 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public IQueryBuilder createQueryBuilder() {
 		return new HibernateQueryBuilder(this);
+	}
+
+	@Override
+	public void generateSchemaDiff() {
+		SchemaUpdate schemaUpdate = new SchemaUpdate(config);
+		schemaUpdate.setDelimiter(";");
+		schemaUpdate.setFormat(true);
+		schemaUpdate.execute(true, false);
 	}
 
 	//----------------------------- PACKAGE METHODS
