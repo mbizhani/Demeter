@@ -8,8 +8,13 @@ import org.devocative.demeter.core.xml.XDTask;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DTaskInfo;
 import org.devocative.demeter.entity.DTaskSchedule;
-import org.devocative.demeter.iservice.*;
+import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
+import org.devocative.demeter.iservice.IApplicationLifecycle;
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.iservice.task.DTask;
+import org.devocative.demeter.iservice.task.ITaskResultCallback;
+import org.devocative.demeter.iservice.task.ITaskService;
 import org.devocative.demeter.vo.UserVO;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -138,19 +143,27 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public Future<?> start(Class<? extends DTask> taskClass) {
-		return start(taskClass, null);
+		return start(taskClass, null, null, null);
 	}
 
 	@Override
 	public Future<?> start(Class<? extends DTask> taskClass, String id) {
+		return start(taskClass, id, null, null);
+	}
+
+	@Override
+	public Future<?> start(Class<? extends DTask> taskClass, String id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
-			throw new DSystemException("Task is not enabled");
+			throw new DSystemException("Task handling is not enabled");
 		}
 
-		logger.info("Starting Task: {} - {}", taskClass, id);
+		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskClass, id, inputData);
 
 		DTask dTask = ModuleLoader.getApplicationContext().getBean(taskClass);
-		dTask.setId(id);
+		dTask
+			.setId(id)
+			.setInputData(inputData)
+			.setResultCallback(resultCallback);
 
 		Future<?> result = null;
 		if (TASKS.containsKey(dTask.getKey())) {

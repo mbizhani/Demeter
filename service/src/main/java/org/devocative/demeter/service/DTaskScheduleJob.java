@@ -2,9 +2,9 @@ package org.devocative.demeter.service;
 
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.entity.DTaskSchedule;
-import org.devocative.demeter.iservice.DTask;
-import org.devocative.demeter.iservice.ITaskService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.iservice.task.DTask;
+import org.devocative.demeter.iservice.task.ITaskService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

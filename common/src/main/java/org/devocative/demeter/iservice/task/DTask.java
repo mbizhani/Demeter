@@ -1,5 +1,6 @@
-package org.devocative.demeter.iservice;
+package org.devocative.demeter.iservice.task;
 
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.entity.DTaskState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +12,14 @@ public abstract class DTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
 	private static final ThreadLocal<String> KEY = new ThreadLocal<String>();
 
-	private String id;
-	private Date startDate;
+	protected String id;
+	protected Object inputData;
+	protected Date startDate;
+
 	private Long duration;
 	private Exception exception;
 	private DTaskState state = DTaskState.InQueue;
+	private ITaskResultCallback resultCallback;
 
 	private AtomicBoolean continue_ = new AtomicBoolean(true);
 
@@ -35,6 +39,16 @@ public abstract class DTask implements Runnable {
 
 	public DTask setId(String id) {
 		this.id = id;
+		return this;
+	}
+
+	public DTask setInputData(Object inputData) {
+		this.inputData = inputData;
+		return this;
+	}
+
+	public DTask setResultCallback(ITaskResultCallback resultCallback) {
+		this.resultCallback = resultCallback;
 		return this;
 	}
 
@@ -88,6 +102,9 @@ public abstract class DTask implements Runnable {
 				logger.error("DTask error: " + key, e);
 				state = DTaskState.Error;
 				exception = e;
+				if (resultCallback != null) {
+					resultCallback.setException(e);
+				}
 			}
 		} else {
 			state = DTaskState.Invalid;
@@ -105,5 +122,13 @@ public abstract class DTask implements Runnable {
 
 	protected boolean canContinue() {
 		return continue_.get();
+	}
+
+	protected void setResult(Object result) {
+		if (resultCallback != null) {
+			resultCallback.setResult(result);
+		} else {
+			throw new DSystemException("Calling setResult without any ITaskResultCallback for DTask: " + getClass().getName());
+		}
 	}
 }

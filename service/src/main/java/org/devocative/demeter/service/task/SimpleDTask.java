@@ -1,7 +1,7 @@
 package org.devocative.demeter.service.task;
 
-import org.devocative.demeter.iservice.DTask;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.iservice.task.DTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
