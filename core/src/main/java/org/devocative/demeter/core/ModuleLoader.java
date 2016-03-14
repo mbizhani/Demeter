@@ -44,6 +44,7 @@ public class ModuleLoader {
 	public static void registerSpringBean(String beanName, Object bean) {
 		ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) appCtx).getBeanFactory();
 		beanFactory.registerSingleton(beanName, bean);
+		beanFactory.autowireBean(bean);
 	}
 
 	public static void init() {
