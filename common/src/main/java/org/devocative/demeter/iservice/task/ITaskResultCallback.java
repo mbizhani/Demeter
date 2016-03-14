@@ -1,7 +1,7 @@
 package org.devocative.demeter.iservice.task;
 
 public interface ITaskResultCallback {
-	void setResult(Object result);
+	void onTaskResult(String id, Object result);
 
-	void setException(Exception e);
+	void onTaskException(Exception e);
 }

@@ -142,24 +142,48 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	// ------------ ITaskService
 
 	@Override
-	public Future<?> start(Class<? extends DTask> taskClass) {
-		return start(taskClass, null, null, null);
+	public Future<?> start(String taskBeanId) {
+		return start(taskBeanId, null, null, null);
 	}
 
 	@Override
-	public Future<?> start(Class<? extends DTask> taskClass, String id) {
-		return start(taskClass, id, null, null);
+	public Future<?> start(String taskBeanId, String id) {
+		return start(taskBeanId, id, null, null);
 	}
 
 	@Override
-	public Future<?> start(Class<? extends DTask> taskClass, String id, Object inputData, ITaskResultCallback resultCallback) {
+	public Future<?> start(String taskBeanId, String id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
 			throw new DSystemException("Task handling is not enabled");
 		}
 
-		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskClass, id, inputData);
+		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskBeanId, id, inputData);
 
+		DTask dTask = (DTask) ModuleLoader.getApplicationContext().getBean(taskBeanId);
+		return startDTask(dTask, id, inputData, resultCallback);
+	}
+
+	@Override
+	public Future<?> start(Class<? extends DTask> taskClass, String id) {
+		if (!enabled) {
+			throw new DSystemException("Task handling is not enabled");
+		}
+
+		logger.info("Starting Task: class=[{}] - id=[{}]", taskClass, id);
 		DTask dTask = ModuleLoader.getApplicationContext().getBean(taskClass);
+		return startDTask(dTask, id, null, null);
+	}
+
+		@Override
+	public void stop(String key) {
+	}
+
+	@Override
+	public void stopAll() {
+	}
+
+	// ------------ private
+	private Future<?> startDTask(DTask dTask, String id, Object inputData, ITaskResultCallback resultCallback) {
 		dTask
 			.setId(id)
 			.setInputData(inputData)
@@ -175,16 +199,6 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		}
 		return result;
 	}
-
-	@Override
-	public void stop(String key) {
-	}
-
-	@Override
-	public void stopAll() {
-	}
-
-	// ------------ private
 
 	private void addOrUpdateTask(String module, XDTask xdTask) {
 		DTaskInfo dTaskInfo = persistorService
