@@ -2,6 +2,7 @@ package org.devocative.demeter.web;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -56,6 +57,7 @@ public class Index extends WebPage {
 	private UserVO currentUser;
 	private WebMarkupContainer signIn, signOut, editProfile;
 	private List<OMenuItem> oMenuItems = new ArrayList<>();
+	private AbstractDefaultAjaxBehavior ajaxBehavior;
 
 	public Index(PageParameters pageParameters) {
 		currentUser = securityService.getCurrentUser();
@@ -140,11 +142,33 @@ public class Index extends WebPage {
 		userMenu.add(signOut);
 
 		add(new FontAwesomeBehavior());
+
+		if (currentUser.getSessionTimeout() > 0) {
+			add(ajaxBehavior = new AbstractDefaultAjaxBehavior() {
+				@Override
+				protected void respond(AjaxRequestTarget target) {
+					logger.info("User reconnect: {}", currentUser.getUsername());
+				}
+			});
+		}
 	}
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
+		String ajaxUrl = "";
+		int pingPeriodBeforeWSTimeout = ConfigUtil.getInteger(DemeterConfigKey.PingServerPeriod);
+		int alertPeriodBeforeSessionTimeout = currentUser.getSessionTimeout();
+
+		if (alertPeriodBeforeSessionTimeout > 0) {
+			alertPeriodBeforeSessionTimeout = (int) ((alertPeriodBeforeSessionTimeout - 0.1 * alertPeriodBeforeSessionTimeout) * 60000);
+			ajaxUrl = ajaxBehavior.getCallbackUrl().toString();
+		}
+
+		String initJSVariables = String.format("var pingServerInterval=%d;var sessionTO=%d;var ajaxUrl='%s';",
+			pingPeriodBeforeWSTimeout, alertPeriodBeforeSessionTimeout, ajaxUrl);
+
 		response.render(INDEX_CSS);
+		response.render(JavaScriptHeaderItem.forScript(initJSVariables, "initJSVariables"));
 		response.render(INDEX_JS);
 
 		// TODO theme-based CSS loading based on user profile

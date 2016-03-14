@@ -9,6 +9,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false),
 	AuthenticationMode("dmt.authentication.mode", "database"),
+	DefaultSessionTimeoutInterval("dmt.session.timeout", -1),
+	PingServerPeriod("dmt.server.ping.period", 270000), //4.5 * 60 * 1000
+
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
 	LdapUrl(true, "dmt.ldap.url"),
 	LdapAttrFirstName("dmt.ldap.attr.firstname"),

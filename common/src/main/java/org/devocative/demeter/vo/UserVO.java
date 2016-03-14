@@ -1,5 +1,7 @@
 package org.devocative.demeter.vo;
 
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInstance;
 
 import java.io.Serializable;
@@ -13,6 +15,7 @@ public class UserVO implements Serializable {
 	private String firstName;
 	private String lastName;
 	private Map<String, List<DPageInstance>> defaultPages;
+	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 
 	public boolean isAuthenticated() {
 		return authenticated;
@@ -69,6 +72,15 @@ public class UserVO implements Serializable {
 
 	public void setDefaultPages(Map<String, List<DPageInstance>> defaultPages) {
 		this.defaultPages = defaultPages;
+	}
+
+	public Integer getSessionTimeout() {
+		return isAuthenticated() ? sessionTimeout : -1;
+	}
+
+	public UserVO setSessionTimeout(Integer sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+		return this;
 	}
 
 	@Override

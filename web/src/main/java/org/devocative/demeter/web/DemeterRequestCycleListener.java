@@ -51,6 +51,7 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 
 		UserVO currentUser = securityService.getCurrentUser();
 		DemeterWebSession.get().setUserVO(currentUser);
+		setSessionTimeout(cycle, currentUser.getSessionTimeout());
 	}
 
 	@Override
@@ -59,12 +60,16 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		return super.onException(cycle, ex);
 	}
 
-	private void setSessionTimeout(RequestCycle cycle, int timeout) {
+	private void setSessionTimeout(RequestCycle cycle, int timeoutInMinutes) {
 		Object containerRequest = cycle.getRequest().getContainerRequest();
 		if (containerRequest instanceof HttpServletRequest) {
 			HttpServletRequest hsr = (HttpServletRequest) containerRequest;
 			HttpSession session = hsr.getSession();
-			session.setMaxInactiveInterval(timeout);
+			if (timeoutInMinutes > 0) {
+				session.setMaxInactiveInterval(timeoutInMinutes * 60);
+			} else {
+				session.setMaxInactiveInterval(-1);
+			}
 		}
 	}
 }

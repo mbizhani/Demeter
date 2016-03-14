@@ -12,6 +12,7 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.core.xml.XModule;
+import org.devocative.wickomp.async.AsyncMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,8 @@ public class DemeterWebApplication extends WebApplication {
 
 		initModulesForWeb();
 
+		AsyncMediator.init(this);
+
 		logger.info("** Demeter Application Up! **");
 		logger.info("*****************************");
 	}
@@ -88,6 +91,8 @@ public class DemeterWebApplication extends WebApplication {
 			XModule xModule = moduleEntry.getValue();
 			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(xModule.getMainResource()));
 
+			loadWebDModule(xModule.getMainResource(), xModule.getShortName().toLowerCase());
+
 			// TODO theme-based CSS finding & loading
 			String moduleRelatedCSS = String.format("/styles/main/d_%s.css", xModule.getShortName().toLowerCase());
 			if (new File(appBaseDir + moduleRelatedCSS).exists()) {
@@ -96,6 +101,22 @@ public class DemeterWebApplication extends WebApplication {
 			}
 
 			logger.info("Module [{}] inited for web", moduleEntry.getKey());
+		}
+	}
+
+	private void loadWebDModule(String classFQN, String module) {
+		WebDModule webDModule = null;
+		try {
+			Class<? extends WebDModule> webDModuleClass = (Class<? extends WebDModule>) Class.forName(classFQN);
+			webDModule = webDModuleClass.newInstance();
+		} catch (Exception e) {
+			logger.info("No WebDModule for module: {}", module);
+		}
+
+		if (webDModule != null) {
+			ModuleLoader.registerSpringBean(module + "WebDModule", webDModule);
+			webDModule.init();
+			logger.info("WebDModule created and inited successfully: {}", module);
 		}
 	}
 }
