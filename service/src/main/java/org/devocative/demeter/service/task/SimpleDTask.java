@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("dmtSimpleDTask")
 @Scope("prototype")
 public class SimpleDTask extends DTask {
 	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
