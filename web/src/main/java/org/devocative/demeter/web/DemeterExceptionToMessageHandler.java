@@ -5,15 +5,6 @@ import org.devocative.demeter.imodule.DModuleException;
 import org.devocative.wickomp.IExceptionToMessageHandler;
 
 public class DemeterExceptionToMessageHandler implements IExceptionToMessageHandler {
-	private static final DemeterExceptionToMessageHandler instance = new DemeterExceptionToMessageHandler();
-
-	public static DemeterExceptionToMessageHandler get() {
-		return instance;
-	}
-
-	private DemeterExceptionToMessageHandler() {
-	}
-
 	@Override
 	public String handleMessage(Component component, Exception e) {
 		if (e instanceof DModuleException) {
@@ -24,6 +15,6 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 			}
 			return error;
 		}
-		return DEFAULT.handleMessage(component, e);
+		return component.getString(e.getMessage(), null, e.getMessage());
 	}
 }
