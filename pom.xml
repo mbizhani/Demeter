@@ -19,19 +19,56 @@
 		<module>core</module>
 	</modules>
 
+	<scm>
+		<connection>scm:git:git@github.com:mbizhani/Demeter.git</connection>
+		<developerConnection>scm:git:git@github.com:mbizhani/Demeter.git</developerConnection>
+		<url>git@github.com:mbizhani/Demeter.git</url>
+		<tag>HEAD</tag>
+	</scm>
+
 	<properties>
 		<adroit.version>1.0-SNAPSHOT</adroit.version>
 		<wickomp.version>1.0-SNAPSHOT</wickomp.version>
 
-		<slf4j.version>1.7.18</slf4j.version>
 		<hibernate.version>4.3.11.Final</hibernate.version>
-		<spring.version>4.2.4.RELEASE</spring.version>
+		<spring.version>4.2.5.RELEASE</spring.version>
 		<wicket.version>7.2.0</wicket.version>
 
 		<jetty.version>9.2.15.v20160210</jetty.version>
 		<jetty.context>/ctx</jetty.context>
+		<jetty.port>8080</jetty.port>
 		<servlet.version>3.0.1</servlet.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<slf4j.version>1.7.19</slf4j.version>
+		<compiler.version>3.5.1</compiler.version>
+		<lang.level>1.7</lang.level>
+		<release.version>2.5.3</release.version>
+		<source.version>3.0.0</source.version>
+		<javadoc.version>2.10.3</javadoc.version>
+		<gpg.version>1.6</gpg.version>
 	</properties>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>mbizhani</id>
+			<name>Mehdi Bizhani</name>
+			<email>mbizhani@gmail.com</email>
+			<organization>Devocative</organization>
+			<roles>
+				<role>Owner</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
@@ -61,16 +98,72 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>${compiler.version}</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${lang.level}</source>
+					<target>${lang.level}</target>
 					<encoding>UTF-8</encoding>
 					<debug>true</debug>
 					<optimize>true</optimize>
 				</configuration>
 			</plugin>
+
+			<!-- Release -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${release.version}</version>
+				<configuration>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+
+			<!-- Source -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${source.version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- JavaDoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${javadoc.version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
 </project>
