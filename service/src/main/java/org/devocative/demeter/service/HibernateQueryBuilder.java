@@ -1,6 +1,6 @@
 package org.devocative.demeter.service;
 
-import org.apache.commons.beanutils.PropertyUtils;
+import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.iservice.persistor.FilterOption;
@@ -186,7 +186,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	@Override
 	public IQueryBuilder applyFilter(Class entity, String alias, Serializable filter, String... ignoreProperties) {
-		PropertyDescriptor[] descriptors = PropertyUtils.getPropertyDescriptors(filter);
+		PropertyDescriptor[] descriptors = ObjectUtil.getPropertyDescriptors(filter, false);
 
 		List<String> ignorePropsList = new ArrayList<>();
 		ignorePropsList.add("class");
@@ -240,7 +240,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 					Class entityPropertyType;
 					String newAlias = alias + "_" + propName;
 					addJoin(newAlias, String.format("join %s.%s %s", alias, propName, newAlias));
-					PropertyDescriptor propertyDescriptor = getDescriptor(entity, propName);
+					PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
 					if (propertyDescriptor == null) {
 						throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
 							propName, entity.getName()));
@@ -259,7 +259,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 					if (col.size() > 0) {
 						// Check the entity side if it is a collection, which implies that the association is
 						// one2many or many2many and it needs a join
-						PropertyDescriptor propertyDescriptor = getDescriptor(entity, propName);
+						PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
 						if (propertyDescriptor == null) {
 							throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
 								propName, entity.getName()));
@@ -286,18 +286,6 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		}
 
 		return this;
-	}
-
-	private PropertyDescriptor getDescriptor(Class<?> entity, String propName) throws Exception {
-		PropertyDescriptor result = null;
-		PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(entity);
-		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-			if (propertyDescriptor.getName().equals(propName)) {
-				result = propertyDescriptor;
-				break;
-			}
-		}
-		return result;
 	}
 
 	private <T extends Annotation> T findAnnotation(Class<? extends Annotation> annot, Object obj,
