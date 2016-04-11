@@ -25,4 +25,9 @@ public class ORESTLinkColumn<T> extends OColumn<T> {
 		Object firstParam = PropertyResolver.getValue(firstParamProperty, bean);
 		return String.format("<a href=\"%s/%s\">%s</a>", baseUri, firstParam, link.toString());
 	}
+
+	@Override
+	public String footerCellValue(Object o, int i, String s) {
+		throw new RuntimeException("Footer not supported in ORESTLinkColumn");
+	}
 }
