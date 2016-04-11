@@ -8,7 +8,9 @@
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 
-	<name>Demeter</name>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>A base web application for DModule</description>
+	<url>https://github.com/mbizhani/Demeter</url>
 
 	<modules>
 		<module>module</module>
@@ -19,15 +21,36 @@
 		<module>core</module>
 	</modules>
 
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>mbizhani</id>
+			<name>${project.owner}</name>
+			<email>mbizhani@gmail.com</email>
+			<organization>Devocative</organization>
+			<roles>
+				<role>Owner</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+	</developers>
+
 	<scm>
-		<connection>scm:git:git@github.com:mbizhani/Demeter.git</connection>
-		<developerConnection>scm:git:git@github.com:mbizhani/Demeter.git</developerConnection>
-		<url>git@github.com:mbizhani/Demeter.git</url>
+		<connection>scm:git:https://github.com/mbizhani/Demeter.git</connection>
+		<developerConnection>scm:git:https://github.com/mbizhani/Demeter.git</developerConnection>
+		<url>https://github.com/mbizhani/</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<properties>
-		<adroit.version>1.0-SNAPSHOT</adroit.version>
+		<adroit.version>1.0</adroit.version>
 		<wickomp.version>1.0-SNAPSHOT</wickomp.version>
 
 		<hibernate.version>4.3.11.Final</hibernate.version>
@@ -47,28 +70,10 @@
 		<source.version>3.0.0</source.version>
 		<javadoc.version>2.10.3</javadoc.version>
 		<gpg.version>1.6</gpg.version>
+		<jar.version>2.6</jar.version>
+
+		<project.owner>Mehdi Bizhani</project.owner>
 	</properties>
-
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<id>mbizhani</id>
-			<name>Mehdi Bizhani</name>
-			<email>mbizhani@gmail.com</email>
-			<organization>Devocative</organization>
-			<roles>
-				<role>Owner</role>
-				<role>Committer</role>
-			</roles>
-		</developer>
-	</developers>
 
 	<dependencies>
 		<dependency>
@@ -108,16 +113,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- Release -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>${release.version}</version>
-				<configuration>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>
-
 			<!-- Source -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -133,23 +128,79 @@
 				</executions>
 			</plugin>
 
-			<!-- JavaDoc -->
+			<!-- Jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${javadoc.version}</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${jar.version}</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Built-By>${project.owner}</Built-By>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- Release -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${release.version}</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
 			</plugin>
 
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- JavaDoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${javadoc.version}</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- GPG -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${gpg.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<distributionManagement>
 		<snapshotRepository>
