@@ -50,7 +50,7 @@
 	</scm>
 
 	<properties>
-		<adroit.version>1.0</adroit.version>
+		<adroit.version>1.1-SNAPSHOT</adroit.version>
 		<wickomp.version>1.0-SNAPSHOT</wickomp.version>
 
 		<hibernate.version>4.3.11.Final</hibernate.version>
