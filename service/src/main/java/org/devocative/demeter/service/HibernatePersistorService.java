@@ -45,7 +45,12 @@ public class HibernatePersistorService implements IPersistorService {
 			config.addAnnotatedClass(entity);
 		}
 
-		config.setInterceptor(new CreateModifyInterceptor());
+		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
+		if ("CreateModify".equals(interceptor)) {
+			config.setInterceptor(new CreateModifyInterceptor());
+		} else {
+			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
+		}
 
 		String username = ConfigUtil.getString(true, getConfig("db.username"));
 
