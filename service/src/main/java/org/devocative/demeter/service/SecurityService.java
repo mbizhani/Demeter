@@ -1,5 +1,6 @@
 package org.devocative.demeter.service;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
@@ -42,6 +43,8 @@ public class SecurityService implements ISecurityService {
 	@Autowired
 	private IPageService pageService;
 
+	// ------------------------------ PUBLIC METHODS
+
 	@Override
 	public UserVO getCurrentUser() {
 		return CURRENT_USER.get() != null ? CURRENT_USER.get() : getGuest();
@@ -80,6 +83,23 @@ public class SecurityService implements ISecurityService {
 	public void signOut() {
 		CURRENT_USER.set(getGuest());
 	}
+
+	@Override
+	public String getUserDigest(String username) {
+		//TODO the password must be saved symmetric-encoded or the following hash must be persisted somewhere
+		User user = userService.getUser(username);
+
+		if (user != null) {
+			return DigestUtils.md5Hex(
+				user.getUsername() + ":" +
+					ConfigUtil.getString(DemeterConfigKey.SecurityRealm) + ":" +
+					user.getPassword());
+		}
+
+		return null;
+	}
+
+	// ------------------------------ PRIVATE METHODS
 
 	private UserVO authenticateByDatabase(String username, String password) {
 		// TODO implement this!

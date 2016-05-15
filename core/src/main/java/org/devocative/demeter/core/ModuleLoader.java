@@ -31,6 +31,8 @@ public class ModuleLoader {
 	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_LOW = new HashMap<>();
 
 	private static ApplicationContext appCtx;
+	private static boolean inited = false;
+	private static boolean shuted = false;
 
 
 	public static ApplicationContext getApplicationContext() {
@@ -47,20 +49,28 @@ public class ModuleLoader {
 		beanFactory.autowireBean(bean);
 	}
 
-	public static void init() {
-		initModules();
-		initSpringContext();
-		initPersistorServices();
-		initDModules();
+	public synchronized static void init() {
+		if (!inited) {
+			initModules();
+			initSpringContext();
+			initPersistorServices();
+			initDModules();
 
-		initApplicationLifecycle();
+			initApplicationLifecycle();
 
-		logger.info("### MODULE LOADER INITED");
+			logger.info("### MODULE LOADER INITED");
+		}
+
+		inited = true;
 	}
 
-	public static void shutdown() {
-		shutdownApplicationLifecycle();
-		logger.info("### MODULE LOADER SHUTDOWNED");
+	public synchronized static void shutdown() {
+		if (!shuted) {
+			shutdownApplicationLifecycle();
+			logger.info("### MODULE LOADER SHUTDOWNED");
+		}
+
+		shuted = true;
 	}
 
 	public static void generatePersistorSchemaDiff() {

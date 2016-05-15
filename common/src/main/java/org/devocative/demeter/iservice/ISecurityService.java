@@ -10,4 +10,6 @@ public interface ISecurityService {
 	void authenticate(String username, String password);
 
 	void signOut();
+
+	String getUserDigest(String username);
 }
