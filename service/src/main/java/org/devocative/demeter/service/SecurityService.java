@@ -52,7 +52,7 @@ public class SecurityService implements ISecurityService {
 
 	@Override
 	public void authenticate(UserVO userVO) {
-		//TODO some checking
+		//TODO some checking, and maybe reloading the user's data
 		if (userVO != null) {
 			CURRENT_USER.set(userVO);
 		} else {

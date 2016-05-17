@@ -77,6 +77,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
 		}
 
+		// TODO create a system user and set it here
 		system = new UserVO();
 
 		TASKS = new ConcurrentHashMap<>();

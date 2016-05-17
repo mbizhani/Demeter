@@ -4,8 +4,11 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.http.filter.WBaseHttpDigestAuthFilter;
 import org.devocative.wickomp.http.filter.WHttpAuthBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -15,6 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DemeterDigestAuthFilter extends WBaseHttpDigestAuthFilter {
+	private static final Logger logger = LoggerFactory.getLogger(DemeterDigestAuthFilter.class);
+
 	private String nonce;
 	private ScheduledExecutorService nonceRefreshExecutor;
 	private ISecurityService securityService;
@@ -48,6 +53,17 @@ public class DemeterDigestAuthFilter extends WBaseHttpDigestAuthFilter {
 		}, 1, 1, TimeUnit.MINUTES);
 
 		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+
+		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
+
+		logger.info("DemeterDigestAuthFilter Inited: DoAuth =[{}]",
+			ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
+	}
+
+	@Override
+	protected void onBeforeChainAuthenticated(WHttpAuthBean authBean) {
+		// TODO
+		securityService.authenticate(new UserVO().setUsername(authBean.getUsername()));
 	}
 
 	@Override
