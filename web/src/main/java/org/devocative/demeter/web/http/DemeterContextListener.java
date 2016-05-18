@@ -1,5 +1,7 @@
 package org.devocative.demeter.web.http;
 
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.ModuleLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,9 @@ public class DemeterContextListener implements ServletContextListener {
 		logger.info("##== Context Initialized!");
 		ModuleLoader.init();
 		logger.info("##========================");
+
+		boolean deployment = ConfigUtil.getBoolean(DemeterConfigKey.DeploymentMode);
+		sce.getServletContext().setInitParameter("configuration", deployment ? "deployment" : "development");
 	}
 
 	@Override
