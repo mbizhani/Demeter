@@ -1,4 +1,4 @@
-package org.devocative.demeter.web;
+package org.devocative.demeter.web.http;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;

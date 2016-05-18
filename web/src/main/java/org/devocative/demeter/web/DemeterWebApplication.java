@@ -44,7 +44,6 @@ public class DemeterWebApplication extends WebApplication {
 		logger.info("** Demeter Application **");
 		logger.info("** Context Path: {}", getServletContext().getContextPath());
 
-		ModuleLoader.init();
 		getComponentInstantiationListeners().add(new SpringComponentInjector(this, ModuleLoader.getApplicationContext()));
 
 		getMarkupSettings().setStripWicketTags(true);
@@ -79,11 +78,6 @@ public class DemeterWebApplication extends WebApplication {
 	@Override
 	public WebSession newSession(Request request, Response response) {
 		return new DemeterWebSession(request);
-	}
-
-	@Override
-	protected void onDestroy() {
-		ModuleLoader.shutdown();
 	}
 
 	private void initModulesForWeb() {
