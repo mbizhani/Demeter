@@ -7,7 +7,7 @@ import java.util.List;
 
 public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
-	DeploymentMode("dmt.deployment.mode", true),
+	DeploymentMode("dmt.deployment.enabled", true),
 
 	EnabledSecurity("dmt.security.enabled", true),
 	SecurityRealm(true, "dmt.security.realm"),
