@@ -2,13 +2,17 @@ package org.devocative.demeter;
 
 import org.devocative.adroit.IConfigKey;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
 	DeploymentMode("dmt.deployment.mode", true),
 
 	EnabledSecurity("dmt.security.enabled", true),
 	SecurityRealm(true, "dmt.security.realm"),
-	AuthenticationMode("dmt.authentication.mode", "database"),
+	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap")),
+	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
@@ -30,19 +34,36 @@ public enum DemeterConfigKey implements IConfigKey {
 	private String key;
 	private boolean validate = false;
 	private Object defaultValue;
+	private List<?> possibilities;
 
 	DemeterConfigKey(String key) {
-		this.key = key;
+		this(false, key, null);
+	}
+
+	DemeterConfigKey(String key, List<?> possibilities) {
+		this(false, key, possibilities);
 	}
 
 	DemeterConfigKey(boolean validate, String key) {
+		this(validate, key, null);
+	}
+
+	// Main Constructor 1
+	DemeterConfigKey(boolean validate, String key, List<?> possibilities) {
 		this.key = key;
 		this.validate = validate;
+		this.possibilities = possibilities;
 	}
 
 	DemeterConfigKey(String key, Object defaultValue) {
+		this(key, defaultValue, null);
+	}
+
+	// Main Constructor 2
+	DemeterConfigKey(String key, Object defaultValue, List<?> possibilities) {
 		this.key = key;
 		this.defaultValue = defaultValue;
+		this.possibilities = possibilities;
 	}
 
 	@Override
@@ -58,5 +79,10 @@ public enum DemeterConfigKey implements IConfigKey {
 	@Override
 	public Object getDefaultValue() {
 		return defaultValue;
+	}
+
+	@Override
+	public List<?> getPossibleValues() {
+		return possibilities;
 	}
 }
