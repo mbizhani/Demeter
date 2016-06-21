@@ -103,7 +103,7 @@ public abstract class DTask implements Runnable {
 				state = DTaskState.Error;
 				exception = e;
 				if (resultCallback != null) {
-					resultCallback.onTaskException(e);
+					resultCallback.onTaskError(id, e);
 				}
 			}
 		} else {
