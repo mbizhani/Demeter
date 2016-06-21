@@ -30,6 +30,10 @@ public abstract class WebDModule implements ITaskResultCallback {
 		AsyncMediator.sendResponse(asyncToken, responsePayLoad);
 	}
 
+	protected void pushErrorToPage(AsyncToken asyncToken, Exception error) {
+		AsyncMediator.sendError(asyncToken, error);
+	}
+
 	protected void pushBroadcastToPages(Object message) {
 		AsyncMediator.broadcast(message);
 	}
