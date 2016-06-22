@@ -5,6 +5,7 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInstance;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class UserVO implements Serializable {
 	private String lastName;
 	private Map<String, List<DPageInstance>> defaultPages;
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
+	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
 	public boolean isAuthenticated() {
 		return authenticated;
@@ -81,6 +83,15 @@ public class UserVO implements Serializable {
 	public UserVO setSessionTimeout(Integer sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
 		return this;
+	}
+
+	public UserVO addOtherProfileInfo(String key, Object info) {
+		otherProfileInfo.put(key, info);
+		return this;
+	}
+
+	public Object getOtherProfileInfo(String key) {
+		return otherProfileInfo.get(key);
 	}
 
 	@Override
