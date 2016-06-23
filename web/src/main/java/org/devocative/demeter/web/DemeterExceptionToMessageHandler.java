@@ -15,6 +15,11 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 			}
 			return error;
 		}
-		return component.getString(e.getMessage(), null, e.getMessage());
+
+		if (e.getMessage() != null) {
+			return component.getString(e.getMessage(), null, e.getMessage());
+		} else {
+			return "General Error: " + e.getClass().getSimpleName();
+		}
 	}
 }
