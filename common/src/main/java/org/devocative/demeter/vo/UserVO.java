@@ -94,6 +94,10 @@ public class UserVO implements Serializable {
 		return otherProfileInfo.get(key);
 	}
 
+	public Object removeOtherProfileInfo(String key) {
+		return otherProfileInfo.remove(key);
+	}
+
 	@Override
 	public String toString() {
 		return username;
