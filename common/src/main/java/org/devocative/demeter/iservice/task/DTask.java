@@ -2,6 +2,7 @@ package org.devocative.demeter.iservice.task;
 
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.entity.DTaskState;
+import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class DTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
-	private static final ThreadLocal<String> KEY = new ThreadLocal<String>();
 
 	protected String id;
 	protected Object inputData;
@@ -20,10 +20,11 @@ public abstract class DTask implements Runnable {
 	private Exception exception;
 	private DTaskState state = DTaskState.InQueue;
 	private ITaskResultCallback resultCallback;
+	private UserVO currentUser;
 
 	private AtomicBoolean continue_ = new AtomicBoolean(true);
 
-	// -------------- main abstract methods
+	// ------------------------------ ABSTRACT METHODS
 
 	public abstract void init();
 
@@ -31,7 +32,7 @@ public abstract class DTask implements Runnable {
 
 	public abstract void execute();
 
-	// -------------- Accessors
+	// ------------------------------ ACCESSORS
 
 	public String getId() {
 		return id;
@@ -76,16 +77,19 @@ public abstract class DTask implements Runnable {
 		return key;
 	}
 
-	public static String getKEY() {
-		return KEY.get();
+	public UserVO getCurrentUser() {
+		return currentUser;
 	}
 
-	// --------------
+	public DTask setCurrentUser(UserVO currentUser) {
+		this.currentUser = currentUser;
+		return this;
+	}
+
+	// ------------------------------ PUBLIC
 
 	@Override
 	public void run() {
-		KEY.set(getKey());
-
 		long start = System.currentTimeMillis();
 		String key = String.format("Task:%s{%s}", getClass().getSimpleName(), id);
 		Thread.currentThread().setName(key);
@@ -118,7 +122,7 @@ public abstract class DTask implements Runnable {
 		state = DTaskState.Interrupted;
 	}
 
-	// --------------
+	// ------------------------------ PROTECTED
 
 	protected boolean canContinue() {
 		return continue_.get();

@@ -46,7 +46,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	@Autowired
 	private IPersistorService persistorService;
 
-	// ------------ IApplicationLifecycle
+	// ------------------------------ IApplicationLifecycle
 
 	@Override
 	public void init() {
@@ -78,7 +78,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		}
 
 		// TODO create a system user and set it here
-		system = new UserVO();
+		system = new UserVO().setUsername("system");
 
 		TASKS = new ConcurrentHashMap<>();
 
@@ -134,13 +134,13 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		return ApplicationLifecyclePriority.Medium;
 	}
 
-	// ------------- RejectedExecutionHandler
+	// ------------------------------ RejectedExecutionHandler
 
 	@Override
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 	}
 
-	// ------------ ITaskService
+	// ------------------------------ ITaskService
 
 	@Override
 	public Future<?> start(String taskBeanId) {
@@ -175,7 +175,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		return startDTask(dTask, id, null, null);
 	}
 
-		@Override
+	@Override
 	public void stop(String key) {
 	}
 
@@ -183,12 +183,15 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	public void stopAll() {
 	}
 
-	// ------------ private
+	// ------------------------------ Private
+
+	// Main start DTask Method
 	private Future<?> startDTask(DTask dTask, String id, Object inputData, ITaskResultCallback resultCallback) {
 		dTask
 			.setId(id)
 			.setInputData(inputData)
-			.setResultCallback(resultCallback);
+			.setResultCallback(resultCallback)
+			.setCurrentUser(securityService.getCurrentUser());
 
 		Future<?> result = null;
 		if (TASKS.containsKey(dTask.getKey())) {
@@ -268,7 +271,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		}
 	}
 
-	// ------------ Demeter ThreadPoolExecutor
+	// ------------------------------ Demeter ThreadPoolExecutor & DemeterFutureTask
 
 	private class DemeterThreadPoolExecutor extends ThreadPoolExecutor {
 		public DemeterThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
@@ -278,16 +281,42 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		@Override
 		protected void beforeExecute(Thread t, Runnable r) {
-			securityService.authenticate(system);
+			DemeterFutureTask futureTask = (DemeterFutureTask) r;
+			DTask task = futureTask.getDTask();
+			if (task.getCurrentUser() != null) {
+				securityService.authenticate(task.getCurrentUser());
+			} else {
+				securityService.authenticate(system);
+			}
 		}
 
 		@Override
 		protected void afterExecute(Runnable r, Throwable t) {
-			String key = DTask.getKEY();
-			DTask dTask = TASKS.get(key);
-			logger.info("Task finished: key=[{}], state=[{}], duration=[{}]", key, dTask.getState(), dTask.getDuration());
-			TASKS.remove(key);
+			//String key = DTask.getKEY();
+			DemeterFutureTask futureTask = (DemeterFutureTask) r;
+			DTask dTask = futureTask.getDTask();
+			logger.info("Task finished: key=[{}], state=[{}], duration=[{}]", dTask.getKey(), dTask.getState(), dTask.getDuration());
+			TASKS.remove(dTask.getKey());
 			persistorService.endSession();
+		}
+
+		@Override
+		protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+			return new DemeterFutureTask<>(runnable, value);
+		}
+	}
+
+	private class DemeterFutureTask<T> extends FutureTask<T> {
+		private Runnable mainRunnable;
+
+		public DemeterFutureTask(Runnable runnable, T result) {
+			super(runnable, result);
+
+			this.mainRunnable = runnable;
+		}
+
+		public DTask getDTask() {
+			return (DTask) mainRunnable;
 		}
 	}
 }
