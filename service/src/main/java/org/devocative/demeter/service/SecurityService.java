@@ -41,8 +41,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 
 	@Override
 	public void init() {
-		system = userService.createOrUpdateUser("system", "system", "system", "system");
-		guest = userService.createOrUpdateUser("guest", "guest", "guest", "guest");
+		system = userService.createOrUpdateUser("system", "system", "", "system");
+		guest = userService.createOrUpdateUser("guest", "guest", "", "guest");
 		guest.setAuthenticated(!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 		if (guest.isAuthenticated()) {
 			guest.setDefaultPages(pageService.getDefaultPages());
