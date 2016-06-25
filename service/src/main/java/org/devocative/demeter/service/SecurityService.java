@@ -6,12 +6,8 @@ import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.EUserStatus;
-import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.User;
-import org.devocative.demeter.iservice.IPageService;
-import org.devocative.demeter.iservice.ISecurityService;
-import org.devocative.demeter.iservice.IUserService;
+import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +21,15 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import java.util.Date;
 import java.util.Properties;
 
 @Service("dmtSecurityService")
-public class SecurityService implements ISecurityService {
+public class SecurityService implements ISecurityService, IApplicationLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
 	private static ThreadLocal<UserVO> CURRENT_USER = new ThreadLocal<>();
 
-	//TODO load guest user from database
-	private UserVO guest;
+	private UserVO system, guest;
 
 	@Autowired
 	private IUserService userService;
@@ -43,11 +37,33 @@ public class SecurityService implements ISecurityService {
 	@Autowired
 	private IPageService pageService;
 
+	// ------------------------------ IApplicationLifecycle METHODS
+
+	@Override
+	public void init() {
+		system = userService.createOrUpdateUser("system", "system", "system", "system");
+		guest = userService.createOrUpdateUser("guest", "guest", "guest", "guest");
+		guest.setAuthenticated(!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
+		if (guest.isAuthenticated()) {
+			guest.setDefaultPages(pageService.getDefaultPages());
+		}
+		authenticate(system);
+	}
+
+	@Override
+	public void shutdown() {
+	}
+
+	@Override
+	public ApplicationLifecyclePriority getLifecyclePriority() {
+		return ApplicationLifecyclePriority.Medium;
+	}
+
 	// ------------------------------ PUBLIC METHODS
 
 	@Override
 	public UserVO getCurrentUser() {
-		return CURRENT_USER.get() != null ? CURRENT_USER.get() : getGuest();
+		return CURRENT_USER.get() != null ? CURRENT_USER.get() : guest;
 	}
 
 	@Override
@@ -81,13 +97,13 @@ public class SecurityService implements ISecurityService {
 
 	@Override
 	public void signOut() {
-		CURRENT_USER.set(getGuest());
+		CURRENT_USER.set(guest);
 	}
 
 	@Override
 	public String getUserDigest(String username) {
 		//TODO the password must be saved symmetric-encoded or the following hash must be persisted somewhere
-		User user = userService.getUser(username);
+		User user = userService.loadByUsername(username);
 
 		if (user != null) {
 			return DigestUtils.md5Hex(
@@ -97,6 +113,11 @@ public class SecurityService implements ISecurityService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public UserVO getSystemUser() {
+		return system;
 	}
 
 	// ------------------------------ PRIVATE METHODS
@@ -135,7 +156,7 @@ public class SecurityService implements ISecurityService {
 				lastName = getValue(attrs.get(lastNameAttr));
 			}
 
-			return createOrUpdateUser(username, password, firstName, lastName);
+			return userService.createOrUpdateUser(username, password, firstName, lastName);
 		} catch (AuthenticationException e) {
 			logger.warn("authenticateByLDAP failed for user: {}", username);
 			throw new DemeterException(DemeterErrorCode.InvalidUser, username);
@@ -143,39 +164,6 @@ public class SecurityService implements ISecurityService {
 			logger.error("AUTHENTICATE BY LDAP ERROR: ", e);
 			throw new DSystemException("LDAP Server Problem:", e);
 		}
-	}
-
-	private UserVO createOrUpdateUser(String username, String password, String firstName, String lastName) {
-		User user = userService.getUser(username);
-		if (user == null) {
-			user = new User();
-		}
-		user.setUsername(username);
-		user.setPassword(password);
-		user.setLastLoginDate(new Date());
-		user.setStatus(EUserStatus.ENABLED);
-
-		Person person = user.getPerson();
-		if (person == null) {
-			person = new Person();
-			user.setPerson(person);
-		}
-		person.setFirstName(firstName);
-		person.setLastName(lastName);
-
-		userService.saveOrUpdate(user);
-
-		return getUserVO(user);
-	}
-
-	private UserVO getUserVO(User user) {
-		UserVO userVO =
-			new UserVO()
-				.setUserId(user.getId())
-				.setUsername(user.getUsername())
-				.setFirstName(user.getPerson().getFirstName())
-				.setLastName(user.getPerson().getLastName());
-		return userVO;
 	}
 
 	private String getValue(Attribute attribute) {
@@ -187,16 +175,5 @@ public class SecurityService implements ISecurityService {
 			logger.error("LDAP getValue for attr = " + attribute, e);
 		}
 		return null;
-	}
-
-	private UserVO getGuest() {
-		if (guest == null) {
-			guest = new UserVO().setUsername("guest");
-			guest.setAuthenticated(!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
-			if (guest.isAuthenticated()) {
-				guest.setDefaultPages(pageService.getDefaultPages());
-			}
-		}
-		return guest;
 	}
 }

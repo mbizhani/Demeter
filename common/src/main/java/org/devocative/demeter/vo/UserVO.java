@@ -19,6 +19,13 @@ public class UserVO implements Serializable {
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
+	public UserVO(Long userId, String username, String firstName, String lastName) {
+		this.userId = userId;
+		this.username = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
 	public boolean isAuthenticated() {
 		return authenticated;
 	}

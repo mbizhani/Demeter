@@ -81,6 +81,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void shutdown() {
+		endSession();
 		sessionFactory.close();
 	}
 
@@ -358,7 +359,7 @@ public class HibernatePersistorService implements IPersistorService {
 			for (int i = 0; i < propertyNames.length; i++) {
 
 				if ("creatorUserId".equals(propertyNames[i])) {
-					if (securityService != null)
+					if (securityService != null && securityService.getCurrentUser() != null)
 						state[i] = securityService.getCurrentUser().getUserId();
 					continue;
 				}

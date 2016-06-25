@@ -15,7 +15,6 @@ import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.task.DTask;
 import org.devocative.demeter.iservice.task.ITaskResultCallback;
 import org.devocative.demeter.iservice.task.ITaskService;
-import org.devocative.demeter.vo.UserVO;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	private static Logger logger = LoggerFactory.getLogger(TaskService.class);
 
 	private boolean enabled;
-	private UserVO system;
 	private Map<String, DTask> TASKS;
 	private Scheduler scheduler;
 	private ThreadPoolExecutor threadPoolExecutor;
@@ -76,9 +74,6 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			logger.info("TaskService.init(): StdSchedulerFactory: ", e);
 			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
 		}
-
-		// TODO create a system user and set it here
-		system = new UserVO().setUsername("system");
 
 		TASKS = new ConcurrentHashMap<>();
 
@@ -283,16 +278,11 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		protected void beforeExecute(Thread t, Runnable r) {
 			DemeterFutureTask futureTask = (DemeterFutureTask) r;
 			DTask task = futureTask.getDTask();
-			if (task.getCurrentUser() != null) {
-				securityService.authenticate(task.getCurrentUser());
-			} else {
-				securityService.authenticate(system);
-			}
+			securityService.authenticate(task.getCurrentUser());
 		}
 
 		@Override
 		protected void afterExecute(Runnable r, Throwable t) {
-			//String key = DTask.getKEY();
 			DemeterFutureTask futureTask = (DemeterFutureTask) r;
 			DTask dTask = futureTask.getDTask();
 			logger.info("Task finished: key=[{}], state=[{}], duration=[{}]", dTask.getKey(), dTask.getState(), dTask.getDuration());

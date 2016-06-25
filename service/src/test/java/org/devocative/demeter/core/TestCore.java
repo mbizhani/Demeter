@@ -92,7 +92,7 @@ public class TestCore {
 			.list()
 			.size();
 		logger.info("sizeF3 = {}", sizeF3);
-		Assert.assertTrue(sizeF3 == 0);
+		Assert.assertTrue(sizeF3 == 2); // system & guest users
 
 		PersonFVO f4 = new PersonFVO()
 			.setBirthRegDate(new RangeVO<>(null, new Date()));
