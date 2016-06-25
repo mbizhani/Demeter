@@ -5,7 +5,7 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.iservice.ISecurityService;
-import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.iservice.IUserService;
 import org.devocative.wickomp.http.filter.WAuthMethod;
 import org.devocative.wickomp.http.filter.WBaseHttpAuthFilter;
 import org.devocative.wickomp.http.filter.WHttpAuthBean;
@@ -25,6 +25,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	private String nonce;
 	private ScheduledExecutorService nonceRefreshExecutor;
 	private ISecurityService securityService;
+	private IUserService userService;
 
 	@Override
 	protected String calculateNonceForDigest(WHttpAuthBean authBean) {
@@ -72,6 +73,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 		}
 
 		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+		userService = ModuleLoader.getApplicationContext().getBean(IUserService.class);
 
 		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 
@@ -81,8 +83,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 
 	@Override
 	protected void onBeforeChainAuthenticated(WHttpAuthBean authBean) {
-		// TODO
-		securityService.authenticate(new UserVO().setUsername(authBean.getUsername()));
+		securityService.authenticate(userService.loadVOByUsername(authBean.getUsername()));
 	}
 
 	@Override
