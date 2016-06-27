@@ -29,9 +29,13 @@ public class DemeterWebApplication extends WebApplication {
 
 	private List<String> modulesRelatedCSS = new ArrayList<>();
 
+	// ------------------------------
+
 	public static DemeterWebApplication get() {
 		return (DemeterWebApplication) WebApplication.get();
 	}
+
+	// ------------------------------ WebApplication OVERRIDES
 
 	@Override
 	public Class<? extends Page> getHomePage() {
@@ -67,6 +71,13 @@ public class DemeterWebApplication extends WebApplication {
 		logger.info("*****************************");
 	}
 
+	@Override
+	public WebSession newSession(Request request, Response response) {
+		return new DemeterWebSession(request);
+	}
+
+	// ------------------------------
+
 	public String getInnerContext() {
 		return APP_INNER_CTX;
 	}
@@ -75,10 +86,7 @@ public class DemeterWebApplication extends WebApplication {
 		return modulesRelatedCSS;
 	}
 
-	@Override
-	public WebSession newSession(Request request, Response response) {
-		return new DemeterWebSession(request);
-	}
+	// ------------------------------
 
 	private void initModulesForWeb() {
 		String appBaseDir = getServletContext().getRealPath(".");
