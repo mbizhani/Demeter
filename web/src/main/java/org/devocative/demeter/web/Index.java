@@ -10,6 +10,7 @@ import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.TransparentWebMarkupContainer;
+import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -198,17 +199,20 @@ public class Index extends WebPage {
 	}
 
 	private void createDPageFromType(String type, List<String> params) {
-		//TODO check security for creating DPage
+		//TODO check params for authentication input from outside
 
 		try {
-			Class<?> dPageClass = Class.forName(type);
+			Class<? extends DPage> dPageClass = (Class<? extends DPage>) Class.forName(type);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
-				//TODO handle authorization correctly
 				if (currentUser.isAuthenticated() || dPageClass.equals(LoginDPage.class)) {
 					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
 					content = (DPage) constructor.newInstance("content", params);
+					//TODO handle authorization correctly
+					//TODO content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
 				} else {
-					content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
+					DemeterWebSession.get().setOriginalDPage(dPageClass);
+					UrlUtil.redirectTo(LoginDPage.class);
+					content = new WebComponent("content");
 				}
 			} else {
 				logger.error("The class is not DPage: " + type);

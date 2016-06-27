@@ -13,15 +13,20 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 public class DemeterWebSession extends WebSession implements OUserPreference {
-	private static Logger logger = LoggerFactory.getLogger(DemeterWebSession.class);
+	private static final Logger logger = LoggerFactory.getLogger(DemeterWebSession.class);
 
 	private UserVO userVO;
+	private Class<? extends DPage> originalDPage;
+
+	// ------------------------------ CONSTRUCTORS
 
 	public DemeterWebSession(Request request) {
 		super(request);
 
 		setLocale(new Locale("fa", "IR"));
 	}
+
+	// ------------------------------ ACCESSORS
 
 	public UserVO getUserVO() {
 		return userVO;
@@ -31,6 +36,18 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 		this.userVO = userVO;
 	}
 
+	public Class<? extends DPage> getOriginalDPage() {
+		return originalDPage;
+	}
+
+	public DemeterWebSession setOriginalDPage(Class<? extends DPage> originalDPage) {
+		this.originalDPage = originalDPage;
+		return this;
+	}
+
+	// ------------------------------ OUserPreference
+
+	//TODO add following methods to UserVO and return from userVO reference
 	@Override
 	public OCalendar getCalendar() {
 		return OCalendar.Persian;
@@ -57,6 +74,8 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 		AsyncMediator.handleSessionExpiration(userVO.getUsername(), getId());
 	}
+
+	// ------------------------------
 
 	public static DemeterWebSession get() {
 		return (DemeterWebSession) WebSession.get();
