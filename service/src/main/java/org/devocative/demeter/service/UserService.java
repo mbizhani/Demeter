@@ -66,6 +66,8 @@ public class UserService implements IUserService {
 
 		if (user == null) {
 			user = new User();
+		} else {
+			password = null;
 		}
 
 		user.setUsername(username);
