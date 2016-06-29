@@ -359,9 +359,9 @@ public class HibernatePersistorService implements IPersistorService {
 			for (int i = 0; i < propertyNames.length; i++) {
 
 				if ("creatorUserId".equals(propertyNames[i])) {
-					if (securityService != null && securityService.getCurrentUser() != null)
+					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
-					continue;
+					}
 				}
 
 				if ("creationDate".equals(propertyNames[i])) {
@@ -374,9 +374,9 @@ public class HibernatePersistorService implements IPersistorService {
 			for (int i = 0; i < propertyNames.length; i++) {
 
 				if ("modifierUserId".equals(propertyNames[i])) {
-					if (securityService != null)
+					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
-					continue;
+					}
 				}
 
 				if ("modificationDate".equals(propertyNames[i])) {
