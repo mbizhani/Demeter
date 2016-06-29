@@ -30,6 +30,7 @@ import org.devocative.demeter.iservice.IPageService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.dPage.LoginDPage;
+import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
 import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
@@ -61,6 +62,7 @@ public class Index extends WebPage {
 	private AbstractDefaultAjaxBehavior ajaxBehavior;
 
 	public Index(PageParameters pageParameters) {
+		securityService.authenticate(WebUtil.toMap(getRequest().getRequestParameters()));
 		currentUser = securityService.getCurrentUser();
 
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
@@ -199,8 +201,6 @@ public class Index extends WebPage {
 	}
 
 	private void createDPageFromType(String type, List<String> params) {
-		//TODO check params for authentication input from outside
-
 		try {
 			Class<? extends DPage> dPageClass = (Class<? extends DPage>) Class.forName(type);
 			if (DPage.class.isAssignableFrom(dPageClass)) {

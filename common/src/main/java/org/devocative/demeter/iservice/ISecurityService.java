@@ -2,12 +2,17 @@ package org.devocative.demeter.iservice;
 
 import org.devocative.demeter.vo.UserVO;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ISecurityService {
 	UserVO getCurrentUser();
 
 	void authenticate(UserVO userVO);
 
 	void authenticate(String username, String password);
+
+	void authenticate(Map<String, List<String>> params);
 
 	void signOut();
 

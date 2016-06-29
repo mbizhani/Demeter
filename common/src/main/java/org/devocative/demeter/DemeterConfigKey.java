@@ -11,7 +11,7 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	EnabledSecurity("dmt.security.enabled", true),
 	SecurityRealm(true, "dmt.security.realm"),
-	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap")),
+	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap", "other")),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 
 	ServiceRemoteHost("dmt.service.remote.host"),

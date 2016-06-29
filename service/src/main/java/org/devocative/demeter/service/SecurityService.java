@@ -2,10 +2,13 @@ package org.devocative.demeter.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.entity.EAuthMechanism;
+import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.vo.UserVO;
@@ -21,11 +24,14 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import java.util.Properties;
+import java.util.*;
 
 @Service("dmtSecurityService")
 public class SecurityService implements ISecurityService, IApplicationLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
+
+	private static final String USERNAME_KEY = "username";
+	private static final String PASSWORD_KEY = "password";
 
 	private static ThreadLocal<UserVO> CURRENT_USER = new ThreadLocal<>();
 
@@ -37,16 +43,22 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 	@Autowired
 	private IPageService pageService;
 
+	@Autowired(required = false)
+	private IOtherAuthenticationService otherAuthenticationService;
+
 	// ------------------------------ IApplicationLifecycle METHODS
 
 	@Override
 	public void init() {
-		system = userService.createOrUpdateUser("system", "system", "", "system");
-		guest = userService.createOrUpdateUser("guest", "guest", "", "guest");
-		guest.setAuthenticated(!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
-		if (guest.isAuthenticated()) {
+		userService.createOrUpdateUser("root", "root", "", "root", true, EUserStatus.ENABLED, EAuthMechanism.DATABASE);
+
+		guest = userService.createOrUpdateUser("guest", null, "", "guest", false, EUserStatus.DISABLED, EAuthMechanism.DATABASE);
+		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
+			guest.setAuthenticated(true);
 			guest.setDefaultPages(pageService.getDefaultPages());
 		}
+
+		system = userService.createOrUpdateUser("system", null, "", "system", false, EUserStatus.DISABLED, EAuthMechanism.DATABASE);
 		authenticate(system);
 	}
 
@@ -78,21 +90,56 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 
 	@Override
 	public void authenticate(String username, String password) {
-		String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
-		logger.debug("Authenticate Mode: {}", mode);
+		UserVO authenticatedUserVO;
+		User user = userService.loadByUsername(username);
 
-		UserVO userVO;
-		if ("database".equalsIgnoreCase(mode)) {
-			userVO = authenticateByDatabase(username, password);
-		} else if ("ldap".equalsIgnoreCase(mode)) {
-			userVO = authenticateByLDAP(username, password);
+		if (user != null) {
+			verifyUser(user);
+
+			if (EAuthMechanism.DATABASE.equals(user.getAuthMechanism())) {
+				authenticatedUserVO = authenticateByDatabase(user, password);
+			} else if (EAuthMechanism.LDAP.equals(user.getAuthMechanism())) {
+				authenticatedUserVO = authenticateByLDAP(username, password);
+			} else if (EAuthMechanism.OTHER.equals(user.getAuthMechanism())) {
+				if (otherAuthenticationService != null) {
+					authenticatedUserVO = authenticateByOther(username, password);
+				} else {
+					throw new DSystemException("No IOtherAuthenticationService bean defined: user = " + username);
+				}
+			} else {
+				throw new DSystemException("Unknown authenticate mechanism: user = " + username);
+			}
 		} else {
-			throw new DSystemException("Unknown authentication mode: " + mode);
+			String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
+
+			if ("database".equalsIgnoreCase(mode)) {
+				throw new DemeterException(DemeterErrorCode.InvalidUser);
+			} else if ("ldap".equalsIgnoreCase(mode)) {
+				authenticatedUserVO = authenticateByLDAP(username, password);
+			} else if ("other".equalsIgnoreCase(mode)) {
+				if (otherAuthenticationService != null) {
+					authenticatedUserVO = authenticateByOther(username, password);
+				} else {
+					throw new DSystemException("No IOtherAuthenticationService bean defined, but mode is 'other'!");
+				}
+			} else {
+				throw new DSystemException("Unknown authenticate mode: " + mode);
+			}
 		}
-		userVO.setAuthenticated(true);
+		authenticatedUserVO.setAuthenticated(true);
 		//TODO find authorized dPages
-		userVO.setDefaultPages(pageService.getDefaultPages());
-		CURRENT_USER.set(userVO);
+		authenticatedUserVO.setDefaultPages(pageService.getDefaultPages());
+		CURRENT_USER.set(authenticatedUserVO);
+	}
+
+	@Override
+	public void authenticate(Map<String, List<String>> params) {
+		/*if (params.containsKey(USERNAME_KEY) && params.containsKey(PASSWORD_KEY)) {
+			authenticate(params.get(USERNAME_KEY).get(0), params.get(PASSWORD_KEY).get(0));
+		} else */
+		if (otherAuthenticationService != null) {
+			otherAuthenticationService.authenticate(params);
+		}
 	}
 
 	@Override
@@ -122,9 +169,17 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 
 	// ------------------------------ PRIVATE METHODS
 
-	private UserVO authenticateByDatabase(String username, String password) {
-		// TODO implement this!
-		throw new DSystemException("authenticateByDatabase not implemented");
+	private UserVO authenticateByDatabase(User user, String password) {
+		if (password != null) {
+			password = StringEncryptorUtil.hash(password);
+			if (password.equals(user.getPassword())) {
+				return userService.getUserVO(user);
+			} else {
+				throw new DemeterException(DemeterErrorCode.InvalidUser);
+			}
+		} else {
+			throw new DemeterException(DemeterErrorCode.InvalidUser);
+		}
 	}
 
 	private UserVO authenticateByLDAP(String username, String password) {
@@ -156,13 +211,29 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 				lastName = getValue(attrs.get(lastNameAttr));
 			}
 
-			return userService.createOrUpdateUser(username, password, firstName, lastName);
+			return userService.createOrUpdateUser(username, password, firstName, lastName, EAuthMechanism.LDAP);
 		} catch (AuthenticationException e) {
 			logger.warn("authenticateByLDAP failed for user: {}", username);
 			throw new DemeterException(DemeterErrorCode.InvalidUser, username);
 		} catch (NamingException e) {
 			logger.error("AUTHENTICATE BY LDAP ERROR: ", e);
-			throw new DSystemException("LDAP Server Problem:", e);
+			throw new DSystemException("LDAP Server Problem: ", e);
+		}
+	}
+
+	private UserVO authenticateByOther(String username, String password) {
+		Map<String, List<String>> params = new HashMap<>();
+		params.put(USERNAME_KEY, Collections.singletonList(username));
+		params.put(PASSWORD_KEY, Collections.singletonList(password));
+		UserVO userVO = otherAuthenticationService.authenticate(params);
+		return userService.createOrUpdateUser(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER);
+	}
+
+	private void verifyUser(User user) {
+		if (EUserStatus.DISABLED.equals(user.getStatus())) {
+			throw new DemeterException(DemeterErrorCode.UserDisabled);
+		} else if (EUserStatus.LOCKED.equals(user.getStatus())) {
+			throw new DemeterException(DemeterErrorCode.UserLocked);
 		}
 	}
 

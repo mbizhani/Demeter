@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EUserStatus implements Serializable {
-	private static final List<EUserStatus> LITERALS = new ArrayList<EUserStatus>();
+	private static final List<EUserStatus> LITERALS = new ArrayList<>();
+
+	// ------------------------------
 
 	public static final EUserStatus ENABLED = new EUserStatus(1);
 	public static final EUserStatus DISABLED = new EUserStatus(2);
 	public static final EUserStatus LOCKED = new EUserStatus(3);
 
+	// ------------------------------
+
 	private Integer id;
+
+	// ------------------------------
 
 	public EUserStatus() {
 	}
@@ -21,9 +27,13 @@ public class EUserStatus implements Serializable {
 		LITERALS.add(this);
 	}
 
+	// ------------------------------
+
 	public Integer getId() {
 		return id;
 	}
+
+	// ------------------------------
 
 	@Override
 	public boolean equals(Object o) {
@@ -42,6 +52,8 @@ public class EUserStatus implements Serializable {
 	public int hashCode() {
 		return getId() != null ? getId().hashCode() : 0;
 	}
+
+	// ------------------------------
 
 	/* TODO
 	@Override
