@@ -27,6 +27,10 @@ public class User implements Serializable {
 	@Column(name = "c_password")
 	private String password;
 
+	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "e_auth_mech", nullable = false))
+	private EAuthMechanism authMechanism;
+
 	//@NotNull
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_status", nullable = false))
@@ -95,6 +99,8 @@ public class User implements Serializable {
 	@ForeignKey(name = "user_allow_prtlt2user", inverseName = "user_allow_prtlt2prtlt")
 	private List<PortletInstance> allowedPortletInstances;*/
 
+	// ------------------------------
+
 	public Long getId() {
 		return id;
 	}
@@ -117,6 +123,14 @@ public class User implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public EAuthMechanism getAuthMechanism() {
+		return authMechanism;
+	}
+
+	public void setAuthMechanism(EAuthMechanism authMechanism) {
+		this.authMechanism = authMechanism;
 	}
 
 	public EUserStatus getStatus() {
@@ -198,6 +212,8 @@ public class User implements Serializable {
 	public void setPerson(Person person) {
 		this.person = person;
 	}
+
+	// ------------------------------
 
 	@Override
 	public boolean equals(Object o) {
