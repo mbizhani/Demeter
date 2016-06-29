@@ -1,7 +1,9 @@
 package org.devocative.demeter.service;
 
+import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.entity.EAuthMechanism;
 import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.User;
@@ -12,7 +14,6 @@ import org.devocative.demeter.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service("dmtUserService")
@@ -39,10 +40,14 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public void saveOrUpdate(User user) {
+	public void saveOrUpdate(User user, String password) {
 		user.getPerson().setHasUser(true);
 
-		//TODO save password encrypted
+		if (password != null) {
+			user.setPassword(StringEncryptorUtil.hash(password));
+		} /*else if (user.getId() != null) {
+			todo update user without password
+		}*/
 
 		persistorService.saveOrUpdate(user.getPerson());
 		persistorService.saveOrUpdate(user);
@@ -50,31 +55,33 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserVO createOrUpdateUser(String username, String password, String firstName, String lastName) {
+	public UserVO createOrUpdateUser(String username, String password, String firstName, String lastName, EAuthMechanism authMechanism) {
+		return createOrUpdateUser(username, password, firstName, lastName, false, EUserStatus.ENABLED, authMechanism);
+	}
+
+	@Override
+	public UserVO createOrUpdateUser(String username, String password, String firstName, String lastName,
+									 boolean isAdmin, EUserStatus status, EAuthMechanism authMechanism) {
 		User user = loadByUsername(username);
 
 		if (user == null) {
 			user = new User();
-			user.setUsername(username);
-			user.setPassword(password);
-			user.setLastLoginDate(new Date());
-			user.setStatus(EUserStatus.ENABLED);
-
-			Person person = user.getPerson();
-			if (person == null) {
-				person = new Person();
-				user.setPerson(person);
-			}
-			person.setFirstName(firstName);
-			person.setLastName(lastName);
-
-			saveOrUpdate(user);
-		} else {
-			user.setStatus(EUserStatus.ENABLED);
-			persistorService.saveOrUpdate(user);
-			persistorService.endSession();
 		}
 
+		user.setUsername(username);
+		user.setStatus(status);
+		user.setAdmin(isAdmin);
+		user.setAuthMechanism(authMechanism);
+
+		Person person = user.getPerson();
+		if (person == null) {
+			person = new Person();
+			user.setPerson(person);
+		}
+		person.setFirstName(firstName);
+		person.setLastName(lastName);
+
+		saveOrUpdate(user, password);
 		return getUserVO(user);
 	}
 
@@ -87,9 +94,8 @@ public class UserService implements IUserService {
 		return getUserVO(user);
 	}
 
-	// ------------------------------
-
-	private UserVO getUserVO(User user) {
+	@Override
+	public UserVO getUserVO(User user) {
 		return new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName());
 	}
 }
