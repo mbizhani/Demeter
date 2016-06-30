@@ -10,6 +10,7 @@ import org.devocative.wickomp.opt.OUserPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Locale;
 
 public class DemeterWebSession extends WebSession implements OUserPreference {
@@ -17,6 +18,7 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	private UserVO userVO;
 	private Class<? extends DPage> originalDPage;
+	private List<String> originalParams;
 
 	// ------------------------------ CONSTRUCTORS
 
@@ -42,6 +44,15 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	public DemeterWebSession setOriginalDPage(Class<? extends DPage> originalDPage) {
 		this.originalDPage = originalDPage;
+		return this;
+	}
+
+	public List<String> getOriginalParams() {
+		return originalParams;
+	}
+
+	public DemeterWebSession setOriginalParams(List<String> originalParams) {
+		this.originalParams = originalParams;
 		return this;
 	}
 
@@ -76,6 +87,11 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	}
 
 	// ------------------------------
+
+	public void removeOriginal() {
+		setOriginalDPage(null);
+		setOriginalParams(null);
+	}
 
 	public static DemeterWebSession get() {
 		return (DemeterWebSession) WebSession.get();

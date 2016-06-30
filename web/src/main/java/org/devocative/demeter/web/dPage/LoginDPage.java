@@ -41,10 +41,13 @@ public class LoginDPage extends DPage {
 			@Override
 			public void onFormSubmit() {
 				securityService.authenticate(username, password);
+
 				Class<? extends DPage> originalDPage = DemeterWebSession.get().getOriginalDPage();
-				DemeterWebSession.get().setOriginalDPage(null);
+				List<String> params = DemeterWebSession.get().getOriginalParams();
+				DemeterWebSession.get().removeOriginal();
+
 				if (originalDPage != null) {
-					UrlUtil.redirectTo(originalDPage);
+					UrlUtil.redirectTo(originalDPage, params);
 				} else {
 					setResponsePage(Index.class);
 				}

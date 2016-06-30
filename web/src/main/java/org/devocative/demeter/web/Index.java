@@ -49,17 +49,23 @@ public class Index extends WebPage {
 	private static final HeaderItem INDEX_CSS = CssHeaderItem.forReference(new CssResourceReference(Index.class, "wrcs/index.css"));
 	private static final HeaderItem INDEX_JS = JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(Index.class, "wrcs/index.js"));
 
+	// ------------------------------
+
 	@Inject
 	private IPageService pageService;
 
 	@Inject
 	private ISecurityService securityService;
 
+	// ------------------------------
+
 	private Component content;
 	private UserVO currentUser;
 	private WebMarkupContainer signIn, signOut, editProfile;
 	private List<OMenuItem> oMenuItems = new ArrayList<>();
 	private AbstractDefaultAjaxBehavior ajaxBehavior;
+
+	// ------------------------------
 
 	public Index(PageParameters pageParameters) {
 		securityService.authenticate(WebUtil.toMap(getRequest().getRequestParameters()));
@@ -156,6 +162,8 @@ public class Index extends WebPage {
 		}
 	}
 
+	// ------------------------------
+
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		String ajaxUrl = "";
@@ -181,6 +189,8 @@ public class Index extends WebPage {
 		}
 	}
 
+	// ------------------------------
+
 	@Override
 	protected void onBeforeRender() {
 		currentUser = securityService.getCurrentUser();
@@ -200,6 +210,8 @@ public class Index extends WebPage {
 		super.onBeforeRender();
 	}
 
+	// ------------------------------
+
 	private void createDPageFromType(String type, List<String> params) {
 		try {
 			Class<? extends DPage> dPageClass = (Class<? extends DPage>) Class.forName(type);
@@ -210,7 +222,9 @@ public class Index extends WebPage {
 					//TODO handle authorization correctly
 					//TODO content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
 				} else {
-					DemeterWebSession.get().setOriginalDPage(dPageClass);
+					DemeterWebSession.get()
+						.setOriginalDPage(dPageClass)
+						.setOriginalParams(params);
 					UrlUtil.redirectTo(LoginDPage.class);
 					content = new WebComponent("content");
 				}

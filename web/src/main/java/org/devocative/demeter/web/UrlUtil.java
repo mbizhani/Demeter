@@ -6,20 +6,29 @@ import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
 
+import java.util.List;
+
 public class UrlUtil {
 	private static IPageService pageService;
 
-	public static void redirectTo(Class<? extends DPage> dPageClass) {
-		redirectTo(dPageClass, null);
+	public static void redirectTo(Class<? extends DPage> dPageClass, List<String> restParams) {
+		String[] restParamsArr = null;
+		if (restParams != null && restParams.size() > 0) {
+			restParamsArr = restParams.toArray(new String[restParams.size()]);
+		}
+		redirectTo(dPageClass, restParamsArr);
 	}
 
-	public static void redirectTo(Class<? extends DPage> dPageClass, String ref) {
+	// Main Method
+	public static void redirectTo(Class<? extends DPage> dPageClass, String... restParams) {
 		String uri = createUri(dPageClass, false);
-		if (ref != null) {
-			if (ref.startsWith("/")) {
-				uri += ref;
-			} else {
-				uri += "/" + ref;
+		if (restParams != null) {
+			for (String param : restParams) {
+				if (param.startsWith("/")) {
+					uri += param;
+				} else {
+					uri += "/" + param;
+				}
 			}
 		}
 		RequestCycle.get().scheduleRequestHandlerAfterCurrent(new RedirectRequestHandler(uri));
