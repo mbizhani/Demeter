@@ -34,6 +34,7 @@ import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
 import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
+import org.devocative.wickomp.wrcs.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +118,7 @@ public class Index extends WebPage {
 		html.add(new Label("headerTitle", headerTitle));
 		html.add(content);
 
-		TransparentWebMarkupContainer header = new TransparentWebMarkupContainer("header");
+		WebMarkupContainer header = new WebMarkupContainer("header");
 		header.add(new WMenuBar("menu", oMenuItems));
 		header.setVisible(pageParameters.get("printable").isNull());
 		html.add(header);
@@ -126,7 +127,7 @@ public class Index extends WebPage {
 
 		WebMarkupContainer userMenu = new WebMarkupContainer("userMenu");
 		userMenu.setVisible(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
-		html.add(userMenu);
+		header.add(userMenu);
 
 		userMenu.add(new Label("userInfo", new PropertyModel<>(this, "currentUser.fullName")));
 
@@ -166,6 +167,8 @@ public class Index extends WebPage {
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
+		Resource.addJQueryReference(response);
+
 		String ajaxUrl = "";
 		int pingPeriodBeforeWSTimeout = ConfigUtil.getInteger(DemeterConfigKey.PingServerPeriod);
 		int alertPeriodBeforeSessionTimeout = currentUser.getSessionTimeout();
