@@ -126,10 +126,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 				throw new DSystemException("Unknown authenticate mode: " + mode);
 			}
 		}
-		authenticatedUserVO.setAuthenticated(true);
-		//TODO find authorized dPages
-		authenticatedUserVO.setDefaultPages(pageService.getDefaultPages());
-		CURRENT_USER.set(authenticatedUserVO);
+
+		afterAuthentication(authenticatedUserVO);
 	}
 
 	@Override
@@ -138,7 +136,10 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 			authenticate(params.get(USERNAME_KEY).get(0), params.get(PASSWORD_KEY).get(0));
 		} else */
 		if (otherAuthenticationService != null) {
-			otherAuthenticationService.authenticate(params);
+			UserVO authenticatedUserVO = otherAuthenticationService.authenticate(params);
+			if (authenticatedUserVO != null) {
+				afterAuthentication(authenticatedUserVO);
+			}
 		}
 	}
 
@@ -227,6 +228,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 		params.put(PASSWORD_KEY, Collections.singletonList(password));
 		UserVO userVO = otherAuthenticationService.authenticate(params);
 		return userService.createOrUpdateUser(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER);
+	}
+
+	private void afterAuthentication(UserVO authenticatedUserVO) {
+		authenticatedUserVO.setAuthenticated(true);
+		//TODO find authorized dPages
+		authenticatedUserVO.setDefaultPages(pageService.getDefaultPages());
+		CURRENT_USER.set(authenticatedUserVO);
 	}
 
 	private void verifyUser(User user) {
