@@ -4,7 +4,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "t_dmt_d_page")
+@Table(name = "t_dmt_d_page", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_dmt_pageinfo_type", columnNames = {"c_type"}),
+	@UniqueConstraint(name = "uk_dmt_pageinfo_baseuri", columnNames = {"c_base_uri"})
+})
 public class DPageInfo implements ICreationDate, IModificationDate {
 	@Id
 	@GeneratedValue(generator = "dmt_d_page")
@@ -17,13 +20,13 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 		})
 	private Long id;
 
-	@Column(name = "c_type", nullable = false, unique = true)
+	@Column(name = "c_type", nullable = false)
 	private String type;
 
 	@Column(name = "c_module", nullable = false)
 	private String module;
 
-	@Column(name = "c_base_uri", nullable = false, unique = true)
+	@Column(name = "c_base_uri", nullable = false)
 	private String baseUri;
 
 	@Column(name = "b_enabled", nullable = false)

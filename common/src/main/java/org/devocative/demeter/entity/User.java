@@ -10,7 +10,9 @@ import java.util.Date;
 
 @Audited
 @Entity
-@Table(name = "t_dmt_user")
+@Table(name = "t_dmt_user", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_dmt_user_username", columnNames = {"c_username"})
+})
 public class User implements Serializable {
 	@Id
 	@GeneratedValue(generator = "SharedPrimaryKeyGenerator")
@@ -20,7 +22,7 @@ public class User implements Serializable {
 	private Long id;
 
 	//@NotNull
-	@Column(name = "c_username", unique = true, nullable = false)
+	@Column(name = "c_username", nullable = false)
 	private String username;
 
 	@NotAudited

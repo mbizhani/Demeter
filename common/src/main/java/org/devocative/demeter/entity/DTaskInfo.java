@@ -6,7 +6,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "t_dmt_d_task")
+@Table(name = "t_dmt_d_task", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_dmt_taskinfo_type", columnNames = {"c_type"})
+})
 public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	@Id
 	@GeneratedValue(generator = "dmt_d_task")
@@ -19,7 +21,7 @@ public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate
 		})
 	private Long id;
 
-	@Column(name = "c_type", nullable = false, unique = true)
+	@Column(name = "c_type", nullable = false)
 	private String type;
 
 	@Column(name = "c_module", nullable = false)

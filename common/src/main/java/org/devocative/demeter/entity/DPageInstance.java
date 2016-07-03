@@ -8,7 +8,9 @@ import java.util.Date;
 
 @Audited
 @Entity
-@Table(name = "t_dmt_d_page_inst")
+@Table(name = "t_dmt_d_page_inst", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_dmt_pageinst_uri", columnNames = {"c_uri"})
+})
 public class DPageInstance implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	@Id
 	@GeneratedValue(generator = "dmt_d_page")
@@ -24,7 +26,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@Column(name = "c_title", nullable = false)
 	private String title;
 
-	@Column(name = "c_uri", nullable = false, unique = true)
+	@Column(name = "c_uri", nullable = false)
 	private String uri;
 
 	@Column(name = "b_in_menu", nullable = false)
