@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "t_dmt_d_task", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_dmt_taskinfo_type", columnNames = {"c_type"})
+	@UniqueConstraint(name = "uk_dmt_task_type", columnNames = {"c_type"})
 })
 public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	@Id

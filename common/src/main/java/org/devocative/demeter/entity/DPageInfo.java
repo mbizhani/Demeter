@@ -5,8 +5,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "t_dmt_d_page", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_dmt_pageinfo_type", columnNames = {"c_type"}),
-	@UniqueConstraint(name = "uk_dmt_pageinfo_baseuri", columnNames = {"c_base_uri"})
+	@UniqueConstraint(name = "uk_dmt_page_type", columnNames = {"c_type"}),
+	@UniqueConstraint(name = "uk_dmt_page_baseuri", columnNames = {"c_base_uri"})
 })
 public class DPageInfo implements ICreationDate, IModificationDate {
 	@Id
