@@ -5,7 +5,9 @@
 				mainResource CDATA #REQUIRED
 				constraintsClass CDATA #IMPLIED
 				errorCodesClass CDATA #IMPLIED
-				localPersistorService (true|false)>
+				localPersistorService (true|false)
+				configKeysClass CDATA #REQUIRED
+				>
 		<!ELEMENT dependencies (dependency)*>
 		<!ELEMENT dependency (#PCDATA)>
 		<!ELEMENT entities (entity)*>

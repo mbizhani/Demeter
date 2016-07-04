@@ -2,6 +2,7 @@ package org.devocative.demeter.core;
 
 import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.IConfigKey;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.xml.XEntity;
@@ -114,6 +115,8 @@ public class ModuleLoader {
 			moduleShortNames.add(xModule.getShortName());
 
 			MODULES.put(moduleName, xModule);
+
+			loadConfigKeys(xModule);
 		}
 	}
 
@@ -256,4 +259,25 @@ public class ModuleLoader {
 		}
 		return classes;
 	}
+
+	private static void loadConfigKeys(XModule xModule) {
+		try {
+			if (xModule.getConfigKeysClass() != null) {
+				Class<?> enumClass = Class.forName(xModule.getConfigKeysClass());
+				if (enumClass.isEnum()) {
+					Object[] enumConstants = enumClass.getEnumConstants();
+					for (Object enumConstant : enumConstants) {
+						ConfigUtil.add((IConfigKey) enumConstant);
+					}
+				} else {
+					throw new DSystemException("ConfigKey class must be enum for module: " + xModule.getShortName());
+				}
+			} else {
+				throw new DSystemException("ConfigKey class not found for module: " + xModule.getShortName());
+			}
+		} catch (Exception e) {
+			logger.error(String.format("Loading module [%s] config keys", xModule.getShortName()), e);
+		}
+	}
+
 }

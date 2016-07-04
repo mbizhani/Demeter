@@ -26,6 +26,9 @@ public class XModule {
 	@XStreamAsAttribute
 	private boolean localPersistorService;
 
+	@XStreamAsAttribute
+	private String configKeysClass;
+
 	private List<String> dependencies;
 
 	private List<XEntity> entities;
@@ -33,6 +36,8 @@ public class XModule {
 	private List<XDPage> dPages;
 
 	private List<XDTask> tasks;
+
+	// ------------------------------
 
 	public String getShortName() {
 		return shortName;
@@ -80,6 +85,15 @@ public class XModule {
 
 	public void setLocalPersistorService(boolean localPersistorService) {
 		this.localPersistorService = localPersistorService;
+	}
+
+	public String getConfigKeysClass() {
+		return configKeysClass;
+	}
+
+	public XModule setConfigKeysClass(String configKeysClass) {
+		this.configKeysClass = configKeysClass;
+		return this;
 	}
 
 	public List<String> getDependencies() {

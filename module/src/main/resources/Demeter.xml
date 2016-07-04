@@ -7,7 +7,8 @@
 <module
 		shortName="DMT"
 		mainClass="org.devocative.demeter.module.DemeterDModule"
-		mainResource="org.devocative.demeter.web.DemeterDModule">
+		mainResource="org.devocative.demeter.web.DemeterDModule"
+		configKeysClass="org.devocative.demeter.DemeterConfigKey">
 
 	<entities>
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>
@@ -35,5 +36,10 @@
 			   title="KEY:dPage.dmt.Login"
 			   uri="/login"
 			   inMenu="false"/>
+
+		<dPage type="org.devocative.demeter.web.dPage.ConfigKeysDPage"
+			   title="KEY:dPage.dmt.ConfigKeys"
+			   uri="/config"
+			   inMenu="true"/>
 	</dPages>
 </module>
