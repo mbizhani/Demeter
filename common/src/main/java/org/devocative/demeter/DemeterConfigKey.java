@@ -7,17 +7,17 @@ import java.util.List;
 
 public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
-	DeploymentMode("dmt.deployment.enabled", true),
+	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
-	EnabledSecurity("dmt.security.enabled", true),
+	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
 	SecurityRealm(true, "dmt.security.realm"),
 	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap", "other")),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
-	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false),
-	DefaultSessionTimeoutInterval("dmt.session.timeout", -1),
+	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
+	DefaultSessionTimeoutInterval("dmt.web.session.timeout", -1),
 	PingServerPeriod("dmt.server.ping.period", 270000), //4.5 * 60 * 1000
 
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
@@ -25,7 +25,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	LdapAttrFirstName("dmt.ldap.attr.firstname"),
 	LdapAttrLastName("dmt.ldap.attr.lastname"),
 
-	TaskEnabled("dmt.task.enabled", true),
+	TaskEnabled("dmt.task.enabled", true, Arrays.asList(true, false)),
 	TaskPoolSize("dmt.task.pool.size", 5),
 	TaskPoolMax("dmt.task.pool.max", 10),
 	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),;
