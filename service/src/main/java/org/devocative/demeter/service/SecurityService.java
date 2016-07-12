@@ -227,6 +227,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 		params.put(USERNAME_KEY, Collections.singletonList(username));
 		params.put(PASSWORD_KEY, Collections.singletonList(password));
 		UserVO userVO = otherAuthenticationService.authenticate(params);
+		if (userVO == null) {
+			throw new DemeterException(DemeterErrorCode.InvalidUser);
+		}
 		return userService.createOrUpdateUser(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER);
 	}
 

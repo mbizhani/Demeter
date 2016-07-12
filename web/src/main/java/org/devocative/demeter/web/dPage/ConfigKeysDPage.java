@@ -56,7 +56,7 @@ public class ConfigKeysDPage extends DPage {
 			protected void onSubmit(AjaxRequestTarget target) {
 				for (Map.Entry<String, String> entry : keysValue.entrySet()) {
 					String key = inverseRemappedKeys.get(entry.getKey());
-					ConfigUtil.updateProperty(key, entry.getValue());
+					ConfigUtil.updateKey(key, entry.getValue());
 				}
 			}
 		});
