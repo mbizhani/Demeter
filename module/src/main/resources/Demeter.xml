@@ -41,5 +41,10 @@
 			   title="KEY:dPage.dmt.ConfigKeys"
 			   uri="/config"
 			   inMenu="true"/>
+
+		<dPage type="org.devocative.demeter.web.dPage.CacheManagementDPage"
+			   title="Cache Management"
+			   uri="/cache"
+			   inMenu="true"/>
 	</dPages>
 </module>

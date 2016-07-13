@@ -2,19 +2,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
 	<form wicket:id="form">
-		<table style="direction: ltr" align="center">
+		<table class="dmt-simple dmt-box" style="direction: ltr">
+			<tbody>
 			<tr wicket:id="keys">
 				<td wicket:id="label"></td>
 				<td>
 					<div wicket:id="key"></div>
 				</td>
 			</tr>
+			</tbody>
+
+			<tfoot>
 			<tr>
 				<td colspan="2">
 					<input type="submit" wicket:id="update" value="Update"/>
 					<input type="reset" value="Clear"/>
 				</td>
 			</tr>
+			</tfoot>
 		</table>
 	</form>
 </wicket:panel>

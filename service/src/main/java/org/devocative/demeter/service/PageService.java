@@ -1,5 +1,7 @@
 package org.devocative.demeter.service;
 
+import org.devocative.adroit.cache.ICache;
+import org.devocative.adroit.cache.IMissedHitHandler;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.core.xml.XDPage;
@@ -8,6 +10,7 @@ import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
+import org.devocative.demeter.iservice.ICacheService;
 import org.devocative.demeter.iservice.IPageService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +23,16 @@ import java.util.Map;
 
 @Service("dmtPageService")
 public class PageService implements IPageService, IApplicationLifecycle {
+	private ICache<String, DPageInstance> pageInstCache;
 
 	@Autowired
 	private IPersistorService persistorService;
 
-	// ----------------- IApplicationLifecycle methods
+	@Autowired
+	private ICacheService cacheService;
+
+	// ------------------------------ IApplicationLifecycle methods
+
 	@Override
 	public void init() {
 		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
@@ -40,6 +48,19 @@ public class PageService implements IPageService, IApplicationLifecycle {
 				}
 			}
 		}
+
+		pageInstCache = cacheService.create("DMT_D_PAGE_INST", 20);
+		pageInstCache.setMissedHitHandler(new IMissedHitHandler<String, DPageInstance>() {
+			@Override
+			public DPageInstance loadForCache(String key) {
+				return persistorService
+					.createQueryBuilder()
+					.addFrom(DPageInstance.class, "ent")
+					.addWhere("and ent.uri = :uri")
+					.addParam("uri", key)
+					.object();
+			}
+		});
 	}
 
 	@Override
@@ -51,29 +72,18 @@ public class PageService implements IPageService, IApplicationLifecycle {
 		return ApplicationLifecyclePriority.Low;
 	}
 
-
-	// ----------------- IPageService methods
+	// ------------------------------ IPageService methods
 
 	@Override
 	public DPageInstance getPageInstanceByURI(String uri, String refIdParam) {
 		String uri2 = uri + "/" + refIdParam;
 
-		List<DPageInstance> instances = persistorService
-			.createQueryBuilder()
-			.addFrom(DPageInstance.class, "ent")
-			.addWhere("and (ent.uri = :uri or ent.uri = :uri2)")
-			.addParam("uri", uri)
-			.addParam("uri2", uri2)
-			.list();
+		if (pageInstCache.containsKey(uri2)) {
+			return pageInstCache.get(uri2);
+		}
 
-		if (instances.size() == 1) {
-			return instances.get(0);
-		} else if (instances.size() == 2) {
-			for (DPageInstance instance : instances) {
-				if (instance.getUri().equals(uri2)) {
-					return instance;
-				}
-			}
+		if (pageInstCache.containsKey(uri)) {
+			return pageInstCache.get(uri);
 		}
 
 		return null;
@@ -120,6 +130,8 @@ public class PageService implements IPageService, IApplicationLifecycle {
 		// TODO check this return or throws exception
 		return "";
 	}
+
+	// ------------------------------
 
 	private void addOrUpdatePageInfo(String module, XDPage xdPage) {
 		String baseUri;

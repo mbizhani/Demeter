@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+	<table class="dmt-simple dmt-box" cellpadding="5">
+		<thead>
+		<tr>
+			<td>#</td>
+			<td>ID</td>
+			<td>Capacity</td>
+			<td>Size</td>
+			<td>Miss Hit</td>
+			<td></td>
+		</tr>
+		</thead>
+
+		<tbody>
+		<tr wicket:id="rows">
+			<td wicket:id="rowNum"></td>
+			<td wicket:id="id"></td>
+			<td wicket:id="capacity"></td>
+			<td wicket:id="size"></td>
+			<td wicket:id="missHitCount"></td>
+			<td><a wicket:id="clear"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
+		</tr>
+		</tbody>
+	</table>
+</wicket:panel>
+</html>
