@@ -19,7 +19,7 @@ import java.util.Map;
 public class CacheService implements ICacheService {
 	private static final Logger logger = LoggerFactory.getLogger(CacheService.class);
 
-	private final Map<String, ICache<String, ?>> ALL_CACHES = new LinkedHashMap<>();
+	private final Map<String, ICache<?, ?>> ALL_CACHES = new LinkedHashMap<>();
 
 	@Autowired
 	private ISecurityService securityService;
@@ -27,9 +27,9 @@ public class CacheService implements ICacheService {
 	// ------------------------------
 
 	@Override
-	public <V> ICache<String, V> create(String id, int capacity) {
+	public <K, V> ICache<K, V> create(String id, int capacity) {
 		logger.info("ICache created: {}, capacity = {}", id, capacity);
-		ICache<String, V> cache = new LRUCache<>(capacity);
+		ICache<K, V> cache = new LRUCache<>(capacity);
 		ALL_CACHES.put(id, cache);
 		return cache;
 	}
@@ -44,7 +44,7 @@ public class CacheService implements ICacheService {
 	@Override
 	public List<CacheInfoVO> list() {
 		List<CacheInfoVO> result = new ArrayList<>();
-		for (Map.Entry<String, ICache<String, ?>> entry : ALL_CACHES.entrySet()) {
+		for (Map.Entry<String, ICache<?, ?>> entry : ALL_CACHES.entrySet()) {
 			CacheInfoVO vo = new CacheInfoVO()
 				.setId(entry.getKey())
 				.setCapacity(entry.getValue().getCapacity())

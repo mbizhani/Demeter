@@ -78,11 +78,11 @@ public class PageService implements IPageService, IApplicationLifecycle {
 	public DPageInstance getPageInstanceByURI(String uri, String refIdParam) {
 		String uri2 = uri + "/" + refIdParam;
 
-		if (pageInstCache.containsKey(uri2)) {
+		if (pageInstCache.containsKeyOrFetch(uri2)) {
 			return pageInstCache.get(uri2);
 		}
 
-		if (pageInstCache.containsKey(uri)) {
+		if (pageInstCache.containsKeyOrFetch(uri)) {
 			return pageInstCache.get(uri);
 		}
 
