@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class DTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
 
-	protected String id;
-	protected Object inputData;
-	protected Date startDate;
+	private String id;
+	private Object inputData;
+	private Date startDate;
 
 	private Long duration;
 	private Exception exception;
@@ -41,6 +41,10 @@ public abstract class DTask implements Runnable {
 	public DTask setId(String id) {
 		this.id = id;
 		return this;
+	}
+
+	public Object getInputData() {
+		return inputData;
 	}
 
 	public DTask setInputData(Object inputData) {
@@ -91,9 +95,14 @@ public abstract class DTask implements Runnable {
 	@Override
 	public void run() {
 		long start = System.currentTimeMillis();
-		String key = String.format("Task:%s{%s}", getClass().getSimpleName(), id);
+		String key;
+		if (currentUser != null && currentUser.getUsername() != null) {
+			key = String.format("Task:%s:%s:%s", getClass().getSimpleName(), currentUser.getUsername(), id);
+		} else {
+			key = String.format("Task:%s:%s", getClass().getSimpleName(), id);
+		}
 		Thread.currentThread().setName(key);
-		logger.info("Running DTask: {}", key);
+		logger.info("Executing DTask: key=[{}]", key);
 
 		init();
 		if (canStart()) {
@@ -115,6 +124,8 @@ public abstract class DTask implements Runnable {
 		}
 
 		duration = System.currentTimeMillis() - start;
+
+		logger.info("Executed DTask: key=[{}] state=[{}] dur=[{}]", key, state, duration);
 	}
 
 	public final void stop() {

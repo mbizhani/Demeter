@@ -138,13 +138,35 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	// ------------------------------ ITaskService
 
 	@Override
-	public Future<?> start(String taskBeanId) {
-		return start(taskBeanId, null, null, null);
+	public DTaskInfo load(Long id) {
+		return persistorService.get(DTaskInfo.class, id);
 	}
 
 	@Override
-	public Future<?> start(String taskBeanId, String id) {
-		return start(taskBeanId, id, null, null);
+	public DTaskInfo loadByType(String type) {
+		return persistorService
+			.createQueryBuilder()
+			.addFrom(DTaskInfo.class, "ent")
+			.addWhere("and ent.type = :type")
+			.addParam("type", type)
+			.object();
+	}
+
+	@Override
+	public List<DTaskInfo> search(long pageIndex, long pageSize) {
+		return persistorService
+			.createQueryBuilder()
+			.addFrom(DTaskInfo.class, "ent")
+			.list((pageIndex - 1) * pageSize, pageSize);
+	}
+
+	@Override
+	public long count() {
+		return persistorService
+			.createQueryBuilder()
+			.addSelect("select count(1)")
+			.addFrom(DTaskInfo.class, "ent")
+			.object();
 	}
 
 	@Override
@@ -155,19 +177,17 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskBeanId, id, inputData);
 
-		DTask dTask = (DTask) ModuleLoader.getApplicationContext().getBean(taskBeanId);
-		return startDTask(dTask, id, inputData, resultCallback);
+		Class<?> type = ModuleLoader.getApplicationContext().getType(taskBeanId);
+		return start(loadByType(type.getName()), id, inputData, resultCallback);
 	}
 
 	@Override
-	public Future<?> start(Class<? extends DTask> taskClass, String id) {
+	public Future<?> start(Long taskInfoId, String id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
 			throw new DSystemException("Task handling is not enabled");
 		}
 
-		logger.info("Starting Task: class=[{}] - id=[{}]", taskClass, id);
-		DTask dTask = ModuleLoader.getApplicationContext().getBean(taskClass);
-		return startDTask(dTask, id, null, null);
+		return start(load(taskInfoId), id, inputData, resultCallback);
 	}
 
 	@Override
@@ -180,8 +200,33 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	// ------------------------------ Private
 
+	// Main
+	private Future<?> start(DTaskInfo taskInfo, String id, Object inputData, ITaskResultCallback resultCallback) {
+		if (taskInfo.getEnabled()) {
+			try {
+				Class taskClass = Class.forName(taskInfo.getType());
+
+				logger.info("Starting Task: class=[{}] - taskInfo=[{}]", taskClass, taskInfo.getId());
+
+				DTask dTask = (DTask) ModuleLoader.getApplicationContext().getBean(taskClass);
+				return startDTask(dTask, id, inputData, resultCallback);
+			} catch (ClassNotFoundException e) {
+				logger.error("Can't find task class: class=[{}] taskInfo=[{}]", taskInfo.getType(), taskInfo.getId());
+				throw new RuntimeException(e); //TODO
+			}
+		} else {
+			logger.warn("Executing disabled task: {}", taskInfo.getType());
+		}
+
+		return null;
+	}
+
 	// Main start DTask Method
 	private Future<?> startDTask(DTask dTask, String id, Object inputData, ITaskResultCallback resultCallback) {
+		if (id == null) {
+			id = String.valueOf(System.currentTimeMillis()); //TODO using DTaskLog.id
+		}
+
 		dTask
 			.setId(id)
 			.setInputData(inputData)
@@ -190,7 +235,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		Future<?> result = null;
 		if (TASKS.containsKey(dTask.getKey())) {
-			logger.warn("Rerunning Task: {}", dTask.getKey());
+			logger.warn("ReRunning Task: {}", dTask.getKey());
 		} else {
 			TASKS.put(dTask.getKey(), dTask);
 			result = threadPoolExecutor.submit(dTask);
@@ -211,13 +256,14 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			dTaskInfo = new DTaskInfo();
 			dTaskInfo.setType(xdTask.getType());
 			dTaskInfo.setModule(module);
-
-			DTaskSchedule schedule = new DTaskSchedule();
-			schedule.setCronExpression(xdTask.getCronExpression());
-			schedule.setTask(dTaskInfo);
-
 			persistorService.saveOrUpdate(dTaskInfo);
-			persistorService.saveOrUpdate(schedule);
+
+			if (xdTask.getCronExpression() != null) {
+				DTaskSchedule schedule = new DTaskSchedule();
+				schedule.setCronExpression(xdTask.getCronExpression());
+				schedule.setTask(dTaskInfo);
+				persistorService.saveOrUpdate(schedule);
+			}
 		} else {
 			persistorService
 				.createQueryBuilder()

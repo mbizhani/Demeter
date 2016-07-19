@@ -23,7 +23,7 @@
 	</entities>
 
 	<tasks>
-		<!--<task type="org.devocative.demeter.service.task.SimpleDTask" cronExpression="0 * * * * ?" />-->
+		<task type="org.devocative.demeter.service.task.SimpleDTask"/>
 	</tasks>
 
 	<dPages>
@@ -45,6 +45,11 @@
 		<dPage type="org.devocative.demeter.web.dPage.CacheManagementDPage"
 			   title="Cache Management"
 			   uri="/cache"
+			   inMenu="true"/>
+
+		<dPage type="org.devocative.demeter.web.dPage.TaskInfoDPage"
+			   title="Task Info"
+			   uri="/task"
 			   inMenu="true"/>
 	</dPages>
 </module>

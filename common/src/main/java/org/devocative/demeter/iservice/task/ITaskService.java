@@ -1,15 +1,22 @@
 package org.devocative.demeter.iservice.task;
 
+import org.devocative.demeter.entity.DTaskInfo;
+
+import java.util.List;
 import java.util.concurrent.Future;
 
 public interface ITaskService {
-	Future<?> start(String taskBeanId);
+	DTaskInfo load(Long id);
 
-	Future<?> start(String taskBeanId, String id);
+	DTaskInfo loadByType(String type);
+
+	Future<?> start(Long taskInfoId, String id, Object inputData, ITaskResultCallback resultCallback);
+
+	List<DTaskInfo> search(long pageIndex, long pageSize);
+
+	long count();
 
 	Future<?> start(String taskBeanId, String id, Object inputData, ITaskResultCallback resultCallback);
-
-	Future<?> start(Class<? extends DTask> taskClass, String id);
 
 	void stop(String key);
 

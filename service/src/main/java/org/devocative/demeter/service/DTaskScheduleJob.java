@@ -3,7 +3,6 @@ package org.devocative.demeter.service;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.entity.DTaskSchedule;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
-import org.devocative.demeter.iservice.task.DTask;
 import org.devocative.demeter.iservice.task.ITaskService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -24,9 +23,8 @@ public class DTaskScheduleJob implements Job {
 
 		try {
 			DTaskSchedule schedule = persistorService.get(DTaskSchedule.class, new Long(scheduleId));
-			if (schedule.getEnabled() && schedule.getTask().getEnabled()) {
-				Class<? extends DTask> taskClass = (Class<? extends DTask>) Class.forName(schedule.getTask().getType());
-				taskService.start(taskClass, schedule.getRefId());
+			if (schedule.getEnabled()) {
+				taskService.start(schedule.getTask().getId(), null, schedule.getRefId(), null);
 			}
 		} catch (Exception e) {
 			logger.error("DemeterSimpleTaskJob: schedule=" + scheduleId, e);
