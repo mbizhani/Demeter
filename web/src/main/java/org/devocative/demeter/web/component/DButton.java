@@ -102,8 +102,7 @@ public class DButton extends Button {
 		if (errors.size() > 0) {
 			String st = WMessager.getScript(
 				getString("label.error", null, "Error"),
-				WMessager.getHtml(errors),
-				WMessager.ShowType.show);
+				WMessager.getHtml(errors));
 
 			getWebResponse().write(String.format("<script>$(function(){%s});</script>", st));
 		}
