@@ -3,6 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.DSystemException;
+import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.FilterOption;
 import org.devocative.demeter.iservice.persistor.Filterer;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
@@ -94,9 +95,19 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addJoin(String alias, String joinExpr) {
-		if (!join.containsKey(alias)) {
-			join.put(alias, joinExpr);
+		return addJoin(alias, joinExpr, EJoinMode.Inner);
+	}
+
+	@Override
+	public IQueryBuilder addJoin(String alias, String joinExpr, EJoinMode joinMode) {
+		if (!join.containsKey(alias.toLowerCase())) {
+			if (joinExpr.toLowerCase().contains("join")) {
+				join.put(alias.toLowerCase(), joinExpr);
+			} else {
+				join.put(alias.toLowerCase(), String.format("%s %s", joinMode.getExpr(), joinExpr));
+			}
 		} else {
 			throw new DSystemException("Duplicate join alias: " + alias);
 		}
@@ -239,7 +250,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 				else if (value.getClass().isAnnotationPresent(Filterer.class)) {
 					Class entityPropertyType;
 					String newAlias = alias + "_" + propName;
-					addJoin(newAlias, String.format("join %s.%s %s", alias, propName, newAlias));
+					addJoin(newAlias, String.format("%s.%s", alias, propName));
 					PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
 					if (propertyDescriptor == null) {
 						throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
@@ -266,7 +277,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 						}
 						if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
 							String newAlias = alias + "_" + propName;
-							addJoin(newAlias, String.format("join %s.%s %s", alias, propName, newAlias));
+							addJoin(newAlias, String.format("%s.%s", alias, propName));
 							addWhere(String.format("and %1$s in :p_%1$s", newAlias));
 							addParam("p_" + newAlias, value);
 						} else {
@@ -342,7 +353,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		if (join.size() > 0) {
 			for (Map.Entry<String, String> entry : join.entrySet()) {
 				concatAllBuilder
-					.append(" join ")
+					.append(" ")
 					.append(entry.getValue()).append(" ") // join expression
 					.append(entry.getKey()).append(" "); // join alias
 			}

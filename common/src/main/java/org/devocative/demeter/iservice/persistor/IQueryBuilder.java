@@ -28,6 +28,8 @@ public interface IQueryBuilder {
 
 	IQueryBuilder addJoin(String alias, String joinExpr);
 
+	IQueryBuilder addJoin(String alias, String joinExpr, EJoinMode joinMode);
+
 	IQueryBuilder addSubQueries(String name, IQueryBuilder builder);
 
 	IQueryBuilder setOrderBy(String order);
