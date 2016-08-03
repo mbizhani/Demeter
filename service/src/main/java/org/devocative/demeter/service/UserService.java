@@ -7,7 +7,6 @@ import org.devocative.demeter.entity.EAuthMechanism;
 import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.User;
-import org.devocative.demeter.iservice.IPageService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserVO;
@@ -21,9 +20,6 @@ public class UserService implements IUserService {
 	@Autowired
 	private IPersistorService persistorService;
 
-	@Autowired
-	private IPageService pageService;
-
 	@Override
 	public List<User> list() {
 		return persistorService.list(User.class);
@@ -35,7 +31,7 @@ public class UserService implements IUserService {
 			.createQueryBuilder()
 			.addFrom(User.class, "ent")
 			.addWhere("and ent.username = :uname")
-			.addParam("uname", username)
+			.addParam("uname", username.toLowerCase())
 			.object();
 	}
 
@@ -43,11 +39,13 @@ public class UserService implements IUserService {
 	public void saveOrUpdate(User user, String password) {
 		user.getPerson().setHasUser(true);
 
+		if (user.getUsername() != null) {
+			user.setUsername(user.getUsername().toLowerCase());
+		}
+
 		if (password != null) {
 			user.setPassword(StringEncryptorUtil.hash(password));
-		} /*else if (user.getId() != null) {
-			todo update user without password
-		}*/
+		}
 
 		persistorService.saveOrUpdate(user.getPerson());
 		persistorService.saveOrUpdate(user);
