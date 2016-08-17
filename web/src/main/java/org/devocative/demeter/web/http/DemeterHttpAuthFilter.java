@@ -88,6 +88,8 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 
 	@Override
 	public void destroy() {
-		nonceRefreshExecutor.shutdown();
+		if (nonceRefreshExecutor != null) {
+			nonceRefreshExecutor.shutdown();
+		}
 	}
 }
