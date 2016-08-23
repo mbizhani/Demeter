@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EAuthMechanism implements Serializable {
+	private static final long serialVersionUID = -6830228264271054817L;
+
 	private static final List<EAuthMechanism> LITERALS = new ArrayList<>();
 
 	// ------------------------------

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class UserVO implements Serializable {
+	private static final long serialVersionUID = -8402970677148363395L;
+
 	private boolean authenticated = false;
 	private Long userId;
 	private String username;

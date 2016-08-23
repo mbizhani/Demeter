@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EDateTimePatternType implements Serializable {
+	private static final long serialVersionUID = 3708198951457435525L;
+
 	private static final Map<Integer, String> FORMATS_MAP = new HashMap<>();
 	private static final List<EDateTimePatternType> LITERALS = new ArrayList<>();
 

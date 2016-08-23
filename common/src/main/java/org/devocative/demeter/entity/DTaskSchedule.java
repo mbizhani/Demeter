@@ -8,6 +8,8 @@ import java.util.Date;
 @Entity
 @Table(name = "t_dmt_d_task_schd")
 public class DTaskSchedule implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+	private static final long serialVersionUID = -8637907343488852636L;
+
 	@Id
 	@GeneratedValue(generator = "dmt_d_task_schd")
 	@org.hibernate.annotations.GenericGenerator(name = "dmt_d_task_schd", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",

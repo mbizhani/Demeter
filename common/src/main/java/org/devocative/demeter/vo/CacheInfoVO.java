@@ -3,6 +3,8 @@ package org.devocative.demeter.vo;
 import java.io.Serializable;
 
 public class CacheInfoVO implements Serializable {
+	private static final long serialVersionUID = 8862349754728879777L;
+
 	private String id;
 	private int capacity;
 	private int size;

@@ -9,6 +9,8 @@ import java.util.Date;
 
 @Filterer
 public class PersonFVO implements Serializable {
+	private static final long serialVersionUID = 3382486365153012902L;
+
 	private String firstName;
 
 	@FilterOption(useLike = false)

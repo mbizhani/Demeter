@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EUserStatus implements Serializable {
+	private static final long serialVersionUID = -5776208676258016175L;
 	private static final List<EUserStatus> LITERALS = new ArrayList<>();
 
 	// ------------------------------

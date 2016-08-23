@@ -7,6 +7,8 @@ import java.util.Date;
 @Entity
 @Table(name = "t_dmt_d_task_log")
 public class DTaskLog implements Serializable {
+	private static final long serialVersionUID = -7466123655350118620L;
+
 	@Id
 	@GeneratedValue(generator = "dmt_d_task_log")
 	@org.hibernate.annotations.GenericGenerator(name = "dmt_d_task_log", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",

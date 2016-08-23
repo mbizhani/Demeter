@@ -11,6 +11,8 @@ import java.util.Date;
 @Table(name = "t_dmt_person")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Person implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+	private static final long serialVersionUID = 6377393773056642925L;
+
 	@Id
 	@GeneratedValue(generator = "dmt_person")
 	@org.hibernate.annotations.GenericGenerator(name = "dmt_person", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",

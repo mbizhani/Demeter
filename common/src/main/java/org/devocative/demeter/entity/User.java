@@ -14,6 +14,8 @@ import java.util.Date;
 	@UniqueConstraint(name = "uk_dmt_user_username", columnNames = {"c_username"})
 })
 public class User implements Serializable {
+	private static final long serialVersionUID = 1580426811623477680L;
+
 	@Id
 	@GeneratedValue(generator = "SharedPrimaryKeyGenerator")
 	@GenericGenerator(name = "SharedPrimaryKeyGenerator",

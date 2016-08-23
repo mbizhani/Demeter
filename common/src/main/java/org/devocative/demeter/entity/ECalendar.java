@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ECalendar implements Serializable {
+	private static final long serialVersionUID = -8563152792867832546L;
+
 	public static final ECalendar JALALI = new ECalendar(1);
 	public static final ECalendar GREGORIAN = new ECalendar(2);
 

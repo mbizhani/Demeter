@@ -10,6 +10,8 @@ import java.util.Date;
 	@UniqueConstraint(name = "uk_dmt_task_type", columnNames = {"c_type"})
 })
 public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+	private static final long serialVersionUID = 3337198546855007284L;
+
 	@Id
 	@GeneratedValue(generator = "dmt_d_task")
 	@org.hibernate.annotations.GenericGenerator(name = "dmt_d_task", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",

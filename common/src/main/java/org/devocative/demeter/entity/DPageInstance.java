@@ -12,6 +12,8 @@ import java.util.Date;
 	@UniqueConstraint(name = "uk_dmt_pageinst_uri", columnNames = {"c_uri"})
 })
 public class DPageInstance implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+	private static final long serialVersionUID = -6082928981155342914L;
+
 	@Id
 	@GeneratedValue(generator = "dmt_d_page")
 	@org.hibernate.annotations.GenericGenerator(name = "dmt_d_page", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",

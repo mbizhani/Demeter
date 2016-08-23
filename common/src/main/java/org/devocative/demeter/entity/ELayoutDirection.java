@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ELayoutDirection implements Serializable {
+	private static final long serialVersionUID = 581360386297611032L;
+
 	public static final ELayoutDirection LTR = new ELayoutDirection(1);
 	public static final ELayoutDirection RTL = new ELayoutDirection(2);
 
