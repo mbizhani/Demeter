@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public abstract class DAjaxButton extends WAjaxButton {
+	private static final long serialVersionUID = 9103254439567154781L;
+
 	public DAjaxButton(String id) {
 		this(id, null, null);
 	}

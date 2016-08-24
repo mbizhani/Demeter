@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Index extends WebPage {
+	private static final long serialVersionUID = -4461033595410274295L;
+
 	private static final Logger logger = LoggerFactory.getLogger(Index.class);
 
 	private static final HeaderItem INDEX_CSS = CssHeaderItem.forReference(new CssResourceReference(Index.class, "wrcs/index.css"));
@@ -132,6 +134,8 @@ public class Index extends WebPage {
 		userMenu.add(new Label("userInfo", new PropertyModel<>(this, "currentUser.fullName")));
 
 		editProfile = new AjaxLink("editProfile") {
+			private static final long serialVersionUID = 1230977798401836525L;
+
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				//TODO implement it!!!
@@ -140,6 +144,8 @@ public class Index extends WebPage {
 		userMenu.add(editProfile);
 
 		signOut = new Link("signOut") {
+			private static final long serialVersionUID = -8414668952922460126L;
+
 			@Override
 			public void onClick() {
 				securityService.signOut();
@@ -155,6 +161,8 @@ public class Index extends WebPage {
 
 		if (currentUser.getSessionTimeout() > 0) {
 			add(ajaxBehavior = new AbstractDefaultAjaxBehavior() {
+				private static final long serialVersionUID = -7894142833970170434L;
+
 				@Override
 				protected void respond(AjaxRequestTarget target) {
 					logger.info("User reconnect: {}", currentUser.getUsername());

@@ -18,6 +18,8 @@ import javax.inject.Inject;
 import java.util.List;
 
 public class LoginDPage extends DPage {
+	private static final long serialVersionUID = 9081154949752445017L;
+
 	private String username, password;
 
 	@Inject
@@ -38,6 +40,8 @@ public class LoginDPage extends DPage {
 			.setRequired(true));
 
 		form.add(new DButton("signIn") {
+			private static final long serialVersionUID = 2122837596660815329L;
+
 			@Override
 			public void onFormSubmit() {
 				securityService.authenticate(username, password);

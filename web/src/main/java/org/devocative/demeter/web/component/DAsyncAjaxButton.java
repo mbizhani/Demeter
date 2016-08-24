@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public abstract class DAsyncAjaxButton extends WAsyncAjaxButton {
+	private static final long serialVersionUID = -8540976636639102816L;
+
 	public DAsyncAjaxButton(String id) {
 		this(id, null, null);
 	}

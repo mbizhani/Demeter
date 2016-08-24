@@ -15,6 +15,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class DButton extends Button {
+	private static final long serialVersionUID = 3072339866517953276L;
+
 	private static final Logger logger = LoggerFactory.getLogger(DButton.class);
 
 	private IModel<String> caption;

@@ -8,6 +8,8 @@ import org.devocative.wickomp.grid.column.OColumn;
 import org.devocative.wickomp.html.HTMLBase;
 
 public class ORESTLinkColumn<T> extends OColumn<T> {
+	private static final long serialVersionUID = 7036989891898143122L;
+
 	private Class<? extends DPage> dPageClass;
 	private String firstParamProperty;
 	private HTMLBase link;

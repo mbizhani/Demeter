@@ -317,6 +317,8 @@ public class HibernatePersistorService implements IPersistorService {
 	//----------------------------- INNER CLASSES
 
 	private class CreateModifyInterceptor extends EmptyInterceptor {
+		private static final long serialVersionUID = -820555101887857570L;
+
 		// insert
 		public boolean onSave(
 			Object entity,

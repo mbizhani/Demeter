@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import java.util.List;
 
 public abstract class DPage extends Panel {
+	private static final long serialVersionUID = -5981362081515131792L;
+
 	@Inject
 	private IPageService pageService;
 

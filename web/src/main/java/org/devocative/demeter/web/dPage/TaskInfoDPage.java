@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 public class TaskInfoDPage extends DPage {
+	private static final long serialVersionUID = 3209745189144896909L;
 
 	@Inject
 	private ITaskService taskService;
@@ -47,6 +48,8 @@ public class TaskInfoDPage extends DPage {
 		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.version"), "version"));
 
 		columnList.add(new OAjaxLinkColumn<DTaskInfo>(new Model<String>(), DemeterIcon.EXECUTE) {
+			private static final long serialVersionUID = 1953340922089825679L;
+
 			@Override
 			public void onClick(AjaxRequestTarget target, IModel<DTaskInfo> rowData) {
 				DTaskInfo taskInfo = rowData.getObject();
@@ -62,6 +65,8 @@ public class TaskInfoDPage extends DPage {
 
 
 		add(new WDataGrid<>("grid", oGrid, new IGridDataSource<DTaskInfo>() {
+			private static final long serialVersionUID = 2797941559456313234L;
+
 			@Override
 			public List<DTaskInfo> list(long pageIndex, long pageSize, List<WSortField> sortFields) {
 				return taskService.search(pageIndex, pageSize);

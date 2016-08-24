@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class DemeterWebSession extends WebSession implements OUserPreference {
+	private static final long serialVersionUID = 4582797765048584757L;
+
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebSession.class);
 
 	private UserVO userVO;

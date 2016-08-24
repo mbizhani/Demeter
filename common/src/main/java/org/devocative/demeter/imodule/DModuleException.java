@@ -1,6 +1,8 @@
 package org.devocative.demeter.imodule;
 
 public abstract class DModuleException extends RuntimeException {
+	private static final long serialVersionUID = 7282948088940717726L;
+
 	private String moduleName;
 	private DErrorCode errorCode;
 	private String errorParameter;

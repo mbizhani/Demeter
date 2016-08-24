@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CacheManagementDPage extends DPage {
+	private static final long serialVersionUID = 400340222764429243L;
+
 	private List<CacheInfoVO> list = new ArrayList<>();
 
 	@Inject
@@ -28,6 +30,8 @@ public class CacheManagementDPage extends DPage {
 		super(id, params);
 
 		add(new ListView<CacheInfoVO>("rows", list) {
+			private static final long serialVersionUID = -8699529925152792053L;
+
 			@Override
 			protected void populateItem(ListItem<CacheInfoVO> item) {
 				final CacheInfoVO vo = item.getModelObject();
@@ -38,6 +42,8 @@ public class CacheManagementDPage extends DPage {
 				item.add(new Label("size", vo.getSize()));
 				item.add(new Label("missHitCount", vo.getMissHitCount()));
 				item.add(new Link("clear") {
+					private static final long serialVersionUID = 3434202721984067781L;
+
 					@Override
 					public void onClick() {
 						cacheService.clear(vo.getId());

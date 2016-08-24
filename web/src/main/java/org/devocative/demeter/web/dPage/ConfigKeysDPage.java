@@ -21,6 +21,8 @@ import javax.inject.Inject;
 import java.util.*;
 
 public class ConfigKeysDPage extends DPage {
+	private static final long serialVersionUID = 599845806014357307L;
+
 	private static final Logger logger = LoggerFactory.getLogger(ConfigKeysDPage.class);
 
 	private Map<String, String> keysValue = new LinkedHashMap<>();
@@ -40,6 +42,8 @@ public class ConfigKeysDPage extends DPage {
 		add(form);
 
 		form.add(new ListView<IConfigKey>("keys", ConfigUtil.getConfigKeys()) {
+			private static final long serialVersionUID = 7292528901486002146L;
+
 			@Override
 			protected void populateItem(ListItem<IConfigKey> item) {
 				IConfigKey configKey = item.getModelObject();
@@ -62,6 +66,8 @@ public class ConfigKeysDPage extends DPage {
 		});
 
 		form.add(new DAjaxButton("update") {
+			private static final long serialVersionUID = 8326667705742791278L;
+
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
 				logger.warn("Update config values: User=[{}]", securityService.getCurrentUser());

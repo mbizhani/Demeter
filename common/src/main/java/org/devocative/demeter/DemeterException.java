@@ -3,6 +3,7 @@ package org.devocative.demeter;
 import org.devocative.demeter.imodule.DModuleException;
 
 public class DemeterException extends DModuleException {
+	private static final long serialVersionUID = -784969764970559551L;
 
 	public DemeterException(DemeterErrorCode errorCode) {
 		this(errorCode, null, null);
