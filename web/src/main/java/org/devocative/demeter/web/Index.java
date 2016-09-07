@@ -122,7 +122,7 @@ public class Index extends WebPage {
 
 		WebMarkupContainer header = new WebMarkupContainer("header");
 		header.add(new WMenuBar("menu", oMenuItems));
-		header.setVisible(pageParameters.get("printable").isNull());
+		header.setVisible(pageParameters.get(DemeterWebParam.PRINTABLE).isNull());
 		html.add(header);
 
 		// ---------------------- User Menu: FullName, Sign In & Out
