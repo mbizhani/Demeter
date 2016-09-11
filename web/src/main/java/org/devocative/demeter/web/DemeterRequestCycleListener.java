@@ -4,26 +4,42 @@ import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
-	private static Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
 
+	private Map<String, IRequestLifecycle> requestLifecycleBeans;
 	private ISecurityService securityService;
 
 	public DemeterRequestCycleListener() {
+		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		for (String beanName : requestLifecycleBeans.keySet()) {
+			logger.info("DemeterRequestCycleListener: IRequestLifecycle Bean = {}", beanName);
+		}
+
 		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
 	}
 
 	@Override
 	public void onBeginRequest(RequestCycle cycle) {
-		logger.debug("DemeterRequestCycleListener.onBeginRequest");
+		boolean isWSRq = WebUtil.isWebSocketRequest(cycle);
+		logger.debug("DemeterRequestCycleListener.onBeginRequest: IsWSRq={}", isWSRq);
+
+		if (requestLifecycleBeans != null && isWSRq) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+				requestLifecycle.beforeRequest();
+			}
+		}
 
 		UserVO currentUser = DemeterWebSession.get().getUserVO();
 		securityService.authenticate(currentUser);
@@ -31,7 +47,14 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 
 	@Override
 	public void onEndRequest(RequestCycle cycle) {
-		logger.debug("DemeterRequestCycleListener.onEndRequest");
+		boolean isWSRs = WebUtil.isWebSocketResponse(cycle);
+		logger.debug("DemeterRequestCycleListener.onEndRequest: IsWSRs={}", isWSRs);
+
+		if (requestLifecycleBeans != null && isWSRs) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+				requestLifecycle.afterResponse();
+			}
+		}
 
 		UserVO currentUser = securityService.getCurrentUser();
 		DemeterWebSession.get().setUserVO(currentUser);
