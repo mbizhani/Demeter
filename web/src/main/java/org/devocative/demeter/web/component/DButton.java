@@ -5,15 +5,11 @@ import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.IModel;
 import org.devocative.demeter.imodule.DModuleException;
-import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.html.HTMLBase;
 import org.devocative.wickomp.html.WMessager;
 import org.devocative.wickomp.wrcs.EasyUIBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.List;
 
 public class DButton extends Button {
 	private static final long serialVersionUID = 3072339866517953276L;
@@ -102,13 +98,6 @@ public class DButton extends Button {
 	protected void onAfterRender() {
 		super.onAfterRender();
 
-		List<Serializable> errors = WebUtil.collectAs(this, true);
-		if (errors.size() > 0) {
-			String st = WMessager.getScript(
-				getString("label.error", null, "Error"),
-				WMessager.getHtml(errors));
-
-			WebUtil.writeJQueryCall(st, true);
-		}
+		WMessager.writeErrorsInAfterRender(this);
 	}
 }
