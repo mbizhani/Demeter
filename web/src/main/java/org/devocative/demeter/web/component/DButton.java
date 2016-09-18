@@ -5,6 +5,7 @@ import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.IModel;
 import org.devocative.demeter.imodule.DModuleException;
+import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.html.HTMLBase;
 import org.devocative.wickomp.html.WMessager;
 import org.devocative.wickomp.wrcs.EasyUIBehavior;
@@ -100,13 +101,14 @@ public class DButton extends Button {
 	@Override
 	protected void onAfterRender() {
 		super.onAfterRender();
-		List<Serializable> errors = WMessager.collectMessages(this);
+
+		List<Serializable> errors = WebUtil.collectAs(this, true);
 		if (errors.size() > 0) {
 			String st = WMessager.getScript(
 				getString("label.error", null, "Error"),
 				WMessager.getHtml(errors));
 
-			getWebResponse().write(String.format("<script>$(function(){%s});</script>", st));
+			WebUtil.writeJQueryCall(st, true);
 		}
 	}
 }
