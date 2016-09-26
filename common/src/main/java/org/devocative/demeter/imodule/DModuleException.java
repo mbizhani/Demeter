@@ -15,6 +15,10 @@ public abstract class DModuleException extends RuntimeException {
 		this.errorParameter = errorParameter;
 	}
 
+	public DErrorCode getErrorCode() {
+		return errorCode;
+	}
+
 	public String getErrorParameter() {
 		return errorParameter;
 	}
