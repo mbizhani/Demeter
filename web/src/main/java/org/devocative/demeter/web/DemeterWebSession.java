@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DemeterWebSession extends WebSession implements OUserPreference {
 	private static final long serialVersionUID = 4582797765048584757L;
@@ -64,6 +65,11 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	@Override
 	public OCalendar getCalendar() {
 		return OCalendar.Persian;
+	}
+
+	@Override
+	public TimeZone getTimeZone() {
+		throw new RuntimeException("Not Implemented!");
 	}
 
 	@Override
