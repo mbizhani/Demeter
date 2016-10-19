@@ -30,13 +30,13 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>wickomp</artifactId>
-			<version>${wickomp.version}</version>
+			<version>${d.wickomp.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
 			<artifactId>wicket-spring</artifactId>
-			<version>${wicket.version}</version>
+			<version>${d.wicket.ver}</version>
 		</dependency>
 
 		<!--<dependency>
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>${servlet.version}</version>
+			<version>${d.servlet.ver}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -121,7 +121,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
+				<version>${p.jetty.ver}</version>
 				<configuration>
 					<useTestScope>true</useTestScope>
 					<webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
