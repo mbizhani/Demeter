@@ -3,6 +3,9 @@ package org.devocative.demeter.core;
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.iservice.template.IStringTemplate;
+import org.devocative.demeter.iservice.template.IStringTemplateService;
+import org.devocative.demeter.iservice.template.TemplateEngineType;
 import org.devocative.demeter.vo.filter.PersonFVO;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -11,8 +14,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TestCore {
 	private static Logger logger = LoggerFactory.getLogger(TestCore.class);
@@ -133,6 +139,29 @@ public class TestCore {
 			logger.error("f6: Filter by 'sillyProp' = {}", e.getMessage());
 			Assert.assertTrue(true);
 		}
+	}
+
+	@Test
+	public void testStringTemplate() {
+		IStringTemplateService templateService = ModuleLoader.getApplicationContext().getBean(IStringTemplateService.class);
+
+		IStringTemplate stringTemplate = templateService.create(
+			"int=${C_INT?c}&long=${C_Long?c}&bigDecimal=${BIG?c}&float=${FlT?c}&double=${dbl?c}&name=${f_name}",
+			TemplateEngineType.FreeMarker
+		);
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("c_int", 12345);
+		params.put("c_LONG", 999L);
+		params.put("big", new BigDecimal(13600602));
+		params.put("flt", 1.2);
+		params.put("dbl", 55555.23633D);
+		params.put("f_name", "Jack");
+
+		String result = stringTemplate.process(params);
+		System.out.println("result = " + result);
+
+		Assert.assertEquals("int=12345&long=999&bigDecimal=13600602&float=1.2&double=55555.23633&name=Jack", result);
 	}
 
 	@AfterClass

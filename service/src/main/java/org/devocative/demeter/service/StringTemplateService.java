@@ -1,0 +1,117 @@
+package org.devocative.demeter.service;
+
+import freemarker.template.*;
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.cache.ICache;
+import org.devocative.demeter.DemeterConfigKey;
+import org.devocative.demeter.iservice.ICacheService;
+import org.devocative.demeter.iservice.template.IStringTemplate;
+import org.devocative.demeter.iservice.template.IStringTemplateService;
+import org.devocative.demeter.iservice.template.TemplateEngineType;
+import org.devocative.demeter.service.template.FreeMarkerStringTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+@Service("dmtStringTemplateService")
+public class StringTemplateService implements IStringTemplateService {
+	private static final Logger logger = LoggerFactory.getLogger(StringTemplateService.class);
+
+	private Configuration freeMarkerCfg;
+	private ICache<String, IStringTemplate> templateCache;
+
+	@Autowired
+	private ICacheService cacheService;
+
+	// ------------------------------
+
+	@PostConstruct
+	public void initTemplateService() {
+		freeMarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
+		freeMarkerCfg.setObjectWrapper(new CaseInsensitiveVariableWrapper());
+	}
+
+	// ------------------------------
+
+	@Override
+	public IStringTemplate create(String template, TemplateEngineType engineType) {
+		String id = UUID.nameUUIDFromBytes(template.getBytes()).toString();
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.StringTemplateCacheEnabled)) {
+			if (getTemplateCache().containsKey(id)) {
+				return getTemplateCache().get(id);
+			}
+		}
+
+		IStringTemplate result;
+
+		switch (engineType) {
+
+			case FreeMarker:
+				result = createFreeMarker(id, template);
+				break;
+
+			default:
+				throw new RuntimeException("No TemplateEngineType Defined!"); //TODO
+		}
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.StringTemplateCacheEnabled)) {
+			getTemplateCache().put(id, result);
+		}
+
+		return result;
+	}
+
+	// ------------------------------
+
+	private IStringTemplate createFreeMarker(String id, String template) {
+		try {
+			Template fmTemplate = new Template(id, template, freeMarkerCfg);
+			return new FreeMarkerStringTemplate(id, fmTemplate);
+		} catch (IOException e) {
+			logger.error("FreeMarkerStringTemplateService.create", e);
+			throw new RuntimeException(e); //TODO
+		}
+	}
+
+	private ICache<String, IStringTemplate> getTemplateCache() {
+		if (templateCache == null) {
+			templateCache = cacheService.create("DMT_STRING_TEMPLATE", 50);
+		}
+
+		return templateCache;
+	}
+
+	// ------------------------------
+
+	private class CaseInsensitiveVariableWrapper implements ObjectWrapper {
+		@Override
+		public TemplateModel wrap(Object o) throws TemplateModelException {
+			if (o != null) {
+				if (o instanceof Map) {
+					Map<String, Object> oldMap = (Map<String, Object>) o;
+					Map<String, Object> newMap = new HashMap<>();
+					for (Map.Entry<String, Object> entry : oldMap.entrySet()) {
+						newMap.put(entry.getKey().toLowerCase(), entry.getValue());
+					}
+
+					return new SimpleHash((Map) newMap, null) {
+						private static final long serialVersionUID = 4486615324575062296L;
+
+						public TemplateModel get(String key) throws TemplateModelException {
+							return super.get(key.toLowerCase());
+						}
+					};
+				}
+			}
+			return null;
+		}
+	}
+}
