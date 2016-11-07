@@ -208,11 +208,11 @@
 			<distributionManagement>
 				<snapshotRepository>
 					<id>localNexus</id>
-					<url>http://localnexus:8081/nexus/content/repositories/DMSnapshot/</url>
+					<url>http://localnexus:8080/nexus/content/repositories/snapshots/</url>
 				</snapshotRepository>
 				<repository>
 					<id>localNexus</id>
-					<url>http://localnexus:8081/nexus/content/repositories/DMRelease/</url>
+					<url>http://localnexus:8080/nexus/content/repositories/releases/</url>
 				</repository>
 			</distributionManagement>
 		</profile>
