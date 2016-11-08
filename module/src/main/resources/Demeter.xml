@@ -27,27 +27,27 @@
 	</tasks>
 
 	<dPages>
-		<dPage type="org.devocative.demeter.web.dPage.InfoDPage"
+		<dPage type="org.devocative.demeter.web.dpages.InfoDPage"
 			   title="KEY:dPage.dmt.Info"
 			   uri="/info"
 			   inMenu="true"/>
 
-		<dPage type="org.devocative.demeter.web.dPage.LoginDPage"
+		<dPage type="org.devocative.demeter.web.dpages.LoginDPage"
 			   title="KEY:dPage.dmt.Login"
 			   uri="/login"
 			   inMenu="false"/>
 
-		<dPage type="org.devocative.demeter.web.dPage.ConfigKeysDPage"
+		<dPage type="org.devocative.demeter.web.dpages.ConfigKeysDPage"
 			   title="KEY:dPage.dmt.ConfigKeys"
 			   uri="/config"
 			   inMenu="true"/>
 
-		<dPage type="org.devocative.demeter.web.dPage.CacheManagementDPage"
+		<dPage type="org.devocative.demeter.web.dpages.CacheManagementDPage"
 			   title="Cache Management"
 			   uri="/cache"
 			   inMenu="true"/>
 
-		<dPage type="org.devocative.demeter.web.dPage.TaskInfoDPage"
+		<dPage type="org.devocative.demeter.web.dpages.TaskInfoDPage"
 			   title="Task Info"
 			   uri="/task"
 			   inMenu="true"/>

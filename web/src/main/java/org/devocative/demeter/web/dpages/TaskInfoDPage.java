@@ -1,4 +1,4 @@
-package org.devocative.demeter.web.dPage;
+package org.devocative.demeter.web.dpages;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
