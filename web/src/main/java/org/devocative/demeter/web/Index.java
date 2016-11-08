@@ -29,7 +29,7 @@ import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
-import org.devocative.demeter.web.dpages.LoginDPage;
+import org.devocative.demeter.web.dpage.LoginDPage;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;

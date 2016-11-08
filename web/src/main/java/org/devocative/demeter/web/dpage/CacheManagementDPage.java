@@ -1,4 +1,4 @@
-package org.devocative.demeter.web.dpages;
+package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
