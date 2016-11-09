@@ -55,7 +55,7 @@
 		<jetty.context>/ctx</jetty.context>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<d.adroit.ver>1.1</d.adroit.ver>
+		<d.adroit.ver>1.2-SNAPSHOT</d.adroit.ver>
 		<d.wickomp.ver>1.1-SNAPSHOT</d.wickomp.ver>
 
 		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
