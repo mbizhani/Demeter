@@ -158,7 +158,9 @@ public class TestCore {
 		params.put("dbl", 55555.23633D);
 		params.put("f_name", "Jack");
 
-		String result = stringTemplate.process(params, false);
+		String result = stringTemplate
+			.setConvertValuesToString(false)
+			.process(params);
 		System.out.println("result = " + result);
 
 		Assert.assertEquals("int=12345&long=999&bigDecimal=13600602&float=1.2&double=55555.23633&name=Jack", result);
@@ -168,7 +170,9 @@ public class TestCore {
 			TemplateEngineType.FreeMarker
 		);
 
-		result = stringTemplate.process(params, true);
+		result = stringTemplate
+			.setConvertValuesToString(true)
+			.process(params);
 		System.out.println("result = " + result);
 
 		Assert.assertEquals("int=12345&long=999&bigDecimal=13600602&float=1.2&double=55555.23633&name=Jack", result);

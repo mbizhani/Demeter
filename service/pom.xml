@@ -70,6 +70,12 @@
 			<version>2.3.23</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.3.9</version>
+		</dependency>
+
 		<!-- TEST SCOPED -->
 
 		<dependency>

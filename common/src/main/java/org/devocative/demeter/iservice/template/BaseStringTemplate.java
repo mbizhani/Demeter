@@ -6,11 +6,20 @@ import java.util.Map;
 public abstract class BaseStringTemplate implements IStringTemplate {
 	private Map<Class, IToStringConverter> map = new HashMap<>();
 
+	protected boolean convertValuesToString = false;
+
 	// ------------------------------
 
 	@Override
-	public <T> void registerToStringConverter(Class<T> cls, IToStringConverter<T> converter) {
+	public IStringTemplate setConvertValuesToString(boolean convertValuesToString) {
+		this.convertValuesToString = convertValuesToString;
+		return this;
+	}
+
+	@Override
+	public <T> IStringTemplate registerToStringConverter(Class<T> cls, IToStringConverter<T> converter) {
 		map.put(cls, converter);
+		return this;
 	}
 
 	// ------------------------------

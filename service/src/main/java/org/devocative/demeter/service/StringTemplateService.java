@@ -1,6 +1,8 @@
 package org.devocative.demeter.service;
 
 import freemarker.template.*;
+import groovy.lang.GroovyShell;
+import groovy.text.SimpleTemplateEngine;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.demeter.DemeterConfigKey;
@@ -9,6 +11,7 @@ import org.devocative.demeter.iservice.template.IStringTemplate;
 import org.devocative.demeter.iservice.template.IStringTemplateService;
 import org.devocative.demeter.iservice.template.TemplateEngineType;
 import org.devocative.demeter.service.template.FreeMarkerStringTemplate;
+import org.devocative.demeter.service.template.GroovyStringTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ public class StringTemplateService implements IStringTemplateService {
 	private Configuration freeMarkerCfg;
 	private ICache<String, IStringTemplate> templateCache;
 
+	private GroovyShell groovyShell;
+	private SimpleTemplateEngine simpleTemplateEngine;
+
 	@Autowired
 	private ICacheService cacheService;
 
@@ -36,6 +42,9 @@ public class StringTemplateService implements IStringTemplateService {
 	public void initTemplateService() {
 		freeMarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
 		freeMarkerCfg.setObjectWrapper(new CaseInsensitiveVariableWrapper());
+
+		groovyShell = new GroovyShell();
+		simpleTemplateEngine = new SimpleTemplateEngine();
 	}
 
 	// ------------------------------
@@ -58,6 +67,14 @@ public class StringTemplateService implements IStringTemplateService {
 				result = createFreeMarker(id, template);
 				break;
 
+			case Groovy:
+				result = createGroovy(template);
+				break;
+
+			case GroovyShell:
+				result = createGroovyShell(template);
+				break;
+
 			default:
 				throw new RuntimeException("No TemplateEngineType Defined!"); //TODO
 		}
@@ -71,12 +88,26 @@ public class StringTemplateService implements IStringTemplateService {
 
 	// ------------------------------
 
+	private IStringTemplate createGroovyShell(String template) {
+		return new GroovyStringTemplate(groovyShell.parse(template));
+	}
+
+	private IStringTemplate createGroovy(String template) {
+		try {
+			groovy.text.Template gTemplate = simpleTemplateEngine.createTemplate(template);
+			return new GroovyStringTemplate(gTemplate);
+		} catch (Exception e) {
+			logger.error("GroovyStringTemplate.create", e);
+			throw new RuntimeException(e); //TODO
+		}
+	}
+
 	private IStringTemplate createFreeMarker(String id, String template) {
 		try {
 			Template fmTemplate = new Template(id, template, freeMarkerCfg);
 			return new FreeMarkerStringTemplate(id, fmTemplate);
 		} catch (IOException e) {
-			logger.error("FreeMarkerStringTemplateService.create", e);
+			logger.error("FreeMarkerStringTemplate.create", e);
 			throw new RuntimeException(e); //TODO
 		}
 	}
