@@ -14,29 +14,33 @@ function setupFunc() {
 	});
 	Wicket.Event.subscribe('/ajax/call/failure', function (attributes, jqXHR, errorThrown, textStatus) {
 		hideBusySign();
-		alert(errorThrown);
+		$.messager.alert('', errorThrown);
 	});
 
-	if(pingServerInterval) {
-		Wicket.Event.subscribe("/websocket/open", function (jqEvent, message) {
-			console.log('Demeter Wicket.Event: websocket/open!, ' + message);
-			webSocketPingHandler = setInterval(pingServerByWS, pingServerInterval);
-		});
+	try {
+		if (pingServerInterval) {
+			Wicket.Event.subscribe("/websocket/open", function (jqEvent, message) {
+				console.log('Demeter Wicket.Event: websocket/open!, ' + message);
+				webSocketPingHandler = setInterval(pingServerByWS, pingServerInterval);
+			});
 
-		Wicket.Event.subscribe("/websocket/closed", function (jqEvent, message) {
-			console.log('Demeter Wicket.Event: websocket/closed!, ' + message);
-			window.clearInterval(webSocketPingHandler);
-		});
+			Wicket.Event.subscribe("/websocket/closed", function (jqEvent, message) {
+				console.log('Demeter Wicket.Event: websocket/closed!, ' + message);
+				window.clearInterval(webSocketPingHandler);
+			});
 
-		Wicket.Event.subscribe("/websocket/error", function (jqEvent, message) {
-			console.log('Demeter Wicket.Event: websocket/error!, ' + message);
-			window.clearInterval(webSocketPingHandler);
-		});
-	}
+			Wicket.Event.subscribe("/websocket/error", function (jqEvent, message) {
+				console.log('Demeter Wicket.Event: websocket/error!, ' + message);
+				window.clearInterval(webSocketPingHandler);
+			});
+		}
 
-	if (sessionTO && sessionTO > 3000) {
-		// alert user 3 sec before session timeout
-		setInterval(onBeforeSessionTimeout, sessionTO - 3000);
+		if (sessionTO && sessionTO > 3000) {
+			// alert user 3 sec before session timeout
+			setInterval(onBeforeSessionTimeout, sessionTO - 3000);
+		}
+	} catch (e) {
+		console.log("Undefined init var: " + e);
 	}
 }
 
@@ -53,7 +57,9 @@ function pingServerByWS() {
 }
 
 function onBeforeSessionTimeout() {
-	if(confirm('Session is to expire.Reconnect?')) {
-		Wicket.Ajax.get({u:ajaxUrl});
-	}
+	$.messager.confirm('', 'Session is to expired. Reconnect?', function (r) {
+		if (r) {
+			Wicket.Ajax.get({u: ajaxUrl});
+		}
+	});
 }

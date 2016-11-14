@@ -176,9 +176,9 @@ public class Index extends WebPage {
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		Resource.addJQueryReference(response);
+		response.render(INDEX_CSS);
 
 		String ajaxUrl = "";
-		int pingPeriodBeforeWSTimeout = ConfigUtil.getInteger(DemeterConfigKey.PingServerPeriod);
 		int alertPeriodBeforeSessionTimeout = currentUser.getSessionTimeout();
 
 		if (alertPeriodBeforeSessionTimeout > 0) {
@@ -186,11 +186,15 @@ public class Index extends WebPage {
 			ajaxUrl = ajaxBehavior.getCallbackUrl().toString();
 		}
 
-		String initJSVariables = String.format("var pingServerInterval=%d;var sessionTO=%d;var ajaxUrl='%s';",
-			pingPeriodBeforeWSTimeout, alertPeriodBeforeSessionTimeout, ajaxUrl);
+		response.render(JavaScriptHeaderItem.forScript(
+			String.format("var sessionTO=%d;var ajaxUrl='%s';", alertPeriodBeforeSessionTimeout, ajaxUrl),
+			"initJSVariables"));
 
-		response.render(INDEX_CSS);
-		response.render(JavaScriptHeaderItem.forScript(initJSVariables, "initJSVariables"));
+		if (ConfigUtil.getBoolean(DemeterConfigKey.PingServerEnabled)) {
+			int pingPeriodBeforeWSTimeout = ConfigUtil.getInteger(DemeterConfigKey.PingServerPeriod);
+			response.render(JavaScriptHeaderItem.forScript(String.format("var pingServerInterval=%d;", pingPeriodBeforeWSTimeout), "pingServer"));
+		}
+
 		response.render(INDEX_JS);
 
 		// TODO theme-based CSS loading based on user profile

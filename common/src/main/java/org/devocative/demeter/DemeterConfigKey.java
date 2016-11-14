@@ -18,6 +18,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
 	DefaultSessionTimeoutInterval("dmt.web.session.timeout", -1),
+	PingServerEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingServerPeriod("dmt.server.ping.period", 270000), //4.5 * 60 * 1000
 
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
