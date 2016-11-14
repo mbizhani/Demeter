@@ -49,7 +49,12 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 		if (requestLifecycleBeans != null) {
 			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				requestLifecycle.beforeRequest();
+				try {
+					requestLifecycle.beforeRequest();
+				} catch (Exception e) {
+					logger.error("DemeterWebListener.requestLifecycle: bean={}",
+						requestLifecycle.getClass().getName(), e);
+				}
 			}
 		}
 	}
@@ -60,7 +65,12 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 		if (requestLifecycleBeans != null) {
 			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				requestLifecycle.afterResponse();
+				try {
+					requestLifecycle.afterResponse();
+				} catch (Exception e) {
+					logger.error("DemeterWebListener.requestDestroyed: bean={}",
+						requestLifecycle.getClass().getName(), e);
+				}
 			}
 		}
 	}

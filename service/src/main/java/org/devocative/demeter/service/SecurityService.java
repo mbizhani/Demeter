@@ -27,7 +27,7 @@ import javax.naming.directory.InitialDirContext;
 import java.util.*;
 
 @Service("dmtSecurityService")
-public class SecurityService implements ISecurityService, IApplicationLifecycle {
+public class SecurityService implements ISecurityService, IApplicationLifecycle, IRequestLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
 	private static final String USERNAME_KEY = "username";
@@ -69,6 +69,17 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
 		return ApplicationLifecyclePriority.Medium;
+	}
+
+	// -------------------------- IRequestLifecycle implementation
+
+	@Override
+	public void beforeRequest() {
+	}
+
+	@Override
+	public void afterResponse() {
+		CURRENT_USER.remove();
 	}
 
 	// ------------------------------ PUBLIC METHODS

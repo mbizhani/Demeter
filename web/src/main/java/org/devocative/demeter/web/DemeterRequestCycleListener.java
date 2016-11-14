@@ -35,14 +35,24 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		boolean isWSRq = WebUtil.isWebSocketRequest(cycle);
 		logger.debug("DemeterRequestCycleListener.onBeginRequest: IsWSRq={}", isWSRq);
 
-		if (requestLifecycleBeans != null && isWSRq) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				requestLifecycle.beforeRequest();
-			}
+		try {
+			UserVO currentUser = DemeterWebSession.get().getUserVO();
+			securityService.authenticate(currentUser);
+		} catch (Exception e) {
+			logger.error("DemeterRequestCycleListener.onBeginRequest: setting currentUser", e);
 		}
 
-		UserVO currentUser = DemeterWebSession.get().getUserVO();
-		securityService.authenticate(currentUser);
+		// Other request cycles are handled in DemeterWebListener, only WebSocket is handled here!
+		if (requestLifecycleBeans != null && isWSRq) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+				try {
+					requestLifecycle.beforeRequest();
+				} catch (Exception e) {
+					logger.error("IRequestLifecycle.beforeRequest(): bean = {}",
+						requestLifecycle.getClass().getName(), e);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -50,15 +60,25 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		boolean isWSRs = WebUtil.isWebSocketResponse(cycle);
 		logger.debug("DemeterRequestCycleListener.onEndRequest: IsWSRs={}", isWSRs);
 
-		if (requestLifecycleBeans != null && isWSRs) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				requestLifecycle.afterResponse();
-			}
+		try {
+			UserVO currentUser = securityService.getCurrentUser();
+			DemeterWebSession.get().setUserVO(currentUser);
+			setSessionTimeout(cycle, currentUser.getSessionTimeout());
+		} catch (Exception e) {
+			logger.error("DemeterRequestCycleListener.onEndRequest: removing currentUser", e);
 		}
 
-		UserVO currentUser = securityService.getCurrentUser();
-		DemeterWebSession.get().setUserVO(currentUser);
-		setSessionTimeout(cycle, currentUser.getSessionTimeout());
+		// Other request cycles are handled in DemeterWebListener, only WebSocket is handled here!
+		if (requestLifecycleBeans != null && isWSRs) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+				try {
+					requestLifecycle.afterResponse();
+				} catch (Exception e) {
+					logger.error("IRequestLifecycle.afterResponse(): bean = {}",
+						requestLifecycle.getClass().getName(), e);
+				}
+			}
+		}
 	}
 
 	@Override

@@ -71,7 +71,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			scheduler.start();
 			logger.info("TaskService.init(): Scheduler Up!");
 		} catch (SchedulerException e) {
-			logger.info("TaskService.init(): StdSchedulerFactory: ", e);
+			logger.error("TaskService.init(): StdSchedulerFactory: ", e);
 			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
 		}
 
