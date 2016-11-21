@@ -3,6 +3,7 @@ package org.devocative.demeter.web;
 import org.apache.wicket.Component;
 import org.devocative.demeter.imodule.DModuleException;
 import org.devocative.wickomp.IExceptionToMessageHandler;
+import org.devocative.wickomp.WebUtil;
 
 public class DemeterExceptionToMessageHandler implements IExceptionToMessageHandler {
 	private static final long serialVersionUID = 473223768980930103L;
@@ -11,7 +12,8 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 	public String handleMessage(Component component, Exception e) {
 		if (e instanceof DModuleException) {
 			DModuleException de = (DModuleException) e;
-			String error = component.getString(de.getMessage(), null, de.getDefaultDescription());
+			String error = getMessage(component, de.getMessage(), de.getDefaultDescription());
+
 			if (de.getErrorParameter() != null) {
 				error += ": " + de.getErrorParameter();
 			} else if (de.getCause() != null) {
@@ -25,9 +27,17 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 		}
 
 		if (e.getMessage() != null) {
-			return component.getString(e.getMessage(), null, e.getMessage());
+			return getMessage(component, e.getMessage(), e.getMessage());
 		} else {
-			return "General Error: " + e.getClass().getSimpleName();
+			return String.format("[Error(%s)]", e.getClass().getName());
+		}
+	}
+
+	private String getMessage(Component cmp, String key, String defaultValue) {
+		if (cmp == null) {
+			return WebUtil.getStringOfResource(key, defaultValue);
+		} else {
+			return cmp.getString(key, null, defaultValue);
 		}
 	}
 }
