@@ -48,12 +48,16 @@ public class UrlUtil {
 		String result = "";
 
 		if (needAbsolute) {
-			result = RequestCycle.get().getRequest().getContextPath();
+			result = DemeterWebApplication.get().getContextPath();
 		}
 
 		result += DemeterWebApplication.get().getInnerContext() + href;
 
 		return result;
+	}
+
+	public static String getFileUri(String fileId) {
+		return createUri(String.format("/dmt/getfile/%s", fileId), true);
 	}
 
 	private static IPageService getPageService() {

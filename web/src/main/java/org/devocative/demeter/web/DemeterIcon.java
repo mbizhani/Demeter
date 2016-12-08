@@ -18,4 +18,6 @@ public class DemeterIcon {
 
 	public static final IconFont TRUE = new FontAwesome("check", new ResourceModel("label.true", "True")).setStyleClass("ic-true");
 	public static final IconFont FALSE = new FontAwesome("times", new ResourceModel("label.false", "False")).setStyleClass("ic-false");
+
+	public static final IconFont DOWNLOAD = new FontAwesome("download", new ResourceModel("label.download", "Download"));
 }

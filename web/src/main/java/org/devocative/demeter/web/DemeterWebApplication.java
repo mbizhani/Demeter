@@ -63,6 +63,8 @@ public class DemeterWebApplication extends WebApplication {
 
 		mountPage(APP_INNER_CTX, Index.class);
 
+		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(ModuleLoader.getApplicationContext()));
+
 		initModulesForWeb();
 
 		AsyncMediator.init(this);
@@ -80,6 +82,10 @@ public class DemeterWebApplication extends WebApplication {
 
 	public String getInnerContext() {
 		return APP_INNER_CTX;
+	}
+
+	public String getContextPath() {
+		return getServletContext().getContextPath();
 	}
 
 	public List<String> getModulesRelatedCSS() {

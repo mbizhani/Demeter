@@ -18,6 +18,8 @@
 		<entity type="org.devocative.demeter.entity.DTaskSchedule"/>
 		<entity type="org.devocative.demeter.entity.DTaskLog"/>
 
+		<entity type="org.devocative.demeter.entity.FileStore"/>
+
 		<entity type="org.devocative.demeter.entity.Person"/>
 		<entity type="org.devocative.demeter.entity.User"/>
 	</entities>
@@ -43,13 +45,19 @@
 			   inMenu="true"/>
 
 		<dPage type="org.devocative.demeter.web.dpage.CacheManagementDPage"
-			   title="Cache Management"
+			   title="KEY:dPage.dmt.CacheManagement"
 			   uri="/cache"
 			   inMenu="true"/>
 
 		<dPage type="org.devocative.demeter.web.dpage.TaskInfoDPage"
-			   title="Task Info"
+			   title="KEY:dPage.dmt.TaskInfoList"
 			   uri="/task"
 			   inMenu="true"/>
+
+		<dPage type="org.devocative.demeter.web.dpage.FileStoreListDPage"
+			   title="KEY:dPage.dmt.FileStoreList"
+			   uri="/files"
+			   inMenu="true"/>
+
 	</dPages>
 </module>

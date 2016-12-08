@@ -31,7 +31,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	TaskPoolMax("dmt.task.pool.max", 10),
 	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),
 
-	StringTemplateCacheEnabled("dmt.string.template.cache.enabled", true, Arrays.asList(true, false)),;
+	StringTemplateCacheEnabled("dmt.string.template.cache.enabled", true, Arrays.asList(true, false)),
+
+	FileBaseDir(true, "dmt.file.base.dir"),;
 
 
 	private String key;
