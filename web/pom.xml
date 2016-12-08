@@ -155,6 +155,13 @@
 				</executions>
 			</plugin>
 
+			<!-- Devolcano -->
+			<plugin>
+				<groupId>org.devocative</groupId>
+				<artifactId>demeter-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

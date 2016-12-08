@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE plan PUBLIC
+		"Plan"
+		"http://www.devocative.org/dtd/devolcano-plan.dtd">
+
+<plan>
+	<pre>
+		<![CDATA[
+			def params = [
+				moduleShortName : "DMT".toLowerCase(),
+				ajaxEditColumn  : true,
+				iconClass       : org.devocative.demeter.web.DemeterIcon
+			]
+		]]>
+	</pre>
+
+	<packageMap>
+		<from pkg="org.devocative.demeter.entity" includeSubPackages="false" includePattern="File">
+			<to pkgReplace="entity:vo.filter" generatorRef="FVO" genDir="common/src/main/java"/>
+
+			<to pkgReplace="entity:iservice" generatorRef="ServiceI" genDir="common/src/main/java"/>
+			<to pkgReplace="entity:service" generatorRef="ServiceM" genDir="service/src/main/java"/>
+
+			<to pkgReplace="entity:web.dpage" generatorRef="ListH" genDir="web/src/main/java"/>
+			<to pkgReplace="entity:web.dpage" generatorRef="ListJ" genDir="web/src/main/java"/>
+
+			<to pkgReplace="entity:web.dpage" generatorRef="FormH" genDir="web/src/main/java"/>
+			<to pkgReplace="entity:web.dpage" generatorRef="FormJ" genDir="web/src/main/java"/>
+		</from>
+	</packageMap>
+
+	<volcanoes>
+
+		<volcano name="FVO">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/FVO.gsp"
+					  suffix="FVO"
+					  genFileType="java"
+					  overwrite="check">
+				<overwriteCheckString>//overwrite</overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="ServiceI">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/ServiceInterface.gsp"
+					  prefix="I"
+					  suffix="Service"
+					  genFileType="java"
+					  overwrite="check">
+				<overwriteCheckString>//overwrite</overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="ServiceM">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/ServiceMain.gsp"
+					  suffix="Service"
+					  genFileType="java"
+					  overwrite="check">
+				<overwriteCheckString>//overwrite</overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="ListH">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/ListH.gsp"
+					  suffix="ListDPage"
+					  genFileType="html"
+					  overwrite="check">
+				<overwriteCheckString><![CDATA[<!--overwrite-->]]></overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="ListJ">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/ListJ.gsp"
+					  suffix="ListDPage"
+					  genFileType="java"
+					  overwrite="check">
+				<overwriteCheckString>//overwrite</overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="FormH">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/FormH.gsp"
+					  suffix="FormDPage"
+					  genFileType="html"
+					  overwrite="check">
+				<overwriteCheckString><![CDATA[<!--overwrite-->]]></overwriteCheckString>
+			</template>
+		</volcano>
+
+		<volcano name="FormJ">
+			<precondition>
+				<![CDATA[
+				targetClass.ok && targetClass.entity
+				]]>
+			</precondition>
+			<template file="/templates/FormJ.gsp"
+					  suffix="FormDPage"
+					  genFileType="java"
+					  overwrite="check">
+				<overwriteCheckString>//overwrite</overwriteCheckString>
+			</template>
+		</volcano>
+
+	</volcanoes>
+
+</plan>

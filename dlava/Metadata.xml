@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE meta PUBLIC
+		"Meta Data"
+		"http://www.devocative.org/dtd/devolcano-metadata.dtd">
+
+<meta>
+	<filterClass>targetClass.entity</filterClass>
+	<classes>
+		<class fqn="org.devocative.demeter.entity.DPageInfo">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="type">
+					<finfo/>
+				</field>
+				<field name="module">
+					<finfo/>
+				</field>
+				<field name="baseUri">
+					<finfo/>
+				</field>
+				<field name="enabled">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.DPageInstance">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="title">
+					<finfo/>
+				</field>
+				<field name="uri">
+					<finfo/>
+				</field>
+				<field name="inMenu">
+					<finfo/>
+				</field>
+				<field name="refId">
+					<finfo/>
+				</field>
+				<field name="pageInfo">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.DTaskInfo">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="type">
+					<finfo/>
+				</field>
+				<field name="module">
+					<finfo/>
+				</field>
+				<field name="enabled">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.DTaskLog">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="key">
+					<finfo/>
+				</field>
+				<field name="start">
+					<finfo hasTimePart="true"/>
+				</field>
+				<field name="end">
+					<finfo hasTimePart="true"/>
+				</field>
+				<field name="state">
+					<finfo/>
+				</field>
+				<field name="task">
+					<finfo/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.DTaskSchedule">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="serialVersionUID">
+					<finfo ignore="true"/>
+				</field>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="refId">
+					<finfo/>
+				</field>
+				<field name="enabled">
+					<finfo/>
+				</field>
+				<field name="cronExpression">
+					<finfo/>
+				</field>
+				<field name="task">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.FileStore">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="serialVersionUID">
+					<finfo ignore="true"/>
+				</field>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="name">
+					<finfo/>
+				</field>
+				<field name="status">
+					<finfo/>
+				</field>
+				<field name="mimeType">
+					<finfo/>
+				</field>
+				<field name="fileId">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="expiration">
+					<finfo hasTimePart="true"/>
+				</field>
+				<field name="tag">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.Person">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="serialVersionUID">
+					<finfo ignore="true"/>
+				</field>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="firstName">
+					<finfo/>
+				</field>
+				<field name="lastName">
+					<finfo/>
+				</field>
+				<field name="birthRegDate">
+					<finfo hasTimePart="true"/>
+				</field>
+				<field name="email">
+					<finfo/>
+				</field>
+				<field name="mobile">
+					<finfo/>
+				</field>
+				<field name="systemNumber">
+					<finfo/>
+				</field>
+				<field name="hasUser">
+					<finfo/>
+				</field>
+				<field name="user">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasSVO="false"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.User">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="serialVersionUID">
+					<finfo ignore="true"/>
+				</field>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="username">
+					<finfo/>
+				</field>
+				<field name="password">
+					<finfo/>
+				</field>
+				<field name="authMechanism">
+					<finfo/>
+				</field>
+				<field name="status">
+					<finfo/>
+				</field>
+				<field name="calendarType">
+					<finfo/>
+				</field>
+				<field name="layoutDirectionType">
+					<finfo/>
+				</field>
+				<field name="datePatternType">
+					<finfo/>
+				</field>
+				<field name="dateTimePatternType">
+					<finfo/>
+				</field>
+				<field name="lastLoginDate">
+					<finfo hasTimePart="true"/>
+				</field>
+				<field name="constraints">
+					<finfo/>
+				</field>
+				<field name="admin">
+					<finfo/>
+				</field>
+				<field name="sessionTimeout">
+					<finfo/>
+				</field>
+				<field name="person">
+					<finfo/>
+				</field>
+			</fields>
+		</class>
+	</classes>
+</meta>
