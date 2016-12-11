@@ -50,6 +50,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 	private WDataGrid<FileStore> grid;
 	private String[] removeColumns;
 
+	private Boolean gridFit;
 	private boolean gridEnabled = false;
 	private OSize gridHeight = OSize.fixed(500);
 	private OSize gridWidth = OSize.percent(100);
@@ -179,7 +180,8 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 			.setColumns(columnList)
 			.setMultiSort(false)
 			.setHeight(gridHeight)
-			.setWidth(gridWidth);
+			.setWidth(gridWidth)
+			.setFit(gridFit);
 
 		grid = new WDataGrid<>("grid", oGrid, this);
 		add(grid);
@@ -221,6 +223,11 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 
 	public FileStoreListDPage setGridWidth(OSize gridWidth) {
 		this.gridWidth = gridWidth;
+		return this;
+	}
+
+	public FileStoreListDPage setGridFit(Boolean gridFit) {
+		this.gridFit = gridFit;
 		return this;
 	}
 

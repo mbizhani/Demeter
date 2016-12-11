@@ -20,4 +20,6 @@ public class DemeterIcon {
 	public static final IconFont FALSE = new FontAwesome("times", new ResourceModel("label.false", "False")).setStyleClass("ic-false");
 
 	public static final IconFont DOWNLOAD = new FontAwesome("download", new ResourceModel("label.download", "Download"));
+	public static final IconFont ATTACHMENT = new FontAwesome("paperclip", new ResourceModel("label.attachment", "Attachment"));
+	public static final IconFont INFO = new FontAwesome("bug", new ResourceModel("label.info", "Info"));
 }
