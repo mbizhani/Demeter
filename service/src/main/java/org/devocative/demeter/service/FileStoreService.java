@@ -1,5 +1,6 @@
 package org.devocative.demeter.service;
 
+import org.apache.commons.io.FileUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
@@ -11,18 +12,22 @@ import org.devocative.demeter.iservice.FileStoreHandler;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.filter.FileStoreFVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Service("dmtFileStoreService")
 public class FileStoreService implements IFileStoreService {
+	private static Logger logger = LoggerFactory.getLogger(FileStoreService.class);
 
 	@Autowired
 	private IPersistorService persistorService;
@@ -114,4 +119,71 @@ public class FileStoreService implements IFileStoreService {
 		}
 	}
 
+	@Override
+	public void doExpire() {
+		logger.info("Starting FileStoreDTask ...");
+
+		try {
+			Date now = new Date();
+
+			String dir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + "EXPIRED";
+			File expiredDir = new File(dir);
+
+			if (expiredDir.exists()) {
+				logger.info("Deleting old expired files");
+				FileUtils.deleteDirectory(expiredDir);
+			}
+
+			expiredDir.mkdirs();
+
+			List<String> fileIds = listOfExpiredFiles(now);
+			logger.info("Try to expire files: no=[{}]", fileIds.size());
+
+			if (!fileIds.isEmpty()) {
+				for (String id : fileIds) {
+					String f = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + id;
+					File file = new File(f);
+					if (file.exists()) {
+						FileUtils.moveFileToDirectory(file, expiredDir, false);
+					}
+				}
+
+				logger.info("Files are moved to temp");
+
+				int updated = updateExpiredFilesStatus(now);
+
+				logger.info("Expired files status are updated: no=[{}]", updated);
+			}
+
+		} catch (IOException e) {
+			logger.error("FileStoreDTask: ", e);
+		}
+
+	}
+
+	// ------------------------------
+
+	private List<String> listOfExpiredFiles(Date dt) {
+		return persistorService
+			.createQueryBuilder()
+			.addSelect("select ent.fileId")
+			.addFrom(FileStore.class, "ent")
+			.addWhere("and ent.expiration < :dt")
+			.addParam("dt", dt)
+			.addWhere("and ent.status = :st")
+			.addParam("st", EFileStatus.VALID)
+			.list();
+	}
+
+	private int updateExpiredFilesStatus(Date dt) {
+		return persistorService
+			.createQueryBuilder()
+			.addSelect("update FileStore ent set ent.status = :new_st")
+			.addParam("new_st", EFileStatus.EXPIRED)
+			.addWhere("and ent.expiration < :dt")
+			.addParam("dt", dt)
+			.addWhere("and ent.status = :old_st")
+			.addParam("old_st", EFileStatus.VALID)
+			.update();
+	}
 }

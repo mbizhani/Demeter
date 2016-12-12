@@ -1,19 +1,20 @@
 package org.devocative.demeter.service.task;
 
+import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.iservice.task.DTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Scope("prototype")
-@Component("dmtSimpleDTask")
-public class SimpleDTask extends DTask {
-	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
+@Component("dmtFileStoreDTask")
+public class FileStoreDTask extends DTask {
+
+	@Autowired
+	private IFileStoreService fileStoreService;
 
 	@Override
 	public void init() {
-		logger.info("SimpleDTask.init");
 	}
 
 	@Override
@@ -23,6 +24,6 @@ public class SimpleDTask extends DTask {
 
 	@Override
 	public void execute() {
-		logger.info("SimpleDTask.execute: {}", getCurrentUser());
+		fileStoreService.doExpire();
 	}
 }

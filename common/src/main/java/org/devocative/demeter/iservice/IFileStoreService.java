@@ -28,4 +28,6 @@ public interface IFileStoreService {
 	// ==============================
 
 	FileStoreHandler create(String name, EMimeType mimeType, Date expiration, String tag);
+
+	void doExpire();
 }
