@@ -32,7 +32,7 @@ public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate
 	@Column(name = "b_enabled", nullable = false)
 	private Boolean enabled = true;
 
-	//----------------------------- CREATE / MODIFY
+	// --------------- CREATE / MODIFY
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -63,6 +63,8 @@ public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate
 	@Version
 	@Column(name = "n_version", nullable = false)
 	private Integer version = 0;
+
+	// ------------------------------
 
 	public Long getId() {
 		return id;
@@ -95,6 +97,8 @@ public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
+
+	// --------------- CREATE / MODIFY
 
 	@Override
 	public Date getCreationDate() {
@@ -161,6 +165,8 @@ public class DTaskInfo implements ICreationDate, ICreatorUser, IModificationDate
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
+
+	// ---------------
 
 	@Override
 	public boolean equals(Object o) {

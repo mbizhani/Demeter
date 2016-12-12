@@ -46,6 +46,8 @@ public class FileStoreResourceReference extends ResourceReference {
 
 				ResourceResponse resourceResponse = new ResourceResponse();
 
+				// TODO: check authorization, e.g. currentUser=fileStore.creatorUser
+
 				if (fileStore != null) {
 					logger.info("Download file: fileid={} filename={}", fileid, fileStore.getName());
 
