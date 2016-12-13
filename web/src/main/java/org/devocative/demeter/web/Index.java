@@ -71,7 +71,7 @@ public class Index extends WebPage {
 	// ------------------------------
 
 	public Index(PageParameters pageParameters) {
-		securityService.authenticate(WebUtil.toMap(getRequest().getRequestParameters(), true, true));
+		securityService.authenticate(WebUtil.toMap(true, true));
 		currentUser = securityService.getCurrentUser();
 
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");

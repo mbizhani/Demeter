@@ -3,6 +3,7 @@ package org.devocative.demeter.vo;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInstance;
+import org.devocative.demeter.entity.User;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,12 +22,16 @@ public class UserVO implements Serializable {
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
+	// ------------------------------
+
 	public UserVO(Long userId, String username, String firstName, String lastName) {
 		this.userId = userId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
+
+	// ------------------------------
 
 	public boolean isAuthenticated() {
 		return authenticated;
@@ -94,18 +99,28 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
+	public Object getOtherProfileInfo(String key) {
+		return otherProfileInfo.get(key);
+	}
+
+	// ------------------------------
+
 	public UserVO addOtherProfileInfo(String key, Object info) {
 		otherProfileInfo.put(key, info);
 		return this;
 	}
 
-	public Object getOtherProfileInfo(String key) {
-		return otherProfileInfo.get(key);
-	}
-
 	public Object removeOtherProfileInfo(String key) {
 		return otherProfileInfo.remove(key);
 	}
+
+	public User toUser() {
+		User user = new User();
+		user.setId(getUserId());
+		return user;
+	}
+
+	// ------------------------------
 
 	@Override
 	public String toString() {
