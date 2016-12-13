@@ -206,6 +206,9 @@
 				<field name="status">
 					<finfo/>
 				</field>
+				<field name="storage">
+					<finfo hasForm="false"/>
+				</field>
 				<field name="mimeType">
 					<finfo/>
 				</field>

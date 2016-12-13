@@ -3,6 +3,7 @@ package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.entity.EFileStatus;
+import org.devocative.demeter.entity.EFileStorage;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.persistor.Filterer;
@@ -17,6 +18,7 @@ public class FileStoreFVO implements Serializable {
 
 	private String name;
 	private List<EFileStatus> status;
+	private List<EFileStorage> storage;
 	private List<EMimeType> mimeType;
 	private String fileId;
 	private String tag;
@@ -42,6 +44,14 @@ public class FileStoreFVO implements Serializable {
 
 	public void setStatus(List<EFileStatus> status) {
 		this.status = status;
+	}
+
+	public List<EFileStorage> getStorage() {
+		return storage;
+	}
+
+	public void setStorage(List<EFileStorage> storage) {
+		this.storage = storage;
 	}
 
 	public List<EMimeType> getMimeType() {

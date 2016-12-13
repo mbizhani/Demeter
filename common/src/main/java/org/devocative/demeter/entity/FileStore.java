@@ -29,6 +29,10 @@ public class FileStore implements ICreationDate, ICreatorUser, IModificationDate
 	private EFileStatus status;
 
 	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "e_storage", nullable = false))
+	private EFileStorage storage;
+
+	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_mime_type", nullable = false))
 	private EMimeType mimeType;
 
@@ -96,6 +100,15 @@ public class FileStore implements ICreationDate, ICreatorUser, IModificationDate
 
 	public void setStatus(EFileStatus status) {
 		this.status = status;
+	}
+
+	public EFileStorage getStorage() {
+		return storage;
+	}
+
+	public FileStore setStorage(EFileStorage storage) {
+		this.storage = storage;
+		return this;
 	}
 
 	public EMimeType getMimeType() {

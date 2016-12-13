@@ -4,9 +4,6 @@ import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.apache.wicket.util.io.IOUtils;
-import org.devocative.adroit.ConfigUtil;
-import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.iservice.IFileStoreService;
@@ -14,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -42,7 +37,7 @@ public class FileStoreResourceReference extends ResourceReference {
 			protected ResourceResponse newResourceResponse(Attributes attributes) {
 				final String fileid = attributes.getParameters().get("fileid").toString();
 
-				FileStore fileStore = fileStoreService.loadByFileId(fileid);
+				final FileStore fileStore = fileStoreService.loadByFileId(fileid);
 
 				ResourceResponse resourceResponse = new ResourceResponse();
 
@@ -60,11 +55,7 @@ public class FileStoreResourceReference extends ResourceReference {
 						@Override
 						public void writeData(Attributes attributes) throws IOException {
 							OutputStream out = attributes.getResponse().getOutputStream();
-
-							String baseDir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir);
-							String path = baseDir + File.separator + fileid;
-
-							IOUtils.copy(new FileInputStream(path), out);
+							fileStoreService.writeFile(fileStore, out);
 						}
 					});
 				} else {

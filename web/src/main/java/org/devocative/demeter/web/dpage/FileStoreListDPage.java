@@ -7,6 +7,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.entity.EFileStatus;
+import org.devocative.demeter.entity.EFileStorage;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.iservice.IFileStoreService;
@@ -95,6 +96,8 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 			.setLabel(new ResourceModel("FileStore.name")));
 		floatTable.add(new WSelectionInput("status", EFileStatus.list(), true)
 			.setLabel(new ResourceModel("FileStore.status")));
+		floatTable.add(new WSelectionInput("storage", EFileStorage.list(), true)
+			.setLabel(new ResourceModel("FileStore.storage")));
 		floatTable.add(new WSelectionInput("mimeType", EMimeType.list(), true)
 			.setLabel(new ResourceModel("FileStore.mimeType")));
 		floatTable.add(new WTextInput("fileId")
@@ -131,6 +134,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 		OColumnList<FileStore> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.name"), "name"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.status"), "status"));
+		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.storage"), "storage"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.mimeType"), "mimeType"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.fileId"), "fileId"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.tag"), "tag"));

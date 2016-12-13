@@ -1,13 +1,11 @@
 package org.devocative.demeter.service;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.util.IOUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.entity.EFileStatus;
-import org.devocative.demeter.entity.EMimeType;
-import org.devocative.demeter.entity.FileStore;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.FileStoreHandler;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -17,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -92,30 +87,66 @@ public class FileStoreService implements IFileStoreService {
 	// ==============================
 
 	@Override
-	public FileStoreHandler create(String name, EMimeType mimeType, Date expiration, String tag) {
-		File baseDir = new File(ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
-
-		if (!baseDir.exists()) {
-			baseDir.mkdirs();
-		} else if (!baseDir.isDirectory()) {
-			throw new DSystemException("Invalid base directory for file: " + ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
-		}
-
-		String fileId = UUID.randomUUID().toString().replaceAll("-", "");
-		String fileFQN = baseDir.getAbsolutePath() + File.separator + fileId;
-
+	public FileStoreHandler create(String name, EFileStorage storage, EMimeType mimeType, Date expiration, String... tags) {
 		FileStore fileStore = new FileStore();
 		fileStore.setName(name);
+		fileStore.setStorage(storage);
 		fileStore.setStatus(EFileStatus.VALID);
 		fileStore.setMimeType(mimeType);
-		fileStore.setFileId(fileId);
 		fileStore.setExpiration(expiration);
-		fileStore.setTag(tag);
+		if (tags != null && tags.length > 0) {
+			String tag = tags[0];
+			for (int i = 1; i < tags.length; i++) {
+				tag += "," + tags[i];
+			}
+			fileStore.setTag(tag);
+		}
 
-		try {
-			return new FileStoreHandler(this, new FileOutputStream(fileFQN), fileStore);
-		} catch (FileNotFoundException e) {
-			throw new DSystemException("Can't create file: " + fileFQN, e);
+		OutputStream outputStream;
+
+		if (EFileStorage.DISK.equals(storage)) {
+			String fileId = UUID.randomUUID().toString().replaceAll("-", "");
+			fileStore.setFileId(fileId);
+
+			File baseDir = new File(ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
+
+			if (!baseDir.exists()) {
+				baseDir.mkdirs();
+			} else if (!baseDir.isDirectory()) {
+				throw new DSystemException("Invalid base directory for file: " + ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
+			}
+
+			String fileFQN = baseDir.getAbsolutePath() + File.separator + fileId;
+
+			try {
+				outputStream = new FileOutputStream(fileFQN);
+			} catch (FileNotFoundException e) {
+				throw new DSystemException("Can't create file: " + fileFQN, e);
+			}
+		} else if (EFileStorage.DATA_BASE.equals(storage)) {
+			throw new RuntimeException("Database as storage is not implemented!");
+		} else {
+			throw new RuntimeException("Invalid storage for FileStore: " + storage);
+		}
+
+		return new FileStoreHandler(this, outputStream, fileStore);
+	}
+
+	@Override
+	public void writeFile(FileStore fileStore, OutputStream outputStream) {
+		if (EFileStorage.DISK.equals(fileStore.getStorage())) {
+			String baseDir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir);
+			String path = baseDir + File.separator + fileStore.getFileId();
+
+			try {
+				IOUtils.copy(new FileInputStream(path), outputStream);
+			} catch (IOException e) {
+				throw new DSystemException("Can't open file: " + path, e);
+			}
+		} else if (EFileStorage.DATA_BASE.equals(fileStore.getStorage())) {
+			throw new RuntimeException("Database as storage is not implemented!");
+		} else {
+			throw new RuntimeException("Invalid storage for FileStore: " + fileStore.getStorage());
 		}
 	}
 

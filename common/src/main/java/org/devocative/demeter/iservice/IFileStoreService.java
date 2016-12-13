@@ -1,10 +1,12 @@
 package org.devocative.demeter.iservice;
 
+import org.devocative.demeter.entity.EFileStorage;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.vo.filter.FileStoreFVO;
 
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +29,9 @@ public interface IFileStoreService {
 
 	// ==============================
 
-	FileStoreHandler create(String name, EMimeType mimeType, Date expiration, String tag);
+	FileStoreHandler create(String name, EFileStorage storage, EMimeType mimeType, Date expiration, String... tags);
+
+	void writeFile(FileStore fileStore, OutputStream outputStream);
 
 	void doExpire();
 }
