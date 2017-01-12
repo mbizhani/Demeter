@@ -25,6 +25,9 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 	@Column(name = "c_type", nullable = false)
 	private String type;
 
+	@Column(name = "c_type_alt")
+	private String typeAlt;
+
 	@Column(name = "c_module", nullable = false)
 	private String module;
 
@@ -60,6 +63,14 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getTypeAlt() {
+		return typeAlt;
+	}
+
+	public void setTypeAlt(String typeAlt) {
+		this.typeAlt = typeAlt;
 	}
 
 	public String getModule() {

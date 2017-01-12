@@ -120,7 +120,7 @@ public class PageService implements IPageService, IApplicationLifecycle {
 		DPageInfo pageInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInfo.class, "ent")
-			.addWhere("and ent.type = :type")
+			.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
 			.addParam("type", dPageClass.getName())
 			.object();
 		if (pageInfo != null) {
@@ -144,15 +144,17 @@ public class PageService implements IPageService, IApplicationLifecycle {
 		DPageInfo pageInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInfo.class, "ent")
-			.addWhere("and (ent.type = :type or ent.baseUri = :uri)")
+			.addWhere("and (ent.type = :type or ent.typeAlt = :type or ent.baseUri = :uri)")
 			.addParam("type", xdPage.getType())
 			.addParam("uri", baseUri)
 			.object();
 
 		if (pageInfo == null) {
 			pageInfo = new DPageInfo();
+			pageInfo.setType(xdPage.getType());
+		} else if (!pageInfo.getType().equals(xdPage.getType())) {
+			pageInfo.setTypeAlt(xdPage.getType());
 		}
-		pageInfo.setType(xdPage.getType());
 		pageInfo.setModule(module);
 		pageInfo.setEnabled(true);
 		pageInfo.setBaseUri(baseUri);

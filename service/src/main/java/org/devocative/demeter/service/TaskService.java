@@ -133,6 +133,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+		logger.error("*** TaskService.RejectedExecution: {}", r);
 	}
 
 	// ------------------------------ ITaskService

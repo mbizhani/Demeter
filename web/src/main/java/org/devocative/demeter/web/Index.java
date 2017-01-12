@@ -25,6 +25,7 @@ import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
+import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IPageService;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -108,7 +109,7 @@ public class Index extends WebPage {
 					}
 				}
 
-				createDPageFromType(pageInstance.getPageInfo().getType(), params);
+				createDPageFromType(pageInstance.getPageInfo(), params);
 			} else {
 				content = new Label("content", new ResourceModel("err.dmt.UnknownDPage"));
 			}
@@ -227,9 +228,9 @@ public class Index extends WebPage {
 
 	// ------------------------------
 
-	private void createDPageFromType(String type, List<String> params) {
+	private void createDPageFromType(DPageInfo pageInfo, List<String> params) {
 		try {
-			Class<? extends DPage> dPageClass = (Class<? extends DPage>) Class.forName(type);
+			Class<? extends DPage> dPageClass = findDPageClass(pageInfo);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
 				if (currentUser.isAuthenticated() || dPageClass.equals(LoginDPage.class)) {
 					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
@@ -244,16 +245,32 @@ public class Index extends WebPage {
 					content = new WebComponent("content");
 				}
 			} else {
-				logger.error("The class is not DPage: " + type);
+				logger.error("The class is not DPage: {}", dPageClass.getName());
 				content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 			}
 		} catch (ClassNotFoundException e) {
-			logger.error("DPage class not found: " + type);
+			logger.error("DPage class not found", e);
 			content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 		} catch (Exception e) {
-			logger.error("DPage instantiation problem: " + type, e);
+			logger.error("DPage instantiation problem", e);
 			content = new Label("content", new ResourceModel("err.dmt.DPageInstantiation"));
 		}
+	}
+
+	private Class<? extends DPage> findDPageClass(DPageInfo pageInfo) throws ClassNotFoundException {
+		String type = null;
+		try {
+			type = pageInfo.getType();
+			return (Class<? extends DPage>) Class.forName(type);
+		} catch (ClassNotFoundException e) {
+			logger.debug("Class not found: {}", type);
+		}
+
+		if (pageInfo.getTypeAlt() != null) {
+			return (Class<? extends DPage>) Class.forName(pageInfo.getTypeAlt());
+		}
+
+		throw new ClassNotFoundException(type);
 	}
 
 	private void createDefaultMenus() {
