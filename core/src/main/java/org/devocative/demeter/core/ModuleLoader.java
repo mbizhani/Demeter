@@ -3,6 +3,7 @@ package org.devocative.demeter.core;
 import com.thoughtworks.xstream.XStream;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.IConfigKey;
+import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.xml.XEntity;
@@ -50,6 +51,7 @@ public class ModuleLoader {
 
 	public synchronized static void init() {
 		if (!inited) {
+			initEncDec();
 			initModules();
 			initSpringContext();
 			initPersistorServices();
@@ -75,6 +77,7 @@ public class ModuleLoader {
 	public static void generatePersistorSchemaDiff() {
 		ConfigUtil.removeKey("dmt.db.apply.ddl");
 
+		initEncDec();
 		initModules();
 		initSpringContext();
 		initPersistorServices();
@@ -88,6 +91,41 @@ public class ModuleLoader {
 		for (Map.Entry<String, IPersistorService> entry : persistorServiceMap.entrySet()) {
 			logger.info("Persistor schema diff: {}", entry.getKey());
 			entry.getValue().generateSchemaDiff();
+		}
+	}
+
+	public static void initEncDec() {
+		boolean enableSecurity = true;
+		try {
+			enableSecurity = ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity);
+		} catch (Exception e) {
+			logger.error("", e);
+		}
+
+		StringEncryptorUtil.setBypassSecurity(!enableSecurity);
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.SecurityKeyStoreEnabled)) {
+			String tokenValue = System.getProperty(ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreToken));
+			if (tokenValue == null) {
+				tokenValue = System.getenv(ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreToken));
+			}
+			String paramValue = System.getProperty(ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreParam));
+			if (paramValue == null) {
+				paramValue = System.getenv(ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreParam));
+			}
+
+			if (tokenValue != null && paramValue != null) {
+				String entry = ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreEntry);
+				try {
+					StringEncryptorUtil.init(ModuleLoader.class.getResourceAsStream("/demeter.ks"), tokenValue, entry, paramValue);
+					logger.info("StringEncryptorUtil INITED");
+				} catch (Exception e) {
+					logger.error("StringEncryptorUtil Init Error: " + e);
+				}
+			} else {
+				logger.error("StringEncryptorUtil Init Problem: KeyStoreToken=[{}] KeyStoreParam=[{}]",
+					tokenValue != null, paramValue != null);
+			}
 		}
 	}
 

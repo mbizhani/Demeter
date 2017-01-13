@@ -11,6 +11,10 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
 	SecurityRealm(true, "dmt.security.realm"),
+	SecurityKeyStoreEnabled("dmt.security.ks.enabled", true, Arrays.asList(true, false)),
+	SecurityKeyStoreToken("dmt.security.ks.token", "DEMETER_TOKEN"),
+	SecurityKeyStoreParam("dmt.security.ks.param", "DEMETER_PARAM"),
+	SecurityKeyStoreEntry("dmt.security.ks.entry", "Demeter"),
 	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap", "other")),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 
