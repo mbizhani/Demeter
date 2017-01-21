@@ -22,7 +22,7 @@ public class FreeMarkerStringTemplate extends BaseStringTemplate {
 	}
 
 	@Override
-	public String process(Map<String, Object> params) {
+	public Object process(Map<String, Object> params) {
 		Object dataModel = params;
 		if (convertValuesToString) {
 			dataModel = convertValuesToString(params);

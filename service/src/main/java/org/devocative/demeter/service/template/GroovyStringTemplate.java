@@ -21,7 +21,7 @@ public class GroovyStringTemplate extends BaseStringTemplate {
 	}
 
 	@Override
-	public String process(Map<String, Object> params) {
+	public Object process(Map<String, Object> params) {
 		if (template != null) {
 			Writable writable = template.make(params);
 			return writable != null ? writable.toString() : null;
@@ -33,7 +33,7 @@ public class GroovyStringTemplate extends BaseStringTemplate {
 
 			script.setBinding(binding);
 			Object run = script.run();
-			return run != null ? run.toString() : null;
+			return run != null ? run : null;
 		}
 	}
 

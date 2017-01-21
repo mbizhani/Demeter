@@ -158,7 +158,7 @@ public class TestCore {
 		params.put("dbl", 55555.23633D);
 		params.put("f_name", "Jack");
 
-		String result = stringTemplate
+		String result = (String) stringTemplate
 			.setConvertValuesToString(false)
 			.process(params);
 		System.out.println("result = " + result);
@@ -170,7 +170,7 @@ public class TestCore {
 			TemplateEngineType.FreeMarker
 		);
 
-		result = stringTemplate
+		result = (String) stringTemplate
 			.setConvertValuesToString(true)
 			.process(params);
 		System.out.println("result = " + result);
