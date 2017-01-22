@@ -258,19 +258,11 @@ public class Index extends WebPage {
 	}
 
 	private Class<? extends DPage> findDPageClass(DPageInfo pageInfo) throws ClassNotFoundException {
-		String type = null;
-		try {
-			type = pageInfo.getType();
-			return (Class<? extends DPage>) Class.forName(type);
-		} catch (ClassNotFoundException e) {
-			logger.debug("Class not found: {}", type);
-		}
-
 		if (pageInfo.getTypeAlt() != null) {
 			return (Class<? extends DPage>) Class.forName(pageInfo.getTypeAlt());
 		}
 
-		throw new ClassNotFoundException(type);
+		return (Class<? extends DPage>) Class.forName(pageInfo.getType());
 	}
 
 	private void createDefaultMenus() {
