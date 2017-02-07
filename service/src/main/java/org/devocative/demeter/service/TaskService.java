@@ -10,6 +10,7 @@ import org.devocative.demeter.entity.DTaskInfo;
 import org.devocative.demeter.entity.DTaskSchedule;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
+import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.task.DTask;
@@ -37,6 +38,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	private Map<String, DTask> TASKS;
 	private Scheduler scheduler;
 	private ThreadPoolExecutor threadPoolExecutor;
+	private Map<String, IRequestLifecycle> requestLifecycleBeans;
 
 	@Autowired
 	private ISecurityService securityService;
@@ -65,6 +67,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		threadPoolExecutor.setRejectedExecutionHandler(this);
 
 		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
+
+		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -326,6 +330,19 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			DemeterFutureTask futureTask = (DemeterFutureTask) r;
 			DTask task = futureTask.getDTask();
 			securityService.authenticate(task.getCurrentUser());
+
+			if (requestLifecycleBeans != null) {
+				for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+					try {
+						logger.debug("Before of TaskService.ThreadPoolExecutor.beforeRequest(): bean = {}",
+							requestLifecycle.getClass().getName());
+						requestLifecycle.beforeRequest();
+					} catch (Exception e) {
+						logger.error("TaskService.ThreadPoolExecutor.beforeRequest(): bean = {}",
+							requestLifecycle.getClass().getName(), e);
+					}
+				}
+			}
 		}
 
 		@Override
@@ -334,7 +351,19 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			DTask dTask = futureTask.getDTask();
 			logger.info("Task finished: key=[{}], state=[{}], duration=[{}]", dTask.getKey(), dTask.getState(), dTask.getDuration());
 			TASKS.remove(dTask.getKey());
-			persistorService.endSession();
+
+			if (requestLifecycleBeans != null) {
+				for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+					try {
+						logger.debug("Before of TaskService.ThreadPoolExecutor.afterResponse(): bean = {}",
+							requestLifecycle.getClass().getName());
+						requestLifecycle.afterResponse();
+					} catch (Exception e) {
+						logger.error("TaskService.ThreadPoolExecutor.afterResponse(): bean = {}",
+							requestLifecycle.getClass().getName(), e);
+					}
+				}
+			}
 		}
 
 		@Override
