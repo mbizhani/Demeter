@@ -11,6 +11,7 @@ import org.devocative.demeter.entity.EAuthMechanism;
 import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.*;
+import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,15 +51,25 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void init() {
-		userService.createOrUpdateUser("root", "root", "", "root", true, EUserStatus.ENABLED, EAuthMechanism.DATABASE);
+		userService.createOrUpdateUser(
+			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
+				.setAdmin(true)
+		);
 
-		guest = userService.createOrUpdateUser("guest", null, "", "guest", false, EUserStatus.DISABLED, EAuthMechanism.DATABASE);
+		guest = userService.createOrUpdateUser(
+			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
+				.setStatus(EUserStatus.DISABLED)
+		);
+
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
 			guest.setAuthenticated(true);
 			guest.setDefaultPages(pageService.getDefaultPages());
 		}
 
-		system = userService.createOrUpdateUser("system", null, "", "system", false, EUserStatus.DISABLED, EAuthMechanism.DATABASE);
+		system = userService.createOrUpdateUser(
+			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
+				.setStatus(EUserStatus.DISABLED)
+		);
 		authenticate(system);
 	}
 
@@ -223,7 +234,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 				lastName = getValue(attrs.get(lastNameAttr));
 			}
 
-			return userService.createOrUpdateUser(username, password, firstName, lastName, EAuthMechanism.LDAP);
+			return userService.createOrUpdateUser(new UserInputVO(username, password, firstName, lastName, EAuthMechanism.LDAP));
 		} catch (AuthenticationException e) {
 			logger.warn("authenticateByLDAP failed for user: {}", username);
 			throw new DemeterException(DemeterErrorCode.InvalidUser, username);
@@ -241,7 +252,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		if (userVO == null) {
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}
-		return userService.createOrUpdateUser(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER);
+		return userService.createOrUpdateUser(new UserInputVO(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER));
 	}
 
 	private void afterAuthentication(UserVO authenticatedUserVO) {

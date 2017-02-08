@@ -22,6 +22,8 @@ public class UserVO implements Serializable {
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
+	private String otherId;
+
 	// ------------------------------
 
 	public UserVO(Long userId, String username, String firstName, String lastName) {
@@ -101,6 +103,15 @@ public class UserVO implements Serializable {
 
 	public Object getOtherProfileInfo(String key) {
 		return otherProfileInfo.get(key);
+	}
+
+	public String getOtherId() {
+		return otherId;
+	}
+
+	public UserVO setOtherId(String otherId) {
+		this.otherId = otherId;
+		return this;
 	}
 
 	// ------------------------------

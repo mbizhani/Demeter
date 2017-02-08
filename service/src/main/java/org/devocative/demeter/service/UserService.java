@@ -3,12 +3,11 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.EAuthMechanism;
-import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,36 +52,32 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserVO createOrUpdateUser(String username, String password, String firstName, String lastName, EAuthMechanism authMechanism) {
-		return createOrUpdateUser(username, password, firstName, lastName, false, EUserStatus.ENABLED, authMechanism);
-	}
+	public UserVO createOrUpdateUser(UserInputVO userInputVO) {
+		User user = loadByUsername(userInputVO.getUsername());
 
-	@Override
-	public UserVO createOrUpdateUser(String username, String password, String firstName, String lastName,
-									 boolean isAdmin, EUserStatus status, EAuthMechanism authMechanism) {
-		User user = loadByUsername(username);
-
+		String password = userInputVO.getPassword();
 		if (user == null) {
 			user = new User();
 		} else {
 			password = null;
 		}
 
-		user.setUsername(username);
-		user.setStatus(status);
-		user.setAdmin(isAdmin);
-		user.setAuthMechanism(authMechanism);
+		user.setUsername(userInputVO.getUsername());
+		user.setStatus(userInputVO.getStatus());
+		user.setAdmin(userInputVO.isAdmin());
+		user.setAuthMechanism(userInputVO.getAuthMechanism());
 
 		Person person = user.getPerson();
 		if (person == null) {
 			person = new Person();
 			user.setPerson(person);
 		}
-		person.setFirstName(firstName);
-		person.setLastName(lastName);
+		person.setFirstName(userInputVO.getFirstName());
+		person.setLastName(userInputVO.getLastName());
 
 		saveOrUpdate(user, password);
-		return getUserVO(user);
+		return getUserVO(user)
+			.setOtherId(userInputVO.getOtherId());
 	}
 
 	@Override
