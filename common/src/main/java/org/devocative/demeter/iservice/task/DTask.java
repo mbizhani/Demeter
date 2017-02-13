@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class DTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
 
-	private String id;
+	private Object id;
 	private Object inputData;
 	private Date startDate;
 
@@ -34,11 +34,11 @@ public abstract class DTask implements Runnable {
 
 	// ------------------------------ ACCESSORS
 
-	public String getId() {
+	public Object getId() {
 		return id;
 	}
 
-	public DTask setId(String id) {
+	public DTask setId(Object id) {
 		this.id = id;
 		return this;
 	}

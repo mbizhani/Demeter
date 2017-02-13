@@ -6,21 +6,23 @@ import org.devocative.wickomp.async.AsyncToken;
 import org.devocative.wickomp.async.IAsyncRequestHandler;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class WebDModule implements ITaskResultCallback {
-	private final Map<String, AsyncToken> TOKENS_MAP = new ConcurrentHashMap<>();
-
 	public abstract void init();
 
-	protected void storeAsyncToken(AsyncToken token) {
-		TOKENS_MAP.put(token.getId(), token);
+	// ------------------------------
+
+	@Override
+	public void onTaskResult(Object token, Object result) {
+		pushResponseToPage((AsyncToken) token, (Serializable) result);
 	}
 
-	protected AsyncToken getAndRemove(String id) {
-		return TOKENS_MAP.remove(id);
+	@Override
+	public void onTaskError(Object token, Exception e) {
+		pushErrorToPage((AsyncToken) token, e);
 	}
+
+	// ------------------------------
 
 	protected void registerAsyncHandler(String handlerId, IAsyncRequestHandler asyncHandler) {
 		AsyncMediator.registerHandler(handlerId, asyncHandler);

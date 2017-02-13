@@ -16,7 +16,7 @@ public interface ITaskService {
 
 	long count();
 
-	Future<?> start(String taskBeanId, String id, Object inputData, ITaskResultCallback resultCallback);
+	Future<?> start(String taskBeanId, Object token, Object inputData, ITaskResultCallback resultCallback);
 
 	void stop(String key);
 
