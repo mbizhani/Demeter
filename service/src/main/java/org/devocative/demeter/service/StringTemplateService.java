@@ -52,7 +52,11 @@ public class StringTemplateService implements IStringTemplateService {
 	@Override
 	public IStringTemplate create(String template, TemplateEngineType engineType) {
 		String id = UUID.nameUUIDFromBytes(template.getBytes()).toString();
+		return create(id, template, engineType);
+	}
 
+	@Override
+	public IStringTemplate create(String id, String template, TemplateEngineType engineType) {
 		if (ConfigUtil.getBoolean(DemeterConfigKey.StringTemplateCacheEnabled)) {
 			if (getTemplateCache().containsKey(id)) {
 				return getTemplateCache().get(id);
@@ -84,6 +88,13 @@ public class StringTemplateService implements IStringTemplateService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void clearCacheFor(String id) {
+		if (templateCache.containsKey(id)) {
+			templateCache.remove(id);
+		}
 	}
 
 	// ------------------------------
