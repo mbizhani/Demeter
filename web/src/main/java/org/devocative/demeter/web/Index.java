@@ -32,6 +32,8 @@ import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.dpage.LoginDPage;
 import org.devocative.wickomp.WebUtil;
+import org.devocative.wickomp.async.AsyncBehavior;
+import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
 import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
@@ -169,6 +171,10 @@ public class Index extends WebPage {
 					logger.info("User reconnect: {}", currentUser.getUsername());
 				}
 			});
+		}
+
+		if (AsyncMediator.hasHandler()) {
+			add(new AsyncBehavior());
 		}
 	}
 
