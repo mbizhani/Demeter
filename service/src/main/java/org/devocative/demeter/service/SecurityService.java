@@ -257,8 +257,6 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	private void afterAuthentication(UserVO authenticatedUserVO) {
 		authenticatedUserVO.setAuthenticated(true);
-		//TODO find authorized dPages
-		authenticatedUserVO.setDefaultPages(pageService.getDefaultPages());
 		CURRENT_USER.set(authenticatedUserVO);
 	}
 

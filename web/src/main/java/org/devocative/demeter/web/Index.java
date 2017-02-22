@@ -275,6 +275,10 @@ public class Index extends WebPage {
 		oMenuItems.clear();
 		oMenuItems.add(new OMenuItem(UrlUtil.createUri("", true), new ResourceModel("label.home")));
 
+		if (currentUser.getDefaultPages() == null) {
+			currentUser.setDefaultPages(pageService.getDefaultPages());
+		}
+
 		// TODO replace DPageInstance with a VO
 		Map<String, List<DPageInstance>> defaultPages = currentUser.getDefaultPages();
 		if (defaultPages != null) {

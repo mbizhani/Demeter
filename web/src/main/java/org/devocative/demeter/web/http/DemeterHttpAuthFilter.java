@@ -55,11 +55,10 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		String httpMode = ConfigUtil.getString(DemeterConfigKey.HttpAuthenticationMode);
+
 		if ("digest".equals(httpMode)) {
 			setDesiredAuthMethod(WAuthMethod.DIGEST);
-		}
 
-		if (getDesiredAuthMethod() == WAuthMethod.DIGEST) {
 			nonce = UUID.randomUUID().toString();
 
 			nonceRefreshExecutor = Executors.newScheduledThreadPool(1);
