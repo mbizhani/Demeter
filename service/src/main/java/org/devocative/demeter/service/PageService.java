@@ -12,6 +12,7 @@ import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.ICacheService;
 import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Map;
 @Service("dmtPageService")
 public class PageService implements IPageService, IApplicationLifecycle {
 	private ICache<String, DPageInstance> pageInstCache;
+	private ICache<Class, String> uriCache;
 
 	@Autowired
 	private IPersistorService persistorService;
@@ -37,6 +39,7 @@ public class PageService implements IPageService, IApplicationLifecycle {
 	public void init() {
 		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
 
+		int totalDPageSize = 0;
 		Map<String, XModule> modules = ModuleLoader.getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
@@ -46,10 +49,11 @@ public class PageService implements IPageService, IApplicationLifecycle {
 				for (XDPage dPage : dPages) {
 					addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
 				}
+				totalDPageSize += dPages.size();
 			}
 		}
 
-		pageInstCache = cacheService.create("DMT_D_PAGE_INST", 20);
+		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2);
 		pageInstCache.setMissedHitHandler(new IMissedHitHandler<String, DPageInstance>() {
 			@Override
 			public DPageInstance loadForCache(String key) {
@@ -59,6 +63,25 @@ public class PageService implements IPageService, IApplicationLifecycle {
 					.addWhere("and ent.uri = :uri")
 					.addParam("uri", key)
 					.object();
+			}
+		});
+
+		uriCache = cacheService.create("DMT_D_PAGE_URI", totalDPageSize * 2);
+		uriCache.setMissedHitHandler(new IMissedHitHandler<Class, String>() {
+			@Override
+			public String loadForCache(Class key) {
+				DPageInfo pageInfo = persistorService
+					.createQueryBuilder()
+					.addFrom(DPageInfo.class, "ent")
+					.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
+					.addParam("type", key.getName())
+					.object();
+
+				if (pageInfo != null) {
+					return pageInfo.getBaseUri();
+				}
+
+				return "";
 			}
 		});
 	}
@@ -76,17 +99,14 @@ public class PageService implements IPageService, IApplicationLifecycle {
 
 	@Override
 	public DPageInstance getPageInstanceByURI(String uri, String refIdParam) {
-		String uri2 = uri + "/" + refIdParam;
-
-		if (pageInstCache.containsKeyOrFetch(uri2)) {
-			return pageInstCache.get(uri2);
+		if (refIdParam != null) {
+			String uri2 = uri + "/" + refIdParam;
+			if (pageInstCache.containsKeyOrFetch(uri2)) {
+				return pageInstCache.get(uri2);
+			}
 		}
 
-		if (pageInstCache.containsKeyOrFetch(uri)) {
-			return pageInstCache.get(uri);
-		}
-
-		return null;
+		return pageInstCache.get(uri);
 	}
 
 	@Override
@@ -97,7 +117,7 @@ public class PageService implements IPageService, IApplicationLifecycle {
 			.createQueryBuilder()
 			.addSelect("select ent")
 			.addFrom(DPageInstance.class, "ent")
-			.addJoin("dp", "ent.pageInfo")
+			.addJoin("dp", "ent.pageInfo", EJoinMode.LeftFetch)
 			.addWhere("and dp.enabled = true")
 			.addWhere("and ent.inMenu = true")
 			.list();
@@ -115,20 +135,7 @@ public class PageService implements IPageService, IApplicationLifecycle {
 
 	@Override
 	public String getUriByPage(Class dPageClass) {
-		// TODO using cache!!!
-
-		DPageInfo pageInfo = persistorService
-			.createQueryBuilder()
-			.addFrom(DPageInfo.class, "ent")
-			.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
-			.addParam("type", dPageClass.getName())
-			.object();
-		if (pageInfo != null) {
-			return pageInfo.getBaseUri();
-		}
-
-		// TODO check this return or throws exception
-		return "";
+		return uriCache.get(dPageClass);
 	}
 
 	// ------------------------------
