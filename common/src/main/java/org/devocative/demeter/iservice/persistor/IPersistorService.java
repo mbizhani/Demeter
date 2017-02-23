@@ -42,4 +42,6 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 	IQueryBuilder createQueryBuilder();
 
 	void generateSchemaDiff();
+
+	void executeScript(String script, String delimiter);
 }

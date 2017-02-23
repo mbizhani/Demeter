@@ -13,13 +13,19 @@ import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 
@@ -77,6 +83,19 @@ public class HibernatePersistorService implements IPersistorService {
 		serviceRegistryBuilder.applySettings(config.getProperties());
 		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
 		logger.info("HibernatePersistorService init()");
+
+		String scriptFile = ConfigUtil.getString(getConfig("db.script"), null);
+		if (scriptFile != null) {
+			logger.info("Executing script file: {}", scriptFile);
+
+			try {
+				File f = new File(scriptFile);
+				String sql = new String(Files.readAllBytes(f.toPath()));
+				executeScript(sql, ";");
+			} catch (Exception e) {
+				logger.error("Executing script file: ", e);
+			}
+		}
 	}
 
 	@Override
@@ -255,6 +274,27 @@ public class HibernatePersistorService implements IPersistorService {
 		schemaUpdate.setDelimiter(";");
 		schemaUpdate.setFormat(true);
 		schemaUpdate.execute(true, false);
+	}
+
+	@Override
+	public void executeScript(final String script, final String delimiter) {
+		Session session = getSession();
+		session.doWork(new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				String[] statements = script.split(delimiter);
+				for (String statement : statements) {
+					statement = statement.trim();
+					if (!statement.isEmpty()) {
+						logger.info("Execute: {}", statement);
+						Statement st = connection.createStatement();
+						st.execute(statement);
+						st.close();
+					}
+				}
+			}
+		});
+		session.close();
 	}
 
 	//----------------------------- PACKAGE METHODS

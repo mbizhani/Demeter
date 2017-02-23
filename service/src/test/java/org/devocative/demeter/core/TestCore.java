@@ -24,46 +24,50 @@ public class TestCore {
 	private static Logger logger = LoggerFactory.getLogger(TestCore.class);
 
 	private static IPersistorService persistorService;
-	private static boolean skip = false;
 
 	@BeforeClass
 	public static void init() {
-		try {
-			ModuleLoader.init();
+		/*InitDB initDB = new InitDB();
+		initDB.setDriver(ConfigUtil.getString(true, "dmt.db.driver"))
+			.setUrl(ConfigUtil.getString(true, "dmt.db.url"))
+			.setUsername(ConfigUtil.getString(true, "dmt.db.username"))
+			.addScript("src/test/resources/init_hsqldb.sql")
+			.build();*/
 
-			persistorService = ModuleLoader.getApplicationContext().getBean(IPersistorService.class);
-		} catch (Exception e) {
-			logger.info("init failed");
-			skip = true;
-		}
+		ModuleLoader.init();
+
+		persistorService = ModuleLoader.getApplicationContext().getBean(IPersistorService.class);
 	}
 
 	@Test
 	public void test01() {
-		if (skip) {
-			return;
+		for (int i = 1; i <= 3; i++) {
+			Person person = new Person();
+			person.setFirstName("John" + i);
+			person.setLastName("Blue" + i);
+			person.setBirthRegDate(new Date());
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			persistorService.saveOrUpdate(person);
 		}
-
-		Person person = new Person();
-		person.setFirstName("John");
-		person.setLastName("Blue");
-		person.setBirthRegDate(new Date());
-
-		persistorService.saveOrUpdate(person);
 		persistorService.commitOrRollback();
 
 		List<Person> list = persistorService.list(Person.class);
 		for (Person p : list) {
-			System.out.println(p);
+			System.out.println(p + ", " + p.getBirthRegDate());
 		}
+
+		// root, system & guest + 3 above
+		Assert.assertEquals(6, list.size());
 	}
 
 	@Test
 	public void test02() {
-		if (skip) {
-			return;
-		}
-
 		PersonFVO f1 = new PersonFVO()
 			.setFirstName("Jo");
 		int sizeF1 = persistorService
@@ -180,10 +184,6 @@ public class TestCore {
 
 	@AfterClass
 	public static void shutdown() {
-		if (skip) {
-			return;
-		}
-
 		ModuleLoader.shutdown();
 	}
 }

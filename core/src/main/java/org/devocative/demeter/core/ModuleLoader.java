@@ -75,8 +75,6 @@ public class ModuleLoader {
 	}
 
 	public static void generatePersistorSchemaDiff() {
-		ConfigUtil.removeKey("dmt.db.apply.ddl");
-
 		initEncDec();
 		initModules();
 		initSpringContext();
