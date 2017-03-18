@@ -1,10 +1,7 @@
 package org.devocative.demeter.service;
 
 import org.devocative.adroit.ConfigUtil;
-import org.devocative.demeter.entity.ICreationDate;
-import org.devocative.demeter.entity.ICreatorUser;
-import org.devocative.demeter.entity.IModificationDate;
-import org.devocative.demeter.entity.IModifierUser;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.ELockMode;
@@ -53,7 +50,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
 		if ("CreateModify".equals(interceptor)) {
-			config.setInterceptor(new CreateModifyInterceptor());
+			config.setInterceptor(new MainInterceptor());
 		} else {
 			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
 		}
@@ -356,7 +353,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	//----------------------------- INNER CLASSES
 
-	private class CreateModifyInterceptor extends EmptyInterceptor {
+	private class MainInterceptor extends EmptyInterceptor {
 		private static final long serialVersionUID = -820555101887857570L;
 
 		// insert
@@ -367,7 +364,9 @@ public class HibernatePersistorService implements IPersistorService {
 			String[] propertyNames,
 			Type[] types) {
 
-			if (entity instanceof ICreationDate || entity instanceof ICreatorUser) {
+			if (entity instanceof ICreationDate ||
+				entity instanceof ICreatorUser ||
+				entity instanceof IRowMod) {
 				setCreatedValues(state, propertyNames);
 				return true;
 			}
@@ -389,7 +388,9 @@ public class HibernatePersistorService implements IPersistorService {
 			String[] propertyNames,
 			Type[] types) {
 
-			if (entity instanceof IModificationDate || entity instanceof IModifierUser) {
+			if (entity instanceof IModificationDate ||
+				entity instanceof IModifierUser ||
+				entity instanceof IRowMod) {
 				setModifiedValues(currentState, propertyNames);
 				return true;
 			}
@@ -399,30 +400,32 @@ public class HibernatePersistorService implements IPersistorService {
 
 		private void setCreatedValues(Object[] state, String[] propertyNames) {
 			for (int i = 0; i < propertyNames.length; i++) {
-
 				if ("creatorUserId".equals(propertyNames[i])) {
 					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
 					}
-				}
-
-				if ("creationDate".equals(propertyNames[i])) {
+				} else if ("creationDate".equals(propertyNames[i])) {
 					state[i] = new Date();
+				} else if ("rowMod".equals(propertyNames[i])) {
+					if (state[i] == null) {
+						state[i] = ERowMod.NORMAL;
+					}
 				}
 			}
 		}
 
 		private void setModifiedValues(Object[] state, String[] propertyNames) {
 			for (int i = 0; i < propertyNames.length; i++) {
-
 				if ("modifierUserId".equals(propertyNames[i])) {
 					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
 					}
-				}
-
-				if ("modificationDate".equals(propertyNames[i])) {
+				} else if ("modificationDate".equals(propertyNames[i])) {
 					state[i] = new Date();
+				} else if ("rowMod".equals(propertyNames[i])) {
+					if (state[i] == null) {
+						state[i] = ERowMod.NORMAL;
+					}
 				}
 			}
 		}

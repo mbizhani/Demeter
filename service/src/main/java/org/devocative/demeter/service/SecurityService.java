@@ -8,6 +8,7 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.EAuthMechanism;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.EUserStatus;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.*;
@@ -75,9 +76,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setDefaultPages(pageService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("AuthByDB");
-		roleService.createOrUpdateRole("AuthByLDAP");
-		roleService.createOrUpdateRole("AuthByOther");
+		roleService.createOrUpdateRole("AuthByDB", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("AuthByOther", ERowMod.SYSTEM);
 	}
 
 	@Override

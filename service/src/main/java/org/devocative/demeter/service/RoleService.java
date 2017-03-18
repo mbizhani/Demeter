@@ -1,5 +1,6 @@
 package org.devocative.demeter.service;
 
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.IRoleService;
@@ -79,12 +80,13 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public void createOrUpdateRole(String name) {
+	public void createOrUpdateRole(String name, ERowMod rowMod) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();
 			role.setName(name);
 		}
+		role.setRowMod(rowMod);
 		saveOrUpdate(role);
 		persistorService.commitOrRollback();
 	}
