@@ -21,6 +21,7 @@
 		<entity type="org.devocative.demeter.entity.FileStore"/>
 
 		<entity type="org.devocative.demeter.entity.Person"/>
+		<entity type="org.devocative.demeter.entity.Role"/>
 		<entity type="org.devocative.demeter.entity.User"/>
 	</entities>
 
@@ -32,6 +33,21 @@
 	</tasks>
 
 	<dPages>
+		<dPage type="org.devocative.demeter.web.dpage.PersonListDPage"
+			   title="KEY:dPage.dmt.Person"
+			   uri="/persons"
+			   inMenu="true"/>
+
+		<dPage type="org.devocative.demeter.web.dpage.UserListDPage"
+			   title="KEY:dPage.dmt.User"
+			   uri="/users"
+			   inMenu="true"/>
+
+		<dPage type="org.devocative.demeter.web.dpage.RoleListDPage"
+			   title="KEY:dPage.dmt.Role"
+			   uri="/roles"
+			   inMenu="true"/>
+
 		<dPage type="org.devocative.demeter.web.dpage.InfoDPage"
 			   title="KEY:dPage.dmt.Info"
 			   uri="/info"

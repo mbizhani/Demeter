@@ -42,6 +42,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	private IUserService userService;
 
 	@Autowired
+	private IRoleService roleService;
+
+	@Autowired
 	private IPageService pageService;
 
 	@Autowired(required = false)
@@ -51,6 +54,12 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void init() {
+		system = userService.createOrUpdateUser(
+			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
+				.setStatus(EUserStatus.DISABLED)
+		);
+		authenticate(system);
+
 		userService.createOrUpdateUser(
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
@@ -66,11 +75,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setDefaultPages(pageService.getDefaultPages());
 		}
 
-		system = userService.createOrUpdateUser(
-			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
-				.setStatus(EUserStatus.DISABLED)
-		);
-		authenticate(system);
+		roleService.createOrUpdateRole("AuthByDB");
+		roleService.createOrUpdateRole("AuthByLDAP");
+		roleService.createOrUpdateRole("AuthByOther");
 	}
 
 	@Override

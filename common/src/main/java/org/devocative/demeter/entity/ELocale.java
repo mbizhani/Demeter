@@ -7,16 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EAuthMechanism implements Serializable {
-	private static final long serialVersionUID = -6830228264271054817L;
+public class ELocale implements Serializable {
+	private static final long serialVersionUID = 1968359933659360157L;
 
-	private static final Map<Integer, EAuthMechanism> ID_TO_LIT = new LinkedHashMap<>();
+	private static final Map<Integer, ELocale> ID_TO_LIT = new LinkedHashMap<>();
 
 	// ------------------------------
 
-	public static final EAuthMechanism DATABASE = new EAuthMechanism(1, "Database");
-	public static final EAuthMechanism LDAP = new EAuthMechanism(2, "LDAP");
-	public static final EAuthMechanism OTHER = new EAuthMechanism(10, "Other");
+	public static final ELocale FA = new ELocale(1, "Farsi", "fa");
+	public static final ELocale EN = new ELocale(2, "English", "en");
 
 	// ------------------------------
 
@@ -25,16 +24,20 @@ public class EAuthMechanism implements Serializable {
 	@Transient
 	private String name;
 
+	@Transient
+	private String code;
+
 	// ------------------------------
 
-	private EAuthMechanism(Integer id, String name) {
+	private ELocale(Integer id, String name, String code) {
 		this.id = id;
 		this.name = name;
+		this.code = code;
 
 		ID_TO_LIT.put(id, this);
 	}
 
-	public EAuthMechanism() {
+	public ELocale() {
 	}
 
 	// ------------------------------
@@ -47,17 +50,22 @@ public class EAuthMechanism implements Serializable {
 		return ID_TO_LIT.get(getId()).name;
 	}
 
+	public String getCode() {
+		return ID_TO_LIT.get(getId()).code;
+	}
+
 	// ------------------------------
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof EAuthMechanism)) return false;
+		if (!(o instanceof ELocale)) return false;
 
-		EAuthMechanism that = (EAuthMechanism) o;
+		ELocale that = (ELocale) o;
 
-		return !(getId() != null ? !getId().equals(that.getId()) : that.getId() != null);
+		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 
+		return true;
 	}
 
 	@Override
@@ -72,7 +80,7 @@ public class EAuthMechanism implements Serializable {
 
 	// ------------------------------
 
-	public static List<EAuthMechanism> list() {
+	public static List<ELocale> list() {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
 }

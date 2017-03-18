@@ -17,6 +17,9 @@
 				<field name="type">
 					<finfo/>
 				</field>
+				<field name="typeAlt">
+					<finfo/>
+				</field>
 				<field name="module">
 					<finfo/>
 				</field>
@@ -33,7 +36,7 @@
 					<finfo hasForm="false" hasTimePart="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -78,7 +81,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -117,7 +120,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -186,7 +189,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -240,7 +243,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -261,7 +264,7 @@
 					<finfo/>
 				</field>
 				<field name="birthRegDate">
-					<finfo hasTimePart="true"/>
+					<finfo hasTimePart="false"/>
 				</field>
 				<field name="email">
 					<finfo/>
@@ -276,7 +279,7 @@
 					<finfo/>
 				</field>
 				<field name="user">
-					<finfo/>
+					<finfo ignore="true"/>
 				</field>
 				<field name="creationDate">
 					<finfo hasForm="false" hasTimePart="true"/>
@@ -297,7 +300,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false" hasSVO="false"/>
+					<finfo hasForm="false"/>
 				</field>
 			</fields>
 		</class>
@@ -315,12 +318,15 @@
 					<finfo/>
 				</field>
 				<field name="password">
-					<finfo/>
+					<finfo hasList="false" hasFVO="false"/>
 				</field>
 				<field name="authMechanism">
-					<finfo/>
+					<finfo hasForm="false"/>
 				</field>
 				<field name="status">
+					<finfo/>
+				</field>
+				<field name="locale">
 					<finfo/>
 				</field>
 				<field name="calendarType">
@@ -336,10 +342,10 @@
 					<finfo/>
 				</field>
 				<field name="lastLoginDate">
-					<finfo hasTimePart="true"/>
+					<finfo hasForm="false" hasTimePart="true"/>
 				</field>
 				<field name="constraints">
-					<finfo/>
+					<finfo ignore="true"/>
 				</field>
 				<field name="admin">
 					<finfo/>
@@ -348,7 +354,46 @@
 					<finfo/>
 				</field>
 				<field name="person">
+					<finfo ignore="true"/>
+				</field>
+				<field name="roles">
 					<finfo/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.Role">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="name">
+					<finfo/>
+				</field>
+				<field name="constraints">
+					<finfo ignore="true"/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasFVO="false"/>
 				</field>
 			</fields>
 		</class>

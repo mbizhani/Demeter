@@ -16,7 +16,7 @@
 	</pre>
 
 	<packageMap>
-		<from pkg="org.devocative.demeter.entity" includeSubPackages="false" includePattern="File">
+		<from pkg="org.devocative.demeter.entity" includeSubPackages="false" includePattern="User">
 			<to pkgReplace="entity:vo.filter" generatorRef="FVO" genDir="common/src/main/java"/>
 
 			<to pkgReplace="entity:iservice" generatorRef="ServiceI" genDir="common/src/main/java"/>

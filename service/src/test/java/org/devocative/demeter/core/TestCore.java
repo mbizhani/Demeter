@@ -6,7 +6,6 @@ import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.template.IStringTemplate;
 import org.devocative.demeter.iservice.template.IStringTemplateService;
 import org.devocative.demeter.iservice.template.TemplateEngineType;
-import org.devocative.demeter.vo.filter.PersonFVO;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

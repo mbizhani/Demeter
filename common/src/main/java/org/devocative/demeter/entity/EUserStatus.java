@@ -1,37 +1,50 @@
 package org.devocative.demeter.entity;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EUserStatus implements Serializable {
 	private static final long serialVersionUID = -5776208676258016175L;
-	private static final List<EUserStatus> LITERALS = new ArrayList<>();
+
+	private static final Map<Integer, EUserStatus> ID_TO_LIT = new LinkedHashMap<>();
 
 	// ------------------------------
 
-	public static final EUserStatus ENABLED = new EUserStatus(1);
-	public static final EUserStatus DISABLED = new EUserStatus(2);
-	public static final EUserStatus LOCKED = new EUserStatus(3);
+	public static final EUserStatus ENABLED = new EUserStatus(1, "Enabled");
+	public static final EUserStatus DISABLED = new EUserStatus(2, "Disabled");
+	public static final EUserStatus LOCKED = new EUserStatus(3, "Locked");
 
 	// ------------------------------
 
 	private Integer id;
 
+	@Transient
+	private String name;
+
 	// ------------------------------
 
-	public EUserStatus() {
+	private EUserStatus(Integer id, String name) {
+		this.id = id;
+		this.name = name;
+
+		ID_TO_LIT.put(id, this);
 	}
 
-	public EUserStatus(Integer id) {
-		this.id = id;
-		LITERALS.add(this);
+	public EUserStatus() {
 	}
 
 	// ------------------------------
 
 	public Integer getId() {
 		return id;
+	}
+
+	public String getName() {
+		return ID_TO_LIT.get(getId()).name;
 	}
 
 	// ------------------------------
@@ -54,27 +67,14 @@ public class EUserStatus implements Serializable {
 		return getId() != null ? getId().hashCode() : 0;
 	}
 
-	// ------------------------------
-
-	/* TODO
 	@Override
 	public String toString() {
-		switch (getId()) {
-			case 1:
-				return I18NUtil.getString("EUserStatus.ENABLED", "[Enabled]");
+		return getName();
+	}
 
-			case 2:
-				return I18NUtil.getString("EUserStatus.DISABLED", "[Disabled]");
-
-			case 3:
-				return I18NUtil.getString("EUserStatus.LOCKED", "[Locked]");
-
-			default:
-				return "[?]";
-		}
-	}*/
+	// ------------------------------
 
 	public static List<EUserStatus> list() {
-		return new ArrayList<>(LITERALS);
+		return new ArrayList<>(ID_TO_LIT.values());
 	}
 }

@@ -7,6 +7,7 @@ import org.hibernate.envers.NotAudited;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Audited
 @Entity
@@ -41,6 +42,10 @@ public class User implements Serializable {
 	private EUserStatus status = EUserStatus.ENABLED;
 
 	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "e_locale", nullable = false))
+	private ELocale locale = ELocale.FA;
+
+	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_cal_type"))
 	private ECalendar calendarType;
 
@@ -70,38 +75,18 @@ public class User implements Serializable {
 	@Column(name = "n_session_timeout", nullable = false)
 	private Integer sessionTimeout = 60;
 
-	/*@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_locale", foreignKey = @ForeignKey(name = "user2locale"))
-	private Locale locale;*/
-
-	/*@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-	//@NotNull
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_layout", nullable = false, foreignKey = @ForeignKey(name = "user2uilayout"))
-	private UILayout layout;
-
-	@Column(name = "f_layout", insertable = false, updatable = false)
-	private Long layoutId;*/
-
 	@OneToOne(fetch = FetchType.EAGER)
 	@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "user2person"))
 	private Person person;
 
-	/*@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "mt_portal_user_role",
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_user_role",
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
-		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)}
+		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)},
+		foreignKey = @ForeignKey(name = "userrole2user"),
+		inverseForeignKey = @ForeignKey(name = "userrole2role")
 	)
-	@ForeignKey(name = "user_role2user", inverseName = "user_role2role")
-	private List<Role> roles;*/
-
-	/*@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "mt_portal_user_portlet_allow",
-		joinColumns = {@JoinColumn(name = "f_user")},
-		inverseJoinColumns = {@JoinColumn(name = "f_portlet_inst")})
-	@ForeignKey(name = "user_allow_prtlt2user", inverseName = "user_allow_prtlt2prtlt")
-	private List<PortletInstance> allowedPortletInstances;*/
+	private List<Role> roles;
 
 	// ------------------------------
 
@@ -143,6 +128,14 @@ public class User implements Serializable {
 
 	public void setStatus(EUserStatus status) {
 		this.status = status;
+	}
+
+	public ELocale getLocale() {
+		return locale;
+	}
+
+	public void setLocale(ELocale locale) {
+		this.locale = locale;
 	}
 
 	public ECalendar getCalendarType() {
@@ -215,6 +208,14 @@ public class User implements Serializable {
 
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
 	}
 
 	// ------------------------------
