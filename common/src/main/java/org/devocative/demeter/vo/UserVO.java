@@ -13,11 +13,13 @@ import java.util.Map;
 public class UserVO implements Serializable {
 	private static final long serialVersionUID = -8402970677148363395L;
 
-	private boolean authenticated = false;
 	private Long userId;
 	private String username;
 	private String firstName;
 	private String lastName;
+
+	private boolean authenticated = false;
+	private boolean admin = false;
 	private Map<String, List<DPageInstance>> defaultPages;
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
@@ -35,6 +37,33 @@ public class UserVO implements Serializable {
 
 	// ------------------------------
 
+	public Long getUserId() {
+		return userId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public String getFullName() {
+		return (getFirstName() != null ? getFirstName() : "") + " " +
+			(getLastName() != null ? getLastName() : "");
+	}
+
+	public boolean isRoot() {
+		return "root".equals(username);
+	}
+
+	// ---------------
+
 	public boolean isAuthenticated() {
 		return authenticated;
 	}
@@ -43,45 +72,13 @@ public class UserVO implements Serializable {
 		this.authenticated = authenticated;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public boolean isAdmin() {
+		return admin;
 	}
 
-	public UserVO setUserId(Long userId) {
-		this.userId = userId;
+	public UserVO setAdmin(boolean admin) {
+		this.admin = admin;
 		return this;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public UserVO setUsername(String username) {
-		this.username = username;
-		return this;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public UserVO setFirstName(String firstName) {
-		this.firstName = firstName;
-		return this;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public UserVO setLastName(String lastName) {
-		this.lastName = lastName;
-		return this;
-	}
-
-	public String getFullName() {
-		return (getFirstName() != null ? getFirstName() : "") + " " +
-			(getLastName() != null ? getLastName() : "");
 	}
 
 	public Map<String, List<DPageInstance>> getDefaultPages() {

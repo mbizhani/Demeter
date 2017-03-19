@@ -374,6 +374,9 @@
 				<field name="constraints">
 					<finfo ignore="true"/>
 				</field>
+				<field name="rowMod">
+					<finfo/>
+				</field>
 				<field name="creationDate">
 					<finfo hasForm="false" hasTimePart="true"/>
 				</field>

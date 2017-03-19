@@ -5,12 +5,14 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -62,6 +64,8 @@ public class RoleFormDPage extends DPage {
 		floatTable.add(new WTextInput("name")
 			.setRequired(true)
 			.setLabel(new ResourceModel("Role.name")));
+		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), false)
+			.setLabel(new ResourceModel("Role.rowMod")));
 
 		Form<Role> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);

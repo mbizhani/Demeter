@@ -5,6 +5,8 @@ import org.apache.wicket.request.UrlUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.vo.UserVO;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -15,9 +17,16 @@ public abstract class DPage extends Panel {
 	@Inject
 	private IPageService pageService;
 
+	@Inject
+	private ISecurityService securityService;
+
+	// ------------------------------
+
 	public DPage(String id, List<String> params) {
 		super(id);
 	}
+
+	// ------------------------------
 
 	protected void redirectToDPage(Class<? extends DPage> dPageClass) {
 		throw new RedirectToUrlException(getUriForPage(dPageClass));
@@ -29,5 +38,9 @@ public abstract class DPage extends Panel {
 			uriByPage = uriByPage.substring(1);
 		}
 		return UrlUtils.rewriteToContextRelative(uriByPage, RequestCycle.get());
+	}
+
+	protected UserVO getCurrentUser() {
+		return securityService.getCurrentUser();
 	}
 }

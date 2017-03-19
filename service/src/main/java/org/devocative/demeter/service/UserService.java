@@ -136,6 +136,7 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserVO getUserVO(User user) {
-		return new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName());
+		return new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
+			.setAdmin(user.getAdmin());
 	}
 }

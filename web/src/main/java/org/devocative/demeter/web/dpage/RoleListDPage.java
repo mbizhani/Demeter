@@ -5,14 +5,15 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.vo.filter.RoleFVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
@@ -25,7 +26,6 @@ import org.devocative.wickomp.grid.WDataGrid;
 import org.devocative.wickomp.grid.WSortField;
 import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
-import org.devocative.wickomp.grid.column.link.OAjaxLinkColumn;
 import org.devocative.wickomp.html.WAjaxLink;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -84,7 +84,6 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		super.onInitialize();
 
 		final WModalWindow window = new WModalWindow("window");
-		window.getOptions().setHeight(OSize.percent(80)).setWidth(OSize.percent(80));
 		add(window);
 
 		add(new WAjaxLink("add", DemeterIcon.ADD) {
@@ -101,6 +100,9 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("name")
 			.setLabel(new ResourceModel("Role.name")));
+		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), true)
+			.setLabel(new ResourceModel("entity.rowMod"))
+			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("creationDate")
 			.setTimePartVisible(true)
 			.setLabel(new ResourceModel("entity.creationDate")));
@@ -127,6 +129,9 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 
 		OColumnList<Role> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.name"), "name"));
+		if (getCurrentUser().isRoot()) {
+			columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.rowMod"), "rowMod"));
+		}
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
@@ -139,15 +144,15 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OAjaxLinkColumn<Role>(new Model<String>(), DemeterIcon.EDIT) {
-			private static final long serialVersionUID = 1314648589L;
+		columnList.add(new OEditAjaxColumn<Role>() {
+			private static final long serialVersionUID = -1491493091L;
 
 			@Override
 			public void onClick(AjaxRequestTarget target, IModel<Role> rowData) {
 				window.setContent(new RoleFormDPage(window.getContentId(), rowData.getObject()));
 				window.show(target);
 			}
-		}.setField("EDIT"));
+		});
 
 		OGrid<Role> oGrid = new OGrid<>();
 		oGrid
