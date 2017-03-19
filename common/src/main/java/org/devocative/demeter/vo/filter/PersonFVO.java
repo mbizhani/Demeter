@@ -1,6 +1,8 @@
+//overwrite
 package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.persistor.Filterer;
 
@@ -10,7 +12,7 @@ import java.util.List;
 
 @Filterer
 public class PersonFVO implements Serializable {
-	private static final long serialVersionUID = 3382486365153012902L;
+	private static final long serialVersionUID = -1277170085L;
 
 	private String firstName;
 	private String lastName;
@@ -19,11 +21,11 @@ public class PersonFVO implements Serializable {
 	private String mobile;
 	private String systemNumber;
 	private Boolean hasUser;
+	private List<ERowMod> rowMod;
 	private RangeVO<Date> creationDate;
 	private List<User> creatorUser;
 	private RangeVO<Date> modificationDate;
 	private List<User> modifierUser;
-	private RangeVO<Integer> version;
 
 	// ------------------------------
 
@@ -83,6 +85,14 @@ public class PersonFVO implements Serializable {
 		this.hasUser = hasUser;
 	}
 
+	public List<ERowMod> getRowMod() {
+		return rowMod;
+	}
+
+	public void setRowMod(List<ERowMod> rowMod) {
+		this.rowMod = rowMod;
+	}
+
 	public RangeVO<Date> getCreationDate() {
 		return creationDate;
 	}
@@ -115,11 +125,4 @@ public class PersonFVO implements Serializable {
 		this.modifierUser = modifierUser;
 	}
 
-	public RangeVO<Integer> getVersion() {
-		return version;
-	}
-
-	public void setVersion(RangeVO<Integer> version) {
-		this.version = version;
-	}
 }

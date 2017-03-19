@@ -119,6 +119,7 @@ public class UserService implements IUserService {
 		}
 		person.setFirstName(userInputVO.getFirstName());
 		person.setLastName(userInputVO.getLastName());
+		person.setRowMod(userInputVO.getRowMod());
 
 		saveOrUpdate(user, password);
 		return getUserVO(user)

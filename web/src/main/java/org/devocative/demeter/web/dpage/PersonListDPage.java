@@ -5,20 +5,20 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.vo.filter.PersonFVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.form.range.WDateRangeInput;
-import org.devocative.wickomp.form.range.WNumberRangeInput;
 import org.devocative.wickomp.formatter.OBooleanFormatter;
 import org.devocative.wickomp.formatter.ODateFormatter;
 import org.devocative.wickomp.formatter.ONumberFormatter;
@@ -28,7 +28,6 @@ import org.devocative.wickomp.grid.WDataGrid;
 import org.devocative.wickomp.grid.WSortField;
 import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
-import org.devocative.wickomp.grid.column.link.OAjaxLinkColumn;
 import org.devocative.wickomp.html.WAjaxLink;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -87,7 +86,6 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 		super.onInitialize();
 
 		final WModalWindow window = new WModalWindow("window");
-		window.getOptions().setHeight(OSize.percent(80)).setWidth(OSize.percent(80));
 		add(window);
 
 		add(new WAjaxLink("add", DemeterIcon.ADD) {
@@ -117,6 +115,9 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 			.setLabel(new ResourceModel("Person.systemNumber")));
 		floatTable.add(new WBooleanInput("hasUser")
 			.setLabel(new ResourceModel("Person.hasUser")));
+		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), true)
+			.setLabel(new ResourceModel("entity.rowMod"))
+			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("creationDate")
 			.setTimePartVisible(true)
 			.setLabel(new ResourceModel("entity.creationDate")));
@@ -127,8 +128,6 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 			.setLabel(new ResourceModel("entity.modificationDate")));
 		floatTable.add(new WSelectionInput("modifierUser", personService.getModifierUserList(), true)
 			.setLabel(new ResourceModel("entity.modifierUser")));
-		floatTable.add(new WNumberRangeInput("version", Integer.class)
-			.setLabel(new ResourceModel("entity.version")));
 
 		Form<PersonFVO> form = new Form<>("form", new CompoundPropertyModel<>(filter));
 		form.add(floatTable);
@@ -154,6 +153,10 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.systemNumber"), "systemNumber"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.hasUser"), "hasUser")
 			.setFormatter(OBooleanFormatter.bool()));
+		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.user"), "user"));
+		if (getCurrentUser().isRoot()) {
+			columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.rowMod"), "rowMod"));
+		}
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
@@ -166,15 +169,15 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OAjaxLinkColumn<Person>(new Model<String>(), DemeterIcon.EDIT) {
-			private static final long serialVersionUID = 1711561934L;
+		columnList.add(new OEditAjaxColumn<Person>() {
+			private static final long serialVersionUID = -1094579746L;
 
 			@Override
 			public void onClick(AjaxRequestTarget target, IModel<Person> rowData) {
 				window.setContent(new PersonFormDPage(window.getContentId(), rowData.getObject()));
 				window.show(target);
 			}
-		}.setField("EDIT"));
+		});
 
 		OGrid<Person> oGrid = new OGrid<>();
 		oGrid

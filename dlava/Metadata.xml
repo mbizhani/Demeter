@@ -276,10 +276,13 @@
 					<finfo/>
 				</field>
 				<field name="hasUser">
-					<finfo/>
+					<finfo hasForm="false"/>
 				</field>
 				<field name="user">
-					<finfo ignore="true"/>
+					<finfo hasForm="false" hasFVO="false"/>
+				</field>
+				<field name="rowMod">
+					<finfo hasForm="false"/>
 				</field>
 				<field name="creationDate">
 					<finfo hasForm="false" hasTimePart="true"/>
@@ -300,7 +303,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false"/>
+					<finfo hasForm="false" hasFVO="false"/>
 				</field>
 			</fields>
 		</class>
@@ -375,7 +378,7 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="rowMod">
-					<finfo/>
+					<finfo hasForm="false"/>
 				</field>
 				<field name="creationDate">
 					<finfo hasForm="false" hasTimePart="true"/>

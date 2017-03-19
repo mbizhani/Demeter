@@ -11,7 +11,6 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
-import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WDateInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.html.WFloatTable;
@@ -74,9 +73,6 @@ public class PersonFormDPage extends DPage {
 			.setLabel(new ResourceModel("Person.mobile")));
 		floatTable.add(new WTextInput("systemNumber")
 			.setLabel(new ResourceModel("Person.systemNumber")));
-		floatTable.add(new WBooleanInput("hasUser")
-			.setRequired(true)
-			.setLabel(new ResourceModel("Person.hasUser")));
 
 		Form<Person> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);

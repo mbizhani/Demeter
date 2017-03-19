@@ -35,6 +35,7 @@ CREATE TABLE a_t_dmt_person (
   c_mobile        VARCHAR(255),
   f_modifier_user BIGINT,
   c_sys_number    VARCHAR(255),
+  e_mod           INTEGER,
   PRIMARY KEY (id, r_num)
 );
 
@@ -168,6 +169,7 @@ CREATE TABLE t_dmt_person (
   f_modifier_user BIGINT,
   c_sys_number    VARCHAR(255),
   n_version       INTEGER NOT NULL,
+  e_mod           INTEGER NOT NULL,
   PRIMARY KEY (id)
 );
 

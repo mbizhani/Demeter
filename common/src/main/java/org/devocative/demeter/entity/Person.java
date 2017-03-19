@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 @Table(name = "t_dmt_person")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Person implements ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+public class Person implements IRowMod, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	private static final long serialVersionUID = 6377393773056642925L;
 
 	@Id
@@ -55,6 +55,10 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 
 	//----------------------------- CREATE / MODIFY
 
+	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
+	private ERowMod rowMod;
+
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
 	private Date creationDate;
@@ -84,6 +88,8 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 	@Version
 	@Column(name = "n_version", nullable = false)
 	private Integer version = 0;
+
+	// ---------------
 
 	public Long getId() {
 		return id;
@@ -157,10 +163,24 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 		this.user = user;
 	}
 
+	// ---------------
+
+	@Override
+	public ERowMod getRowMod() {
+		return rowMod;
+	}
+
+	@Override
+	public void setRowMod(ERowMod rowMod) {
+		this.rowMod = rowMod;
+	}
+
+	@Override
 	public Date getCreationDate() {
 		return creationDate;
 	}
 
+	@Override
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
 	}
@@ -169,18 +189,22 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 		return creatorUser;
 	}
 
+	@Override
 	public Long getCreatorUserId() {
 		return creatorUserId;
 	}
 
+	@Override
 	public void setCreatorUserId(Long creatorUserId) {
 		this.creatorUserId = creatorUserId;
 	}
 
+	@Override
 	public Date getModificationDate() {
 		return modificationDate;
 	}
 
+	@Override
 	public void setModificationDate(Date modificationDate) {
 		this.modificationDate = modificationDate;
 	}
@@ -189,21 +213,27 @@ public class Person implements ICreationDate, ICreatorUser, IModificationDate, I
 		return modifierUser;
 	}
 
+	@Override
 	public Long getModifierUserId() {
 		return modifierUserId;
 	}
 
+	@Override
 	public void setModifierUserId(Long modifierUserId) {
 		this.modifierUserId = modifierUserId;
 	}
 
+	@Override
 	public Integer getVersion() {
 		return version;
 	}
 
+	@Override
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
+
+	// ---------------
 
 	@Override
 	public boolean equals(Object o) {

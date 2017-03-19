@@ -58,17 +58,20 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
+				.setRowMod(ERowMod.SYSTEM)
 		);
 		authenticate(system);
 
 		userService.createOrUpdateUser(
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
+				.setRowMod(ERowMod.SYSTEM)
 		);
 
 		guest = userService.createOrUpdateUser(
 			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
+				.setRowMod(ERowMod.SYSTEM)
 		);
 
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
