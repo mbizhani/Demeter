@@ -67,6 +67,8 @@ public class UserFormDPage extends DPage {
 			.setLabel(new ResourceModel("User.username")));
 		floatTable.add(new WTextInput("password")
 			.setLabel(new ResourceModel("User.password")));
+		floatTable.add(new WSelectionInput("authMechanism", EAuthMechanism.list(), false)
+			.setLabel(new ResourceModel("User.authMechanism")));
 		floatTable.add(new WSelectionInput("status", EUserStatus.list(), false)
 			.setLabel(new ResourceModel("User.status")));
 		floatTable.add(new WSelectionInput("locale", ELocale.list(), false)

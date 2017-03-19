@@ -5,7 +5,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IUserService;
@@ -13,6 +12,7 @@ import org.devocative.demeter.vo.filter.UserFVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -28,7 +28,6 @@ import org.devocative.wickomp.grid.WDataGrid;
 import org.devocative.wickomp.grid.WSortField;
 import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
-import org.devocative.wickomp.grid.column.link.OAjaxLinkColumn;
 import org.devocative.wickomp.html.WAjaxLink;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -87,7 +86,6 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		super.onInitialize();
 
 		final WModalWindow window = new WModalWindow("window");
-		window.getOptions().setHeight(OSize.percent(80)).setWidth(OSize.percent(80));
 		add(window);
 
 		add(new WAjaxLink("add", DemeterIcon.ADD) {
@@ -160,15 +158,15 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.roles"), "roles"));
 
-		columnList.add(new OAjaxLinkColumn<User>(new Model<String>(), DemeterIcon.EDIT) {
-			private static final long serialVersionUID = 341934168L;
+		columnList.add(new OEditAjaxColumn<User>() {
+			private static final long serialVersionUID = 1830759784L;
 
 			@Override
 			public void onClick(AjaxRequestTarget target, IModel<User> rowData) {
 				window.setContent(new UserFormDPage(window.getContentId(), rowData.getObject()));
 				window.show(target);
 			}
-		}.setField("EDIT"));
+		});
 
 		OGrid<User> oGrid = new OGrid<>();
 		oGrid
