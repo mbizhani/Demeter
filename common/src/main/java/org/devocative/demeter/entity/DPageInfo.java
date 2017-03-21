@@ -37,7 +37,7 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 	@Column(name = "b_enabled", nullable = false)
 	private Boolean enabled = true;
 
-	//----------------------------- CREATE / MODIFY
+	// ---------------
 
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
 	private Date creationDate;
@@ -48,6 +48,8 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 	@Version
 	@Column(name = "n_version", nullable = false)
 	private Integer version = 0;
+
+	// ------------------------------
 
 	public Long getId() {
 		return id;
@@ -97,6 +99,8 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 		this.enabled = enabled;
 	}
 
+	// ---------------
+
 	@Override
 	public Date getCreationDate() {
 		return creationDate;
@@ -127,6 +131,8 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 		this.version = version;
 	}
 
+	// ---------------
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -141,5 +147,10 @@ public class DPageInfo implements ICreationDate, IModificationDate {
 	@Override
 	public int hashCode() {
 		return getId() != null ? getId().hashCode() : 0;
+	}
+
+	@Override
+	public String toString() {
+		return getBaseUri();
 	}
 }

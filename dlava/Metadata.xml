@@ -8,7 +8,7 @@
 	<filterClass>targetClass.entity</filterClass>
 	<classes>
 		<class fqn="org.devocative.demeter.entity.DPageInfo">
-			<cinfo/>
+			<cinfo ignore="true"/>
 			<id ref="id"/>
 			<fields>
 				<field name="id">
@@ -41,7 +41,7 @@
 			</fields>
 		</class>
 		<class fqn="org.devocative.demeter.entity.DPageInstance">
-			<cinfo/>
+			<cinfo hasAdd="false"/>
 			<id ref="id"/>
 			<fields>
 				<field name="id">
@@ -60,6 +60,9 @@
 					<finfo/>
 				</field>
 				<field name="pageInfo">
+					<finfo/>
+				</field>
+				<field name="roles">
 					<finfo/>
 				</field>
 				<field name="creationDate">
@@ -81,12 +84,12 @@
 					<finfo ignore="true"/>
 				</field>
 				<field name="version">
-					<finfo hasForm="false"/>
+					<finfo hasForm="false" hasFVO="false"/>
 				</field>
 			</fields>
 		</class>
 		<class fqn="org.devocative.demeter.entity.DTaskInfo">
-			<cinfo/>
+			<cinfo hasAdd="false"/>
 			<id ref="id"/>
 			<fields>
 				<field name="id">
@@ -125,7 +128,7 @@
 			</fields>
 		</class>
 		<class fqn="org.devocative.demeter.entity.DTaskLog">
-			<cinfo/>
+			<cinfo hasAdd="false"/>
 			<id ref="id"/>
 			<fields>
 				<field name="id">
@@ -152,9 +155,6 @@
 			<cinfo/>
 			<id ref="id"/>
 			<fields>
-				<field name="serialVersionUID">
-					<finfo ignore="true"/>
-				</field>
 				<field name="id">
 					<finfo/>
 				</field>
@@ -194,12 +194,9 @@
 			</fields>
 		</class>
 		<class fqn="org.devocative.demeter.entity.FileStore">
-			<cinfo/>
+			<cinfo hasAdd="false"/>
 			<id ref="id"/>
 			<fields>
-				<field name="serialVersionUID">
-					<finfo ignore="true"/>
-				</field>
 				<field name="id">
 					<finfo/>
 				</field>
@@ -324,7 +321,7 @@
 					<finfo hasList="false" hasFVO="false"/>
 				</field>
 				<field name="authMechanism">
-					<finfo hasForm="false"/>
+					<finfo/>
 				</field>
 				<field name="status">
 					<finfo/>

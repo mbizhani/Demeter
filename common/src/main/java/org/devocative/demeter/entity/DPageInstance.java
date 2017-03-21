@@ -5,6 +5,7 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Audited
 @Entity
@@ -43,9 +44,16 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@JoinColumn(name = "f_page_info", foreignKey = @ForeignKey(name = "pageinst2pageinfo"))
 	private DPageInfo pageInfo;
 
-	//TODO private List<Role> roles;
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_pageinst_role",
+		joinColumns = {@JoinColumn(name = "f_page_inst", nullable = false)},
+		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)},
+		foreignKey = @ForeignKey(name = "pageinstrole2user"),
+		inverseForeignKey = @ForeignKey(name = "pageinstrole2role")
+	)
+	private List<Role> roles;
 
-	//----------------------------- CREATE / MODIFY
+	// ---------------
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -76,6 +84,8 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@Version
 	@Column(name = "n_version", nullable = false)
 	private Integer version = 0;
+
+	// ------------------------------
 
 	public Long getId() {
 		return id;
@@ -124,6 +134,16 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	public void setPageInfo(DPageInfo pageInfo) {
 		this.pageInfo = pageInfo;
 	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+	// ---------------
 
 	@Override
 	public Date getCreationDate() {
@@ -191,6 +211,8 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		this.version = version;
 	}
 
+	// ---------------
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -205,5 +227,10 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@Override
 	public int hashCode() {
 		return getId() != null ? getId().hashCode() : 0;
+	}
+
+	@Override
+	public String toString() {
+		return getUri();
 	}
 }

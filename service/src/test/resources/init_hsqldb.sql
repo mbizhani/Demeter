@@ -4,6 +4,14 @@ CREATE TABLE REVINFO (
   PRIMARY KEY (REV)
 );
 
+CREATE TABLE a_mt_dmt_pageinst_role (
+  r_num       INTEGER NOT NULL,
+  f_page_inst BIGINT  NOT NULL,
+  f_role      BIGINT  NOT NULL,
+  r_type      TINYINT,
+  PRIMARY KEY (r_num, f_page_inst, f_role)
+);
+
 CREATE TABLE a_mt_dmt_user_role (
   r_num  INTEGER NOT NULL,
   f_user BIGINT  NOT NULL,
@@ -34,8 +42,8 @@ CREATE TABLE a_t_dmt_person (
   c_last_name     VARCHAR(255),
   c_mobile        VARCHAR(255),
   f_modifier_user BIGINT,
-  c_sys_number    VARCHAR(255),
   e_mod           INTEGER,
+  c_sys_number    VARCHAR(255),
   PRIMARY KEY (id, r_num)
 );
 
@@ -66,6 +74,11 @@ CREATE TABLE a_t_dmt_user (
   e_status            INTEGER,
   c_username          VARCHAR(255),
   PRIMARY KEY (id, r_num)
+);
+
+CREATE TABLE mt_dmt_pageinst_role (
+  f_page_inst BIGINT NOT NULL,
+  f_role      BIGINT NOT NULL
 );
 
 CREATE TABLE mt_dmt_user_role (
@@ -181,8 +194,8 @@ CREATE TABLE t_dmt_role (
   d_modification  DATE,
   f_modifier_user BIGINT,
   c_name          VARCHAR(255) NOT NULL,
-  n_version       INTEGER      NOT NULL,
   e_mod           INTEGER      NOT NULL,
+  n_version       INTEGER      NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -225,6 +238,11 @@ ADD CONSTRAINT uk_dmt_role_rolename UNIQUE (c_name);
 ALTER TABLE t_dmt_user
 ADD CONSTRAINT uk_dmt_user_username UNIQUE (c_username);
 
+ALTER TABLE a_mt_dmt_pageinst_role
+ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
 ALTER TABLE a_mt_dmt_user_role
 ADD CONSTRAINT FK_mqjoupr478iv6jchf7be9w2kf
 FOREIGN KEY (r_num)
@@ -249,6 +267,16 @@ ALTER TABLE a_t_dmt_user
 ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
+
+ALTER TABLE mt_dmt_pageinst_role
+ADD CONSTRAINT pageinstrole2role
+FOREIGN KEY (f_role)
+REFERENCES t_dmt_role;
+
+ALTER TABLE mt_dmt_pageinst_role
+ADD CONSTRAINT pageinstrole2user
+FOREIGN KEY (f_page_inst)
+REFERENCES t_dmt_d_page_inst;
 
 ALTER TABLE mt_dmt_user_role
 ADD CONSTRAINT userrole2role

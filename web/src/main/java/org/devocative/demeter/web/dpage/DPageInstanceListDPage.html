@@ -1,0 +1,36 @@
+<!--overwrite-->
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+
+	<div wicket:id="window"></div>
+
+	<form wicket:id="form">
+		<div class="dmt-form">
+			<div wicket:id="floatTable">
+				<div><div wicket:id="title"></div></div>
+				<div><div wicket:id="uri"></div></div>
+				<div><div wicket:id="inMenu"></div></div>
+				<div><div wicket:id="refId"></div></div>
+				<div><div wicket:id="pageInfo"></div></div>
+				<div><div wicket:id="roles"></div></div>
+				<div><div wicket:id="creationDate"></div></div>
+				<div><div wicket:id="creatorUser"></div></div>
+				<div><div wicket:id="modificationDate"></div></div>
+				<div><div wicket:id="modifierUser"></div></div>
+
+			</div>
+
+			<button wicket:id="search"></button>
+			<button type="reset">
+				<wicket:message key="label.reset"/>
+				<i class="fa fa-history"></i>
+			</button>
+		</div>
+	</form>
+
+	<div wicket:id="grid"></div>
+
+</wicket:panel>
+
+</html>
