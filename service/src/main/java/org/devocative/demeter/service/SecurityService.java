@@ -79,6 +79,10 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setDefaultPages(pageService.getDefaultPages());
 		}
 
+		roleService.createOrUpdateRole("User", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("Admin", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("Root", ERowMod.SYSTEM);
+
 		roleService.createOrUpdateRole("AuthByDB", ERowMod.SYSTEM);
 		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.SYSTEM);
 		roleService.createOrUpdateRole("AuthByOther", ERowMod.SYSTEM);
@@ -268,7 +272,26 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	private void afterAuthentication(UserVO authenticatedUserVO) {
 		authenticatedUserVO.setAuthenticated(true);
+
+		authenticatedUserVO.addRole(roleService.loadByName("User"));
+		if (authenticatedUserVO.isAdmin()) {
+			authenticatedUserVO.addRole(roleService.loadByName("Admin"));
+		}
+
+		if (authenticatedUserVO.isRoot()) {
+			authenticatedUserVO.addRole(roleService.loadByName("Root"));
+		}
+
+		if (EAuthMechanism.DATABASE.equals(authenticatedUserVO.getAuthMechanism())) {
+			authenticatedUserVO.addRole(roleService.loadByName("AuthByDB"));
+		} else if (EAuthMechanism.LDAP.equals(authenticatedUserVO.getAuthMechanism())) {
+			authenticatedUserVO.addRole(roleService.loadByName("AuthByLDAP"));
+		} else if (EAuthMechanism.OTHER.equals(authenticatedUserVO.getAuthMechanism())) {
+			authenticatedUserVO.addRole(roleService.loadByName("AuthByOther"));
+		}
 		CURRENT_USER.set(authenticatedUserVO);
+
+		logger.info("User Roles: [{}]={}", authenticatedUserVO, authenticatedUserVO.getRoles());
 	}
 
 	private void verifyUser(User user) {

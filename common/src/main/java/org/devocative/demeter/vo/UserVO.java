@@ -3,12 +3,12 @@ package org.devocative.demeter.vo;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInstance;
+import org.devocative.demeter.entity.EAuthMechanism;
+import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserVO implements Serializable {
 	private static final long serialVersionUID = -8402970677148363395L;
@@ -20,6 +20,9 @@ public class UserVO implements Serializable {
 
 	private boolean authenticated = false;
 	private boolean admin = false;
+	private EAuthMechanism authMechanism;
+	private Set<Role> roles = new HashSet<>();
+
 	private Map<String, List<DPageInstance>> defaultPages;
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
@@ -78,6 +81,34 @@ public class UserVO implements Serializable {
 
 	public UserVO setAdmin(boolean admin) {
 		this.admin = admin;
+		return this;
+	}
+
+	public EAuthMechanism getAuthMechanism() {
+		return authMechanism;
+	}
+
+	public UserVO setAuthMechanism(EAuthMechanism authMechanism) {
+		this.authMechanism = authMechanism;
+		return this;
+	}
+
+	public Collection<Role> getRoles() {
+		return roles;
+	}
+
+	public UserVO addRole(Role role) {
+		// TODO set permissions
+		roles.add(role);
+		return this;
+	}
+
+	public UserVO addRoles(Collection<Role> roles) {
+		if (roles != null) {
+			for (Role role : roles) {
+				addRole(role);
+			}
+		}
 		return this;
 	}
 
