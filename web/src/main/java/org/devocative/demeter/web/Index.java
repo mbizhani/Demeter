@@ -27,7 +27,7 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
-import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.dpage.LoginDPage;
@@ -58,7 +58,7 @@ public class Index extends WebPage {
 	// ------------------------------
 
 	@Inject
-	private IPageService pageService;
+	private IDPageInstanceService pageInstanceService;
 
 	@Inject
 	private ISecurityService securityService;
@@ -95,7 +95,7 @@ public class Index extends WebPage {
 				uriBuilder.append("/").append(pageParameters.get(i));
 			}
 			String refIdParam = pageParameters.getIndexedCount() >= 2 ? pageParameters.get(2).toString() : null;
-			pageInstance = pageService.getPageInstanceByURI(uriBuilder.toString(), refIdParam);
+			pageInstance = pageInstanceService.getPageInstanceByURI(uriBuilder.toString(), refIdParam);
 			if (pageInstance != null) {
 				headerTitle = getDPageTitle(pageInstance);
 
@@ -276,7 +276,7 @@ public class Index extends WebPage {
 		oMenuItems.add(new OMenuItem(UrlUtil.createUri("", true), new ResourceModel("label.home")));
 
 		if (currentUser.getDefaultPages() == null) {
-			currentUser.setDefaultPages(pageService.getDefaultPages());
+			currentUser.setDefaultPages(pageInstanceService.getDefaultPages());
 		}
 
 		// TODO replace DPageInstance with a VO
@@ -297,8 +297,8 @@ public class Index extends WebPage {
 	private IModel<String> getDPageTitle(DPageInstance dPageInstance) {
 		IModel<String> result;
 		String title = dPageInstance.getTitle();
-		if (title != null && title.startsWith(IPageService.D_PAGE_RESOURCE_KEY_PREFIX)) {
-			title = title.substring(IPageService.D_PAGE_RESOURCE_KEY_PREFIX.length());
+		if (title != null && title.startsWith(IDPageInstanceService.D_PAGE_RESOURCE_KEY_PREFIX)) {
+			title = title.substring(IDPageInstanceService.D_PAGE_RESOURCE_KEY_PREFIX.length());
 			result = new ResourceModel(title, String.format("[%s]", title));
 		} else {
 			result = new Model<>(title);

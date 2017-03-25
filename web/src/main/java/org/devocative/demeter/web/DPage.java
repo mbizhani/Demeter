@@ -4,7 +4,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.UrlUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.flow.RedirectToUrlException;
-import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 
@@ -15,7 +15,7 @@ public abstract class DPage extends Panel {
 	private static final long serialVersionUID = -5981362081515131792L;
 
 	@Inject
-	private IPageService pageService;
+	private IDPageInstanceService pageInstanceService;
 
 	@Inject
 	private ISecurityService securityService;
@@ -33,7 +33,7 @@ public abstract class DPage extends Panel {
 	}
 
 	protected String getUriForPage(Class<? extends DPage> dPageClass) {
-		String uriByPage = pageService.getUriByPage(dPageClass);
+		String uriByPage = pageInstanceService.getUriByPage(dPageClass);
 		if (uriByPage.length() > 0 && uriByPage.charAt(0) == '/') {
 			uriByPage = uriByPage.substring(1);
 		}

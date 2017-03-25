@@ -8,6 +8,7 @@ import org.devocative.demeter.entity.User;
 import org.devocative.demeter.vo.filter.DPageInstanceFVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IDPageInstanceService {
 	void saveOrUpdate(DPageInstance entity);
@@ -31,4 +32,12 @@ public interface IDPageInstanceService {
 	List<User> getModifierUserList();
 
 	// ==============================
+
+	String D_PAGE_RESOURCE_KEY_PREFIX = "KEY:";
+
+	DPageInstance getPageInstanceByURI(String uri, String refIdParam);
+
+	Map<String, List<DPageInstance>> getDefaultPages();
+
+	String getUriByPage(Class dPageClass);
 }

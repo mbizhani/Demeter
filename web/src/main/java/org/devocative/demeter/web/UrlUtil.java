@@ -4,12 +4,12 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.entity.DPageInstance;
-import org.devocative.demeter.iservice.IPageService;
+import org.devocative.demeter.iservice.IDPageInstanceService;
 
 import java.util.List;
 
 public class UrlUtil {
-	private static IPageService pageService;
+	private static IDPageInstanceService pageInstanceService;
 
 	public static void redirectTo(Class<? extends DPage> dPageClass, List<String> restParams) {
 		String[] restParamsArr = null;
@@ -35,7 +35,7 @@ public class UrlUtil {
 	}
 
 	public static String createUri(Class<? extends DPage> dPageClass, boolean needAbsolute) {
-		String href = getPageService().getUriByPage(dPageClass);
+		String href = getPageInstanceService().getUriByPage(dPageClass);
 
 		return createUri(href, needAbsolute);
 	}
@@ -60,10 +60,10 @@ public class UrlUtil {
 		return createUri(String.format("/dmt/getfile/%s", fileId), true);
 	}
 
-	private static IPageService getPageService() {
-		if (pageService == null) {
-			pageService = ModuleLoader.getApplicationContext().getBean(IPageService.class);
+	private static IDPageInstanceService getPageInstanceService() {
+		if (pageInstanceService == null) {
+			pageInstanceService = ModuleLoader.getApplicationContext().getBean(IDPageInstanceService.class);
 		}
-		return pageService;
+		return pageInstanceService;
 	}
 }

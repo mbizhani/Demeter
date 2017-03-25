@@ -46,7 +46,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	private IRoleService roleService;
 
 	@Autowired
-	private IPageService pageService;
+	private IDPageInstanceService pageInstanceService;
 
 	@Autowired(required = false)
 	private IOtherAuthenticationService otherAuthenticationService;
@@ -76,7 +76,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
 			guest.setAuthenticated(true);
-			guest.setDefaultPages(pageService.getDefaultPages());
+			guest.setDefaultPages(pageInstanceService.getDefaultPages());
 		}
 
 		roleService.createOrUpdateRole("User", ERowMod.SYSTEM);
