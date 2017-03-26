@@ -23,7 +23,7 @@ public class UserVO implements Serializable {
 	private EAuthMechanism authMechanism;
 	private Set<Role> roles = new HashSet<>();
 
-	private Map<String, List<DPageInstance>> defaultPages;
+	private PageVO pageVO;
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
@@ -63,6 +63,14 @@ public class UserVO implements Serializable {
 
 	public boolean isRoot() {
 		return "root".equals(username);
+	}
+
+	public boolean hasAccessToURI(String uri) {
+		return pageVO.getAccessibleUri().contains(uri);
+	}
+
+	public Map<String, List<DPageInstance>> getMainMenuEntries() {
+		return pageVO.getMainMenuEntries();
 	}
 
 	// ---------------
@@ -112,12 +120,13 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
-	public Map<String, List<DPageInstance>> getDefaultPages() {
-		return defaultPages;
+	public boolean isPageEmpty() {
+		return pageVO == null;
 	}
 
-	public void setDefaultPages(Map<String, List<DPageInstance>> defaultPages) {
-		this.defaultPages = defaultPages;
+	public UserVO setPageVO(PageVO pageVO) {
+		this.pageVO = pageVO;
+		return this;
 	}
 
 	public Integer getSessionTimeout() {
@@ -164,5 +173,36 @@ public class UserVO implements Serializable {
 	@Override
 	public String toString() {
 		return username;
+	}
+
+	// ------------------------------
+
+	public static class PageVO implements Serializable {
+		private static final long serialVersionUID = 5722909672657821898L;
+
+		private Set<String> accessibleUri;
+		private Map<String, List<DPageInstance>> mainMenuEntries;
+
+		// ------------------------------
+
+		public PageVO(Set<String> accessibleUri, Map<String, List<DPageInstance>> mainMenuEntries) {
+			this.accessibleUri = accessibleUri;
+			this.mainMenuEntries = mainMenuEntries;
+		}
+
+		// ------------------------------
+
+		public Set<String> getAccessibleUri() {
+			return accessibleUri;
+		}
+
+		public Map<String, List<DPageInstance>> getMainMenuEntries() {
+			return mainMenuEntries;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("URIs=%s, Menu=%s", accessibleUri, mainMenuEntries);
+		}
 	}
 }

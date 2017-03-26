@@ -11,22 +11,18 @@ import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
-import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
-import org.devocative.demeter.iservice.IApplicationLifecycle;
-import org.devocative.demeter.iservice.ICacheService;
-import org.devocative.demeter.iservice.IDPageInstanceService;
+import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.iservice.persistor.IQueryBuilder;
+import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.vo.filter.DPageInstanceFVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("dmtDPageInstanceService")
 public class DPageInstanceService implements IDPageInstanceService, IApplicationLifecycle {
@@ -110,6 +106,9 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 	@Autowired
 	private ICacheService cacheService;
 
+	@Autowired
+	private IRoleService roleService;
+
 	// ------------------------------ IApplicationLifecycle methods
 
 	@Override
@@ -129,11 +128,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 				totalDPageSize += dPages.size();
 			}
 		}
-
-		List<DPageInfo> list = persistorService.list(DPageInfo.class);
-		for (DPageInfo pageInfo : list) {
-			logger.debug("DPageInfo: baseUri={} enabled={}", pageInfo.getBaseUri(), pageInfo.getEnabled());
-		}
+		persistorService.commitOrRollback();
 
 		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2);
 		pageInstCache.setMissedHitHandler(new IMissedHitHandler<String, DPageInstance>() {
@@ -192,9 +187,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 	}
 
 	@Override
-	public Map<String, List<DPageInstance>> getDefaultPages() {
-		Map<String, List<DPageInstance>> result = new HashMap<>();
-
+	public UserVO.PageVO getDefaultPages() {
 		List<DPageInstance> instances = persistorService
 			.createQueryBuilder()
 			.addSelect("select ent")
@@ -204,20 +197,66 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 			.addWhere("and ent.inMenu = true")
 			.list();
 
+		Set<String> accessibleUri = new HashSet<>();
+		Map<String, List<DPageInstance>> menuEntries = new HashMap<>();
+
 		for (DPageInstance pageInstance : instances) {
-			String module = pageInstance.getPageInfo().getModule();
-			if (!result.containsKey(module)) {
-				result.put(module, new ArrayList<DPageInstance>());
+			DPageInfo pageInfo = pageInstance.getPageInfo();
+
+			String module = pageInfo.getModule();
+			if (!menuEntries.containsKey(module)) {
+				menuEntries.put(module, new ArrayList<DPageInstance>());
 			}
-			result.get(module).add(pageInstance);
+			menuEntries.get(module).add(pageInstance);
+
+			accessibleUri.add(pageInstance.getUri());
 		}
 
-		return result;
+		return new UserVO.PageVO(accessibleUri, menuEntries);
 	}
 
 	@Override
 	public String getUriByPage(Class dPageClass) {
 		return uriCache.get(dPageClass);
+	}
+
+	@Override
+	public UserVO.PageVO getAccessiblePages(Collection<Role> roles) {
+		IQueryBuilder queryBuilder = persistorService.createQueryBuilder()
+			.addSelect("select ent")
+			.addFrom(DPageInstance.class, "ent")
+			.addJoin("pi", "ent.pageInfo", EJoinMode.LeftFetch)
+			.addJoin("rl", "ent.roles", EJoinMode.Left)
+			.addWhere("and pi.enabled = true");
+
+		if (roles != null && !roles.isEmpty()) {
+			queryBuilder
+				.addWhere("and (rl in (:roles) or rl.id is null)")
+				.addParam("roles", roles);
+		} else {
+			queryBuilder.addWhere("and rl.id is null");
+		}
+
+		List<DPageInstance> instances = queryBuilder.list();
+
+		Set<String> accessibleUri = new HashSet<>();
+		Map<String, List<DPageInstance>> menuEntries = new HashMap<>();
+
+		for (DPageInstance pageInstance : instances) {
+			DPageInfo pageInfo = pageInstance.getPageInfo();
+
+			String module = pageInfo.getModule();
+			if (pageInstance.getInMenu()) {
+				if (!menuEntries.containsKey(module)) {
+					menuEntries.put(module, new ArrayList<DPageInstance>());
+				}
+				menuEntries.get(module).add(pageInstance);
+			}
+
+			accessibleUri.add(pageInstance.getUri());
+		}
+
+		return new UserVO.PageVO(accessibleUri, menuEntries);
 	}
 
 	// ------------------------------
@@ -270,18 +309,19 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		pageInstance.setInMenu(xdPage.getInMenu());
 		pageInstance.setPageInfo(pageInfo);
 		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
+		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
+			List<Role> roles = new ArrayList<>();
+			String[] roleNames = xdPage.getRoles().split("[,]");
+			for (String roleName : roleNames) {
+				Role role = roleService.loadByName(roleName);
+				if (role != null) {
+					roles.add(role);
+				} else {
+					throw new RuntimeException(String.format("Invalid role name [%s] for DPage [%s]", roleName, xdPage.getUri()));
+				}
+			}
+			pageInstance.setRoles(roles);
+		}
 		persistorService.saveOrUpdate(pageInstance);
-
-		persistorService
-			.createQueryBuilder()
-			.addSelect("update DPageInstance ent set ent.uri = concat('/',:base_uri, '/', ent.refId)")
-			.addWhere("and ent.pageInfo.id = :id")
-			.addWhere("and ent.refId is not null")
-			.addParam("base_uri", pageInfo.getBaseUri())
-			.addParam("id", pageInfo.getId())
-			.update();
-
-		persistorService.commitOrRollback();
 	}
-
 }

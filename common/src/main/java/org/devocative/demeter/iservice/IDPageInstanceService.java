@@ -5,10 +5,11 @@ import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
+import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.vo.filter.DPageInstanceFVO;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public interface IDPageInstanceService {
 	void saveOrUpdate(DPageInstance entity);
@@ -37,7 +38,9 @@ public interface IDPageInstanceService {
 
 	DPageInstance getPageInstanceByURI(String uri, String refIdParam);
 
-	Map<String, List<DPageInstance>> getDefaultPages();
+	UserVO.PageVO getDefaultPages();
 
 	String getUriByPage(Class dPageClass);
+
+	UserVO.PageVO getAccessiblePages(Collection<Role> roles);
 }

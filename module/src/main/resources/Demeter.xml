@@ -36,52 +36,71 @@
 		<dPage type="org.devocative.demeter.web.dpage.PersonListDPage"
 			   title="KEY:dPage.dmt.Person"
 			   uri="/persons"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Admin"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.UserListDPage"
 			   title="KEY:dPage.dmt.User"
 			   uri="/users"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Admin"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.RoleListDPage"
 			   title="KEY:dPage.dmt.Role"
 			   uri="/roles"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Admin"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.DPageInstanceListDPage"
 			   title="KEY:dPage.dmt.DPageInstanceListDPage"
 			   uri="/pages"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Admin"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.InfoDPage"
 			   title="KEY:dPage.dmt.Info"
 			   uri="/info"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Root"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.LoginDPage"
 			   title="KEY:dPage.dmt.Login"
 			   uri="/login"
-			   inMenu="false"/>
+			   inMenu="false"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.ConfigKeysDPage"
 			   title="KEY:dPage.dmt.ConfigKeys"
 			   uri="/config"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Root"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.CacheManagementDPage"
 			   title="KEY:dPage.dmt.CacheManagement"
 			   uri="/cache"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Root"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.TaskInfoDPage"
 			   title="KEY:dPage.dmt.TaskInfoList"
 			   uri="/tasks"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Root"
+				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.FileStoreListDPage"
 			   title="KEY:dPage.dmt.FileStoreList"
 			   uri="/files"
-			   inMenu="true"/>
+			   inMenu="true"
+			   roles="Admin"
+				/>
 
 	</dPages>
 </module>

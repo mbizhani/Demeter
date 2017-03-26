@@ -77,6 +77,14 @@ public class Index extends WebPage {
 		securityService.authenticate(WebUtil.toMap(true, true));
 		currentUser = securityService.getCurrentUser();
 
+		if (currentUser.isPageEmpty()) {
+			UserVO.PageVO pageVO = pageInstanceService.getAccessiblePages(currentUser.getRoles());
+			currentUser.setPageVO(pageVO);
+			if (logger.isDebugEnabled()) {
+				logger.debug("User=[{}] {}", currentUser.getUsername(), pageVO);
+			}
+		}
+
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
 		html.add(new AttributeModifier("dir", DemeterWebSession.get().getLayoutDirection().toString()));
 		add(html);
@@ -111,7 +119,7 @@ public class Index extends WebPage {
 					}
 				}
 
-				createDPageFromType(pageInstance.getPageInfo(), params);
+				createDPageFromType(pageInstance.getUri(), pageInstance.getPageInfo(), params);
 			} else {
 				content = new Label("content", new ResourceModel("err.dmt.UnknownDPage"));
 			}
@@ -234,15 +242,15 @@ public class Index extends WebPage {
 
 	// ------------------------------
 
-	private void createDPageFromType(DPageInfo pageInfo, List<String> params) {
+	private void createDPageFromType(String uri, DPageInfo pageInfo, List<String> params) {
 		try {
 			Class<? extends DPage> dPageClass = findDPageClass(pageInfo);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
-				if (currentUser.isAuthenticated() || dPageClass.equals(LoginDPage.class)) {
+				if (currentUser.hasAccessToURI(uri)) {
 					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
 					content = (DPage) constructor.newInstance("content", params);
-					//TODO handle authorization correctly
-					//TODO content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
+				} else if (currentUser.isAuthenticated()) {
+					content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
 				} else {
 					DemeterWebSession.get()
 						.setOriginalDPage(dPageClass)
@@ -275,12 +283,8 @@ public class Index extends WebPage {
 		oMenuItems.clear();
 		oMenuItems.add(new OMenuItem(UrlUtil.createUri("", true), new ResourceModel("label.home")));
 
-		if (currentUser.getDefaultPages() == null) {
-			currentUser.setDefaultPages(pageInstanceService.getDefaultPages());
-		}
-
 		// TODO replace DPageInstance with a VO
-		Map<String, List<DPageInstance>> defaultPages = currentUser.getDefaultPages();
+		Map<String, List<DPageInstance>> defaultPages = currentUser.getMainMenuEntries();
 		if (defaultPages != null) {
 			for (Map.Entry<String, List<DPageInstance>> entry : defaultPages.entrySet()) {
 				OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));

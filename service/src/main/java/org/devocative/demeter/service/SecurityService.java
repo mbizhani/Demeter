@@ -76,7 +76,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
 			guest.setAuthenticated(true);
-			guest.setDefaultPages(pageInstanceService.getDefaultPages());
+			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
 		roleService.createOrUpdateRole("User", ERowMod.SYSTEM);

@@ -20,7 +20,9 @@
 				inMenu (true|false) #REQUIRED
 				type CDATA #REQUIRED
 				title CDATA #REQUIRED
-				uri CDATA #REQUIRED>
+				uri CDATA #REQUIRED
+				roles CDATA
+				>
 		<!ELEMENT tasks (task)*>
 		<!ELEMENT task (#PCDATA)>
 		<!ATTLIST task

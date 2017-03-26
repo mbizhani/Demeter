@@ -17,6 +17,11 @@ public class XDPage {
 	@XStreamAsAttribute
 	private String uri;
 
+	@XStreamAsAttribute
+	private String roles;
+
+	// ------------------------------
+
 	public Boolean getInMenu() {
 		return inMenu;
 	}
@@ -50,6 +55,15 @@ public class XDPage {
 
 	public XDPage setUri(String uri) {
 		this.uri = uri;
+		return this;
+	}
+
+	public String getRoles() {
+		return roles;
+	}
+
+	public XDPage setRoles(String roles) {
+		this.roles = roles;
 		return this;
 	}
 }
