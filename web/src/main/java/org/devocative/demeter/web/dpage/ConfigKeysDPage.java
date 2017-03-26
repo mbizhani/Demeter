@@ -10,7 +10,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.IConfigKey;
 import org.devocative.adroit.vo.KeyValueVO;
-import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -18,7 +17,6 @@ import org.devocative.wickomp.form.WTextInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.*;
 
 public class ConfigKeysDPage extends DPage {
@@ -30,16 +28,12 @@ public class ConfigKeysDPage extends DPage {
 	private Map<String, String> remappedKeys = new HashMap<>();
 	private Map<String, String> inverseRemappedKeys = new HashMap<>();
 
-	@Inject
-	private ISecurityService securityService;
-
 	public ConfigKeysDPage(String id, List<String> params) {
 		super(id, params);
 
 		fillConfigKeys();
 
 		Form<Map<String, String>> form = new Form<>("form", new CompoundPropertyModel<>(keysValue));
-		form.setVisible(securityService.getCurrentUser().getUsername().equals("root"));
 		add(form);
 
 		form.add(new ListView<IConfigKey>("keys", ConfigUtil.getConfigKeys()) {
@@ -71,7 +65,7 @@ public class ConfigKeysDPage extends DPage {
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				logger.warn("Update config values: User=[{}]", securityService.getCurrentUser());
+				logger.warn("Update config values: User=[{}]", getCurrentUser());
 
 				for (Map.Entry<String, String> entry : keysValue.entrySet()) {
 					String key = inverseRemappedKeys.get(entry.getKey());

@@ -6,7 +6,6 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.devocative.demeter.iservice.ICacheService;
-import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.CacheInfoVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
@@ -22,9 +21,6 @@ public class CacheManagementDPage extends DPage {
 
 	@Inject
 	private ICacheService cacheService;
-
-	@Inject
-	private ISecurityService securityService;
 
 	public CacheManagementDPage(String id, List<String> params) {
 		super(id, params);
@@ -50,7 +46,7 @@ public class CacheManagementDPage extends DPage {
 					}
 				}.add(new AttributeModifier("onclick", "return confirm('Are you sure?');")));
 			}
-		}.setVisible(securityService.getCurrentUser().getUsername().equals("root")));
+		});
 
 		add(new FontAwesomeBehavior());
 	}

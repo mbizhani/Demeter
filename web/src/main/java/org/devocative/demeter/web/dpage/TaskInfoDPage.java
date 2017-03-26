@@ -5,7 +5,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.entity.DTaskInfo;
-import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.task.ITaskService;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
@@ -28,9 +27,6 @@ public class TaskInfoDPage extends DPage {
 
 	@Inject
 	private ITaskService taskService;
-
-	@Inject
-	private ISecurityService securityService;
 
 	public TaskInfoDPage(String id, List<String> params) {
 		super(id, params);
@@ -81,7 +77,6 @@ public class TaskInfoDPage extends DPage {
 			public IModel<DTaskInfo> model(DTaskInfo object) {
 				return new WModel<>(object);
 			}
-		}).setVisible(securityService.getCurrentUser().getUsername().equals("root")) //TODO using authorization
-		);
+		}));
 	}
 }
