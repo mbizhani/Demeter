@@ -51,7 +51,6 @@ CREATE TABLE a_t_dmt_role (
   id              BIGINT  NOT NULL,
   r_num           INTEGER NOT NULL,
   r_type          TINYINT,
-  c_constraints   VARCHAR(1000),
   d_modification  DATE,
   f_modifier_user BIGINT,
   c_name          VARCHAR(255),
@@ -188,7 +187,6 @@ CREATE TABLE t_dmt_person (
 
 CREATE TABLE t_dmt_role (
   id              BIGINT       NOT NULL,
-  c_constraints   VARCHAR(1000),
   d_creation      DATE         NOT NULL,
   f_creator_user  BIGINT,
   d_modification  DATE,
@@ -204,7 +202,6 @@ CREATE TABLE t_dmt_user (
   b_admin             BOOLEAN      NOT NULL,
   e_auth_mech         INTEGER      NOT NULL,
   e_cal_type          INTEGER,
-  c_constraints       VARCHAR(1000),
   e_date_pattern      INTEGER,
   e_date_time_pattern INTEGER,
   d_last_login        DATE,

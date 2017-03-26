@@ -28,9 +28,6 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Column(name = "c_name", nullable = false)
 	private String name;
 
-	@Column(name = "c_constraints", length = 1000)
-	private String constraints;
-
 	// ---------------
 
 	@Embedded
@@ -82,14 +79,6 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getConstraints() {
-		return constraints;
-	}
-
-	public void setConstraints(String constraints) {
-		this.constraints = constraints;
 	}
 
 	// ---------------

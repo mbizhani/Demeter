@@ -65,10 +65,6 @@ public class User implements Serializable {
 	@Column(name = "d_last_login", columnDefinition = "date")
 	private Date lastLoginDate;
 
-	@NotAudited
-	@Column(name = "c_constraints", length = 1000)
-	private String constraints;
-
 	@Column(name = "b_admin", nullable = false)
 	private Boolean admin = false;
 
@@ -176,14 +172,6 @@ public class User implements Serializable {
 
 	public void setLastLoginDate(Date lastLoginDate) {
 		this.lastLoginDate = lastLoginDate;
-	}
-
-	public String getConstraints() {
-		return constraints;
-	}
-
-	public void setConstraints(String constraints) {
-		this.constraints = constraints;
 	}
 
 	public Boolean getAdmin() {

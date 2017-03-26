@@ -344,9 +344,6 @@
 				<field name="lastLoginDate">
 					<finfo hasForm="false" hasTimePart="true"/>
 				</field>
-				<field name="constraints">
-					<finfo ignore="true"/>
-				</field>
 				<field name="admin">
 					<finfo/>
 				</field>
@@ -370,9 +367,6 @@
 				</field>
 				<field name="name">
 					<finfo/>
-				</field>
-				<field name="constraints">
-					<finfo ignore="true"/>
 				</field>
 				<field name="rowMod">
 					<finfo hasForm="false"/>
