@@ -3,10 +3,10 @@
 				shortName CDATA #REQUIRED
 				mainClass CDATA #REQUIRED
 				mainResource CDATA #REQUIRED
-				constraintsClass CDATA #IMPLIED
+				authorizationKeyClass CDATA #IMPLIED
 				errorCodesClass CDATA #IMPLIED
 				localPersistorService (true|false)
-				configKeysClass CDATA #REQUIRED
+				configKeyClass CDATA #REQUIRED
 				>
 		<!ELEMENT dependencies (dependency)*>
 		<!ELEMENT dependency (#PCDATA)>

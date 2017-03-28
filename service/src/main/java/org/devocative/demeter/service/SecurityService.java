@@ -7,11 +7,11 @@ import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.EAuthMechanism;
-import org.devocative.demeter.entity.ERowMod;
-import org.devocative.demeter.entity.EUserStatus;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.xml.XModule;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.*;
+import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
@@ -48,6 +48,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	@Autowired
 	private IDPageInstanceService pageInstanceService;
 
+	@Autowired
+	private IPersistorService persistorService;
+
 	@Autowired(required = false)
 	private IOtherAuthenticationService otherAuthenticationService;
 
@@ -55,6 +58,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void init() {
+		storeAuthorizationKeys();
+
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
@@ -108,7 +113,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		CURRENT_USER.remove();
 	}
 
-	// ------------------------------ PUBLIC METHODS
+	// ------------------------------
 
 	@Override
 	public UserVO getCurrentUser() {
@@ -205,7 +210,59 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		return system;
 	}
 
-	// ------------------------------ PRIVATE METHODS
+	// ------------------------------
+
+	private void storeAuthorizationKeys() {
+		Collection<XModule> xModules = ModuleLoader.getModules().values();
+		for (XModule xModule : xModules) {
+			try {
+				String authorizationKeyClass = xModule.getAuthorizationKeyClass();
+				if (authorizationKeyClass != null) {
+					Class<?> enumClass = Class.forName(authorizationKeyClass);
+					if (enumClass.isEnum()) {
+						Object[] enumConstants = enumClass.getEnumConstants();
+						for (Object enumConstant : enumConstants) {
+							IAuthorizationKey key = (IAuthorizationKey) enumConstant;
+							key.setModule(xModule.getShortName().toLowerCase());
+
+							checkAndSaveAuthorizationKey(key.getName());
+						}
+					} else {
+						throw new DSystemException("IAuthorizationKey class must be enum for module: " + xModule.getShortName());
+					}
+				}
+			} catch (Exception e) {
+				logger.error(String.format("Loading module [%s] authorization keys", xModule.getShortName()), e);
+			}
+		}
+
+		persistorService.commitOrRollback();
+
+		if (logger.isDebugEnabled()) {
+			List<Authorization> list = persistorService.list(Authorization.class);
+			for (Authorization authorization : list) {
+				logger.debug("AuthKey = {}", authorization);
+			}
+		}
+	}
+
+	private void checkAndSaveAuthorizationKey(String name) {
+		long cnt = persistorService.createQueryBuilder()
+			.addSelect("select count(1)")
+			.addFrom(Authorization.class, "ent")
+			.addWhere("and ent.name = :name")
+			.addParam("name", name)
+			.object();
+
+		if (cnt == 0) {
+			logger.info("Adding AuthorizationKey = {}", name);
+
+			Authorization authorization = new Authorization();
+			authorization.setName(name);
+			persistorService.saveOrUpdate(authorization);
+		}
+	}
+
 
 	private UserVO authenticateByDatabase(User user, String password) {
 		if (password != null) {

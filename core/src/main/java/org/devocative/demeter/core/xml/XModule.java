@@ -18,7 +18,7 @@ public class XModule {
 	private String mainResource;
 
 	@XStreamAsAttribute
-	private String constraintsClass;
+	private String authorizationKeyClass;
 
 	@XStreamAsAttribute
 	private String errorCodesClass;
@@ -27,7 +27,7 @@ public class XModule {
 	private boolean localPersistorService;
 
 	@XStreamAsAttribute
-	private String configKeysClass;
+	private String configKeyClass;
 
 	private List<String> dependencies;
 
@@ -63,12 +63,12 @@ public class XModule {
 		this.mainResource = mainResource;
 	}
 
-	public String getConstraintsClass() {
-		return constraintsClass;
+	public String getAuthorizationKeyClass() {
+		return authorizationKeyClass;
 	}
 
-	public void setConstraintsClass(String constraintsClass) {
-		this.constraintsClass = constraintsClass;
+	public void setAuthorizationKeyClass(String authorizationKeyClass) {
+		this.authorizationKeyClass = authorizationKeyClass;
 	}
 
 	public String getErrorCodesClass() {
@@ -87,12 +87,12 @@ public class XModule {
 		this.localPersistorService = localPersistorService;
 	}
 
-	public String getConfigKeysClass() {
-		return configKeysClass;
+	public String getConfigKeyClass() {
+		return configKeyClass;
 	}
 
-	public XModule setConfigKeysClass(String configKeysClass) {
-		this.configKeysClass = configKeysClass;
+	public XModule setConfigKeyClass(String configKeyClass) {
+		this.configKeyClass = configKeyClass;
 		return this;
 	}
 

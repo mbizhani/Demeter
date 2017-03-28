@@ -34,13 +34,14 @@ public class ModuleLoader {
 	private static boolean inited = false;
 	private static boolean shuted = false;
 
+	// ------------------------------
 
 	public static ApplicationContext getApplicationContext() {
 		return appCtx;
 	}
 
 	public static Map<String, XModule> getModules() {
-		return MODULES;
+		return new LinkedHashMap<>(MODULES);
 	}
 
 	public static void registerSpringBean(String beanName, Object bean) {
@@ -127,7 +128,7 @@ public class ModuleLoader {
 		}
 	}
 
-	// ---------------------------- LIFECYCLIC METHODS
+	// ---------------
 
 	private static void initModules() {
 		XStream xStream = new XStream();
@@ -185,10 +186,10 @@ public class ModuleLoader {
 			String moduleName = moduleEntry.getKey();
 			XModule module = moduleEntry.getValue();
 			if (module.isLocalPersistorService()) {
-				IPersistorService localModulePersistor = persistors.get(String.format("%sPersistorService", module.getShortName().toLowerCase()));
+				String prefix = module.getShortName().toLowerCase();
+				IPersistorService localModulePersistor = persistors.get(String.format("%sPersistorService", prefix));
 				if (localModulePersistor != null) {
 					if (module.getEntities() != null && module.getEntities().size() > 0) {
-						String prefix = module.getShortName().toLowerCase();
 						localModulePersistor.setInitData(loadEntities(module.getEntities()), prefix);
 						logger.info("Local persistor for module [{}] initialized with [{}] entities.",
 							moduleName, module.getEntities().size());
@@ -282,7 +283,7 @@ public class ModuleLoader {
 		}
 	}
 
-	// ------------------------- PRIVATE METHODS
+	// ---------------
 
 	private static List<Class> loadEntities(List<XEntity> entities) {
 		List<Class> classes = new ArrayList<>();
@@ -298,8 +299,8 @@ public class ModuleLoader {
 
 	private static void loadConfigKeys(XModule xModule) {
 		try {
-			if (xModule.getConfigKeysClass() != null) {
-				Class<?> enumClass = Class.forName(xModule.getConfigKeysClass());
+			if (xModule.getConfigKeyClass() != null) {
+				Class<?> enumClass = Class.forName(xModule.getConfigKeyClass());
 				if (enumClass.isEnum()) {
 					Object[] enumConstants = enumClass.getEnumConstants();
 					for (Object enumConstant : enumConstants) {
@@ -315,5 +316,4 @@ public class ModuleLoader {
 			logger.error(String.format("Loading module [%s] config keys", xModule.getShortName()), e);
 		}
 	}
-
 }
