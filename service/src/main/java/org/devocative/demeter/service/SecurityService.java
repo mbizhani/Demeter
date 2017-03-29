@@ -58,7 +58,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void init() {
-		storeAuthorizationKeys();
+		storePrivilegeKeys();
 
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
@@ -84,13 +84,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("User", ERowMod.SYSTEM);
-		roleService.createOrUpdateRole("Admin", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("User", ERowMod.ROOT);
+		roleService.createOrUpdateRole("Admin", ERowMod.ROOT);
 		roleService.createOrUpdateRole("Root", ERowMod.SYSTEM);
 
-		roleService.createOrUpdateRole("AuthByDB", ERowMod.SYSTEM);
-		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.SYSTEM);
-		roleService.createOrUpdateRole("AuthByOther", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("AuthByDB", ERowMod.ROOT);
+		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.ROOT);
+		roleService.createOrUpdateRole("AuthByOther", ERowMod.ROOT);
 	}
 
 	@Override
@@ -212,54 +212,54 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	// ------------------------------
 
-	private void storeAuthorizationKeys() {
+	private void storePrivilegeKeys() {
 		Collection<XModule> xModules = ModuleLoader.getModules().values();
 		for (XModule xModule : xModules) {
 			try {
-				String authorizationKeyClass = xModule.getAuthorizationKeyClass();
-				if (authorizationKeyClass != null) {
-					Class<?> enumClass = Class.forName(authorizationKeyClass);
+				String privilegeKeyClass = xModule.getPrivilegeKeyClass();
+				if (privilegeKeyClass != null) {
+					Class<?> enumClass = Class.forName(privilegeKeyClass);
 					if (enumClass.isEnum()) {
 						Object[] enumConstants = enumClass.getEnumConstants();
 						for (Object enumConstant : enumConstants) {
-							IAuthorizationKey key = (IAuthorizationKey) enumConstant;
+							IPrivilegeKey key = (IPrivilegeKey) enumConstant;
 							key.setModule(xModule.getShortName().toLowerCase());
 
-							checkAndSaveAuthorizationKey(key.getName());
+							checkAndSavePrivilegeKey(key.getName());
 						}
 					} else {
-						throw new DSystemException("IAuthorizationKey class must be enum for module: " + xModule.getShortName());
+						throw new DSystemException("IPrivilegeKey class must be enum for module: " + xModule.getShortName());
 					}
 				}
 			} catch (Exception e) {
-				logger.error(String.format("Loading module [%s] authorization keys", xModule.getShortName()), e);
+				logger.error(String.format("Loading module [%s] privilege keys", xModule.getShortName()), e);
 			}
 		}
 
 		persistorService.commitOrRollback();
 
 		if (logger.isDebugEnabled()) {
-			List<Authorization> list = persistorService.list(Authorization.class);
-			for (Authorization authorization : list) {
-				logger.debug("AuthKey = {}", authorization);
+			List<Privilege> list = persistorService.list(Privilege.class);
+			for (Privilege privilege : list) {
+				logger.debug("PrivilegeKey = {}", privilege);
 			}
 		}
 	}
 
-	private void checkAndSaveAuthorizationKey(String name) {
+	private void checkAndSavePrivilegeKey(String name) {
 		long cnt = persistorService.createQueryBuilder()
 			.addSelect("select count(1)")
-			.addFrom(Authorization.class, "ent")
+			.addFrom(Privilege.class, "ent")
 			.addWhere("and ent.name = :name")
 			.addParam("name", name)
 			.object();
 
 		if (cnt == 0) {
-			logger.info("Adding AuthorizationKey = {}", name);
+			logger.info("Adding PrivilegeKey = {}", name);
 
-			Authorization authorization = new Authorization();
-			authorization.setName(name);
-			persistorService.saveOrUpdate(authorization);
+			Privilege privilege = new Privilege();
+			privilege.setName(name);
+			persistorService.saveOrUpdate(privilege);
 		}
 	}
 

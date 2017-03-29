@@ -1,8 +1,8 @@
 package org.devocative.demeter;
 
-import org.devocative.demeter.entity.IAuthorizationKey;
+import org.devocative.demeter.entity.IPrivilegeKey;
 
-public enum DemeterAuthorizationKey implements IAuthorizationKey {
+public enum DemeterPrivilegeKey implements IPrivilegeKey {
 	RoleAdd, RoleEdit,
 	UserAdd, UserEdit,
 	PersonAdd, PersonEdit;

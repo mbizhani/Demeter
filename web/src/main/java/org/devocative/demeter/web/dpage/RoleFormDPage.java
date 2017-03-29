@@ -11,6 +11,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -62,6 +63,10 @@ public class RoleFormDPage extends DPage {
 		floatTable.add(new WTextInput("name")
 			.setRequired(true)
 			.setLabel(new ResourceModel("Role.name")));
+		floatTable.add(new WSelectionInput("permissions", roleService.getPermissionsList(), true)
+			.setLabel(new ResourceModel("Role.permissions")));
+		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
+			.setLabel(new ResourceModel("Role.denials")));
 
 		Form<Role> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);

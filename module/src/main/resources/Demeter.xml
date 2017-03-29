@@ -8,12 +8,10 @@
 		shortName="DMT"
 		mainClass="org.devocative.demeter.module.DemeterDModule"
 		mainResource="org.devocative.demeter.web.DemeterDModule"
-		authorizationKeyClass="org.devocative.demeter.DemeterAuthorizationKey"
+		privilegeKeyClass="org.devocative.demeter.DemeterPrivilegeKey"
 		configKeyClass="org.devocative.demeter.DemeterConfigKey">
 
 	<entities>
-		<entity type="org.devocative.demeter.entity.Authorization"/>
-
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>
 		<entity type="org.devocative.demeter.entity.DPageInstance"/>
 
@@ -24,6 +22,7 @@
 		<entity type="org.devocative.demeter.entity.FileStore"/>
 
 		<entity type="org.devocative.demeter.entity.Person"/>
+		<entity type="org.devocative.demeter.entity.Privilege"/>
 		<entity type="org.devocative.demeter.entity.Role"/>
 		<entity type="org.devocative.demeter.entity.User"/>
 	</entities>

@@ -18,7 +18,7 @@ public class XModule {
 	private String mainResource;
 
 	@XStreamAsAttribute
-	private String authorizationKeyClass;
+	private String privilegeKeyClass;
 
 	@XStreamAsAttribute
 	private String errorCodesClass;
@@ -63,12 +63,12 @@ public class XModule {
 		this.mainResource = mainResource;
 	}
 
-	public String getAuthorizationKeyClass() {
-		return authorizationKeyClass;
+	public String getPrivilegeKeyClass() {
+		return privilegeKeyClass;
 	}
 
-	public void setAuthorizationKeyClass(String authorizationKeyClass) {
-		this.authorizationKeyClass = authorizationKeyClass;
+	public void setPrivilegeKeyClass(String privilegeKeyClass) {
+		this.privilegeKeyClass = privilegeKeyClass;
 	}
 
 	public String getErrorCodesClass() {

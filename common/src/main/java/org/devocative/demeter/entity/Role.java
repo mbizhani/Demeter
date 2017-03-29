@@ -2,14 +2,16 @@ package org.devocative.demeter.entity;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Audited
 @Entity
 @Table(name = "t_dmt_role", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_dmt_role_rolename", columnNames = {"c_name"})
+	@UniqueConstraint(name = "uk_dmt_role_name", columnNames = {"c_name"})
 })
 public class Role implements IRowMod, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	private static final long serialVersionUID = -7388401924357240473L;
@@ -27,6 +29,26 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	@Column(name = "c_name", nullable = false)
 	private String name;
+
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_prvlg_role_perm",
+		joinColumns = {@JoinColumn(name = "f_role", nullable = false)},
+		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
+		foreignKey = @ForeignKey(name = "prvlgRolePerm2role"),
+		inverseForeignKey = @ForeignKey(name = "prvlgRolePerm2prvlg")
+	)
+	private List<Privilege> permissions;
+
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_prvlg_role_deny",
+		joinColumns = {@JoinColumn(name = "f_role", nullable = false)},
+		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
+		foreignKey = @ForeignKey(name = "prvlgRoleDeny2role"),
+		inverseForeignKey = @ForeignKey(name = "prvlgRoleDeny2prvlg")
+	)
+	private List<Privilege> denials;
 
 	// ---------------
 
@@ -79,6 +101,22 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<Privilege> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<Privilege> permissions) {
+		this.permissions = permissions;
+	}
+
+	public List<Privilege> getDenials() {
+		return denials;
+	}
+
+	public void setDenials(List<Privilege> denials) {
+		this.denials = denials;
 	}
 
 	// ---------------

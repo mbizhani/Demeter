@@ -4,28 +4,36 @@ CREATE TABLE REVINFO (
 	PRIMARY KEY (REV)
 );
 
-CREATE TABLE a_mt_dmt_auth_role (
-	r_num  INTEGER NOT NULL,
-	f_role BIGINT  NOT NULL,
-	f_auth BIGINT  NOT NULL,
-	r_type TINYINT,
-	PRIMARY KEY (r_num, f_role, f_auth)
-);
-
-CREATE TABLE a_mt_dmt_auth_user (
-	r_num  INTEGER NOT NULL,
-	f_user BIGINT  NOT NULL,
-	f_auth BIGINT  NOT NULL,
-	r_type TINYINT,
-	PRIMARY KEY (r_num, f_user, f_auth)
-);
-
 CREATE TABLE a_mt_dmt_pageinst_role (
 	r_num       INTEGER NOT NULL,
 	f_page_inst BIGINT  NOT NULL,
 	f_role      BIGINT  NOT NULL,
 	r_type      TINYINT,
 	PRIMARY KEY (r_num, f_page_inst, f_role)
+);
+
+CREATE TABLE a_mt_dmt_prvlg_role_deny (
+	r_num   INTEGER NOT NULL,
+	f_role  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_role, f_prvlg)
+);
+
+CREATE TABLE a_mt_dmt_prvlg_role_perm (
+	r_num   INTEGER NOT NULL,
+	f_role  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_role, f_prvlg)
+);
+
+CREATE TABLE a_mt_dmt_prvlg_user (
+	r_num   INTEGER NOT NULL,
+	f_user  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_user, f_prvlg)
 );
 
 CREATE TABLE a_mt_dmt_user_role (
@@ -91,31 +99,29 @@ CREATE TABLE a_t_dmt_user (
 	PRIMARY KEY (id, r_num)
 );
 
-CREATE TABLE mt_dmt_auth_role (
-	f_role BIGINT NOT NULL,
-	f_auth BIGINT NOT NULL
-);
-
-CREATE TABLE mt_dmt_auth_user (
-	f_user BIGINT NOT NULL,
-	f_auth BIGINT NOT NULL
-);
-
 CREATE TABLE mt_dmt_pageinst_role (
 	f_page_inst BIGINT NOT NULL,
 	f_role      BIGINT NOT NULL
 );
 
+CREATE TABLE mt_dmt_prvlg_role_deny (
+	f_role  BIGINT NOT NULL,
+	f_prvlg BIGINT NOT NULL
+);
+
+CREATE TABLE mt_dmt_prvlg_role_perm (
+	f_role  BIGINT NOT NULL,
+	f_prvlg BIGINT NOT NULL
+);
+
+CREATE TABLE mt_dmt_prvlg_user (
+	f_user  BIGINT NOT NULL,
+	f_prvlg BIGINT NOT NULL
+);
+
 CREATE TABLE mt_dmt_user_role (
 	f_user BIGINT NOT NULL,
 	f_role BIGINT NOT NULL
-);
-
-CREATE TABLE t_dmt_auth (
-	id         BIGINT       NOT NULL,
-	d_creation DATE         NOT NULL,
-	c_name     VARCHAR(255) NOT NULL,
-	PRIMARY KEY (id)
 );
 
 CREATE TABLE t_dmt_d_page (
@@ -212,9 +218,16 @@ CREATE TABLE t_dmt_person (
 	c_mobile        VARCHAR(255),
 	d_modification  DATE,
 	f_modifier_user BIGINT,
+	e_mod           INTEGER NOT NULL,
 	c_sys_number    VARCHAR(255),
 	n_version       INTEGER NOT NULL,
-	e_mod           INTEGER NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE t_dmt_privilege (
+	id         BIGINT       NOT NULL,
+	d_creation DATE         NOT NULL,
+	c_name     VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id)
 );
 
@@ -247,9 +260,6 @@ CREATE TABLE t_dmt_user (
 	PRIMARY KEY (id)
 );
 
-ALTER TABLE t_dmt_auth
-ADD CONSTRAINT uk_dmt_auth_name UNIQUE (c_name);
-
 ALTER TABLE t_dmt_d_page
 ADD CONSTRAINT uk_dmt_page_type UNIQUE (c_type);
 
@@ -265,24 +275,32 @@ ADD CONSTRAINT uk_dmt_task_type UNIQUE (c_type);
 ALTER TABLE t_dmt_file_store
 ADD CONSTRAINT uk_dmt_filestore_fileid UNIQUE (c_file_id);
 
+ALTER TABLE t_dmt_privilege
+ADD CONSTRAINT uk_dmt_privilege_name UNIQUE (c_name);
+
 ALTER TABLE t_dmt_role
-ADD CONSTRAINT uk_dmt_role_rolename UNIQUE (c_name);
+ADD CONSTRAINT uk_dmt_role_name UNIQUE (c_name);
 
 ALTER TABLE t_dmt_user
 ADD CONSTRAINT uk_dmt_user_username UNIQUE (c_username);
 
-ALTER TABLE a_mt_dmt_auth_role
-ADD CONSTRAINT FK_dry288pwwls9teclovyw1d6bp
-FOREIGN KEY (r_num)
-REFERENCES REVINFO;
-
-ALTER TABLE a_mt_dmt_auth_user
-ADD CONSTRAINT FK_ag4c2tvmp87uoh33r9s5s8deq
-FOREIGN KEY (r_num)
-REFERENCES REVINFO;
-
 ALTER TABLE a_mt_dmt_pageinst_role
 ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_role_deny
+ADD CONSTRAINT FK_mqwhogdldx9juleqmc9c185xr
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_role_perm
+ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_user
+ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
@@ -311,26 +329,6 @@ ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
-ALTER TABLE mt_dmt_auth_role
-ADD CONSTRAINT authRole2auth
-FOREIGN KEY (f_auth)
-REFERENCES t_dmt_auth;
-
-ALTER TABLE mt_dmt_auth_role
-ADD CONSTRAINT authRole2role
-FOREIGN KEY (f_role)
-REFERENCES t_dmt_role;
-
-ALTER TABLE mt_dmt_auth_user
-ADD CONSTRAINT authUser2auth
-FOREIGN KEY (f_auth)
-REFERENCES t_dmt_auth;
-
-ALTER TABLE mt_dmt_auth_user
-ADD CONSTRAINT authUser2user
-FOREIGN KEY (f_user)
-REFERENCES t_dmt_user;
-
 ALTER TABLE mt_dmt_pageinst_role
 ADD CONSTRAINT pageinstrole2role
 FOREIGN KEY (f_role)
@@ -340,6 +338,36 @@ ALTER TABLE mt_dmt_pageinst_role
 ADD CONSTRAINT pageinstrole2user
 FOREIGN KEY (f_page_inst)
 REFERENCES t_dmt_d_page_inst;
+
+ALTER TABLE mt_dmt_prvlg_role_deny
+ADD CONSTRAINT prvlgRoleDeny2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_role_deny
+ADD CONSTRAINT prvlgRoleDeny2role
+FOREIGN KEY (f_role)
+REFERENCES t_dmt_role;
+
+ALTER TABLE mt_dmt_prvlg_role_perm
+ADD CONSTRAINT prvlgRolePerm2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_role_perm
+ADD CONSTRAINT prvlgRolePerm2role
+FOREIGN KEY (f_role)
+REFERENCES t_dmt_role;
+
+ALTER TABLE mt_dmt_prvlg_user
+ADD CONSTRAINT prvlgUser2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_user
+ADD CONSTRAINT prvlgUser2user
+FOREIGN KEY (f_user)
+REFERENCES t_dmt_user;
 
 ALTER TABLE mt_dmt_user_role
 ADD CONSTRAINT userrole2role
@@ -426,10 +454,6 @@ ADD CONSTRAINT role_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
-CREATE SEQUENCE dmt_auth
-		START WITH 1
-		INCREMENT BY 1;
-
 CREATE SEQUENCE dmt_d_page
 		START WITH 1
 		INCREMENT BY 1;
@@ -451,6 +475,10 @@ CREATE SEQUENCE dmt_file_store
 		INCREMENT BY 1;
 
 CREATE SEQUENCE dmt_person
+		START WITH 1
+		INCREMENT BY 1;
+
+CREATE SEQUENCE dmt_privilege
 		START WITH 1
 		INCREMENT BY 1;
 

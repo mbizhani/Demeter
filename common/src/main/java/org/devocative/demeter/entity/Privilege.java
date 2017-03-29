@@ -4,20 +4,20 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "t_dmt_auth", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_dmt_auth_name", columnNames = {"c_name"})
+@Table(name = "t_dmt_privilege", uniqueConstraints = {
+	@UniqueConstraint(name = "uk_dmt_privilege_name", columnNames = {"c_name"})
 })
-public class Authorization implements ICreationDate {
+public class Privilege implements ICreationDate {
 	private static final long serialVersionUID = -2351213011902835877L;
 
 	@Id
-	@GeneratedValue(generator = "dmt_auth")
-	@org.hibernate.annotations.GenericGenerator(name = "dmt_auth", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+	@GeneratedValue(generator = "dmt_privilege")
+	@org.hibernate.annotations.GenericGenerator(name = "dmt_privilege", strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
 		parameters = {
 			//@org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled"),
 			@org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
 			@org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
-			@org.hibernate.annotations.Parameter(name = "sequence_name", value = "dmt_auth")
+			@org.hibernate.annotations.Parameter(name = "sequence_name", value = "dmt_privilege")
 		})
 	private Long id;
 
@@ -64,9 +64,9 @@ public class Authorization implements ICreationDate {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Authorization)) return false;
+		if (!(o instanceof Privilege)) return false;
 
-		Authorization that = (Authorization) o;
+		Privilege that = (Privilege) o;
 
 		return !(getId() != null ? !getId().equals(that.getId()) : that.getId() != null);
 

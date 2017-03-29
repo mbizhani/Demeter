@@ -1,6 +1,7 @@
 package org.devocative.demeter.service;
 
 import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.IRoleService;
@@ -65,6 +66,16 @@ public class RoleService implements IRoleService {
 			.addFrom(Role.class, "ent")
 			.applyFilter(Role.class, "ent", filter)
 			.object();
+	}
+
+	@Override
+	public List<Privilege> getPermissionsList() {
+		return persistorService.list(Privilege.class);
+	}
+
+	@Override
+	public List<Privilege> getDenialsList() {
+		return persistorService.list(Privilege.class);
 	}
 
 	@Override

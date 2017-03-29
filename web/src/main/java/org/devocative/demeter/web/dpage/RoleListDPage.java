@@ -100,6 +100,10 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("name")
 			.setLabel(new ResourceModel("Role.name")));
+		floatTable.add(new WSelectionInput("permissions", roleService.getPermissionsList(), true)
+			.setLabel(new ResourceModel("Role.permissions")));
+		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
+			.setLabel(new ResourceModel("Role.denials")));
 		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), true)
 			.setLabel(new ResourceModel("entity.rowMod"))
 			.setVisible(getCurrentUser().isRoot()));
@@ -129,6 +133,8 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 
 		OColumnList<Role> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.name"), "name"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions"), "permissions"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials"), "denials"));
 		if (getCurrentUser().isRoot()) {
 			columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.rowMod"), "rowMod"));
 		}

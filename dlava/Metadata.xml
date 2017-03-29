@@ -304,6 +304,63 @@
 				</field>
 			</fields>
 		</class>
+		<class fqn="org.devocative.demeter.entity.Privilege">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="name">
+					<finfo/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.Role">
+			<cinfo/>
+			<id ref="id"/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="name">
+					<finfo/>
+				</field>
+				<field name="permissions">
+					<finfo/>
+				</field>
+				<field name="denials">
+					<finfo/>
+				</field>
+				<field name="rowMod">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="creatorUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="creatorUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="modificationDate">
+					<finfo hasForm="false" hasTimePart="true"/>
+				</field>
+				<field name="modifierUser">
+					<finfo hasForm="false"/>
+				</field>
+				<field name="modifierUserId">
+					<finfo ignore="true"/>
+				</field>
+				<field name="version">
+					<finfo hasForm="false" hasFVO="false"/>
+				</field>
+			</fields>
+		</class>
 		<class fqn="org.devocative.demeter.entity.User">
 			<cinfo/>
 			<id ref="id"/>
@@ -356,41 +413,8 @@
 				<field name="roles">
 					<finfo/>
 				</field>
-			</fields>
-		</class>
-		<class fqn="org.devocative.demeter.entity.Role">
-			<cinfo/>
-			<id ref="id"/>
-			<fields>
-				<field name="id">
+				<field name="authorizations">
 					<finfo/>
-				</field>
-				<field name="name">
-					<finfo/>
-				</field>
-				<field name="rowMod">
-					<finfo hasForm="false"/>
-				</field>
-				<field name="creationDate">
-					<finfo hasForm="false" hasTimePart="true"/>
-				</field>
-				<field name="creatorUser">
-					<finfo hasForm="false"/>
-				</field>
-				<field name="creatorUserId">
-					<finfo ignore="true"/>
-				</field>
-				<field name="modificationDate">
-					<finfo hasForm="false" hasTimePart="true"/>
-				</field>
-				<field name="modifierUser">
-					<finfo hasForm="false"/>
-				</field>
-				<field name="modifierUserId">
-					<finfo ignore="true"/>
-				</field>
-				<field name="version">
-					<finfo hasForm="false" hasFVO="false"/>
 				</field>
 			</fields>
 		</class>

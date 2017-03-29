@@ -3,7 +3,7 @@
 				shortName CDATA #REQUIRED
 				mainClass CDATA #REQUIRED
 				mainResource CDATA #REQUIRED
-				authorizationKeyClass CDATA #IMPLIED
+				privilegeKeyClass CDATA #IMPLIED
 				errorCodesClass CDATA #IMPLIED
 				localPersistorService (true|false)
 				configKeyClass CDATA #REQUIRED
