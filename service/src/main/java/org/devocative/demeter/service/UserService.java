@@ -143,9 +143,41 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserVO getUserVO(User user) {
-		return new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
+		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
 			.setAdmin(user.getAdmin())
-			.setAuthMechanism(user.getAuthMechanism())
-			.addRoles(user.getRoles());
+			.setAuthMechanism(user.getAuthMechanism());
+
+		if (user.getRoles() != null) {
+			for (Role role : user.getRoles()) {
+				userVO.addRole(role);
+
+				if (role.getDenials() != null) {
+					for (Privilege privilege : role.getDenials()) {
+						userVO.addDenial(privilege.getName());
+					}
+				}
+
+				// Admin user has permission to every thing by default
+				if (!user.getAdmin() && role.getPermissions() != null) {
+					for (Privilege privilege : role.getPermissions()) {
+						userVO.addPermission(privilege.getName());
+					}
+				}
+			}
+		}
+
+		if (user.getAuthorizations() != null) {
+			for (Privilege privilege : user.getAuthorizations()) {
+				if (user.getAdmin()) {
+					userVO.addDenial(privilege.getName());
+				} else {
+					userVO.addPermission(privilege.getName());
+				}
+			}
+		}
+
+		logger.info("UserVO: permissions={}, denials={}", userVO.getPermissions(), userVO.getDenials());
+
+		return userVO;
 	}
 }

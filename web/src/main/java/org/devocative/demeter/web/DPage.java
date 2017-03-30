@@ -4,6 +4,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.UrlUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.flow.RedirectToUrlException;
+import org.devocative.demeter.entity.IPrivilegeKey;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
@@ -42,5 +43,9 @@ public abstract class DPage extends Panel {
 
 	protected UserVO getCurrentUser() {
 		return securityService.getCurrentUser();
+	}
+
+	protected boolean hasPermission(IPrivilegeKey privilegeKey) {
+		return getCurrentUser().hasPermission(privilegeKey);
 	}
 }

@@ -2,10 +2,7 @@ package org.devocative.demeter.vo;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.entity.DPageInstance;
-import org.devocative.demeter.entity.EAuthMechanism;
-import org.devocative.demeter.entity.Role;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -19,9 +16,12 @@ public class UserVO implements Serializable {
 	private String lastName;
 
 	private boolean authenticated = false;
+	private boolean root = false;
 	private boolean admin = false;
 	private EAuthMechanism authMechanism;
 	private Set<Role> roles = new HashSet<>();
+	private Set<String> permissions = new HashSet<>();
+	private Set<String> denials = new HashSet<>();
 
 	private PageVO pageVO;
 	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
@@ -36,6 +36,7 @@ public class UserVO implements Serializable {
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.root = "root".equals(username);
 	}
 
 	// ------------------------------
@@ -62,7 +63,7 @@ public class UserVO implements Serializable {
 	}
 
 	public boolean isRoot() {
-		return "root".equals(username);
+		return root;
 	}
 
 	public boolean hasAccessToURI(String uri) {
@@ -71,6 +72,13 @@ public class UserVO implements Serializable {
 
 	public Map<String, List<DPageInstance>> getMainMenuEntries() {
 		return pageVO.getMainMenuEntries();
+	}
+
+	public boolean hasPermission(IPrivilegeKey privilegeKey) {
+		return
+			isRoot() ||
+				!denials.contains(privilegeKey.getName()) &&
+					(isAdmin() || permissions.contains(privilegeKey.getName()));
 	}
 
 	// ---------------
@@ -106,17 +114,25 @@ public class UserVO implements Serializable {
 	}
 
 	public UserVO addRole(Role role) {
-		// TODO set permissions
 		roles.add(role);
 		return this;
 	}
 
-	public UserVO addRoles(Collection<Role> roles) {
-		if (roles != null) {
-			for (Role role : roles) {
-				addRole(role);
-			}
-		}
+	public Set<String> getPermissions() {
+		return permissions;
+	}
+
+	public Set<String> getDenials() {
+		return denials;
+	}
+
+	public UserVO addPermission(String privilegeKey) {
+		permissions.add(privilegeKey);
+		return this;
+	}
+
+	public UserVO addDenial(String privilegeKey) {
+		denials.add(privilegeKey);
 		return this;
 	}
 
