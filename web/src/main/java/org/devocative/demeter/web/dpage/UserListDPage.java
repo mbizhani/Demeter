@@ -125,6 +125,8 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setLabel(new ResourceModel("User.sessionTimeout")));
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));
+		floatTable.add(new WSelectionInput("authorizations", userService.getAuthorizationsList(), true)
+			.setLabel(new ResourceModel("User.authorizations")));
 
 		Form<UserFVO> form = new Form<>("form", new CompoundPropertyModel<>(filter));
 		form.add(floatTable);
@@ -157,6 +159,7 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.roles"), "roles"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.authorizations"), "authorizations"));
 
 		columnList.add(new OEditAjaxColumn<User>() {
 			private static final long serialVersionUID = 1830759784L;

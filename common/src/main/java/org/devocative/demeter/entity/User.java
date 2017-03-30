@@ -3,6 +3,7 @@ package org.devocative.demeter.entity;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -83,6 +84,16 @@ public class User implements Serializable {
 		inverseForeignKey = @ForeignKey(name = "userrole2role")
 	)
 	private List<Role> roles;
+
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_prvlg_user",
+		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
+		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
+		foreignKey = @ForeignKey(name = "prvlgUser2user"),
+		inverseForeignKey = @ForeignKey(name = "prvlgUser2prvlg")
+	)
+	private List<Privilege> authorizations;
 
 	// ------------------------------
 
@@ -204,6 +215,14 @@ public class User implements Serializable {
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	public List<Privilege> getAuthorizations() {
+		return authorizations;
+	}
+
+	public void setAuthorizations(List<Privilege> authorizations) {
+		this.authorizations = authorizations;
 	}
 
 	// ------------------------------

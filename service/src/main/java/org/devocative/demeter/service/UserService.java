@@ -4,6 +4,7 @@ import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.Person;
+import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.IUserService;
@@ -75,6 +76,11 @@ public class UserService implements IUserService {
 	@Override
 	public List<Role> getRolesList() {
 		return persistorService.list(Role.class);
+	}
+
+	@Override
+	public List<Privilege> getAuthorizationsList() {
+		return persistorService.list(Privilege.class);
 	}
 
 	// ==============================

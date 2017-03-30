@@ -89,6 +89,8 @@ public class UserFormDPage extends DPage {
 			.setLabel(new ResourceModel("User.sessionTimeout")));
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));
+		floatTable.add(new WSelectionInput("authorizations", userService.getAuthorizationsList(), true)
+			.setLabel(new ResourceModel("User.authorizations")));
 
 		Form<User> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);

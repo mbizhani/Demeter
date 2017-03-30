@@ -25,6 +25,7 @@ public class UserFVO implements Serializable {
 	private Boolean admin;
 	private RangeVO<Integer> sessionTimeout;
 	private List<Role> roles;
+	private List<Privilege> authorizations;
 
 	// ------------------------------
 
@@ -122,6 +123,14 @@ public class UserFVO implements Serializable {
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	public List<Privilege> getAuthorizations() {
+		return authorizations;
+	}
+
+	public void setAuthorizations(List<Privilege> authorizations) {
+		this.authorizations = authorizations;
 	}
 
 }

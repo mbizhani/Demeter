@@ -1,5 +1,6 @@
 package org.devocative.demeter.iservice;
 
+import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.vo.UserInputVO;
@@ -22,6 +23,8 @@ public interface IUserService {
 	long count(UserFVO filter);
 
 	List<Role> getRolesList();
+
+	List<Privilege> getAuthorizationsList();
 
 	// ==============================
 
