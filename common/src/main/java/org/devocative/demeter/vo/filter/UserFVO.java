@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
@@ -24,6 +23,7 @@ public class UserFVO implements Serializable {
 	private RangeVO<Date> lastLoginDate;
 	private Boolean admin;
 	private RangeVO<Integer> sessionTimeout;
+	private PersonFVO person;
 	private List<Role> roles;
 	private List<Privilege> authorizations;
 
@@ -115,6 +115,14 @@ public class UserFVO implements Serializable {
 
 	public void setSessionTimeout(RangeVO<Integer> sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
+	}
+
+	public PersonFVO getPerson() {
+		return person;
+	}
+
+	public void setPerson(PersonFVO person) {
+		this.person = person;
 	}
 
 	public List<Role> getRoles() {

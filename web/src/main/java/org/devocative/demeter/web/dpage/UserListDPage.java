@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -6,7 +5,9 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.*;
+import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.vo.filter.UserFVO;
 import org.devocative.demeter.web.DPage;
@@ -42,6 +43,9 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 
 	@Inject
 	private IUserService userService;
+
+	@Inject
+	private IPersonService personService;
 
 	private UserFVO filter;
 	private boolean formVisible = true;
@@ -86,6 +90,7 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		super.onInitialize();
 
 		final WModalWindow window = new WModalWindow("window");
+		window.getOptions().setWidth(OSize.fixed(650));
 		add(window);
 
 		add(new WAjaxLink("add", DemeterIcon.ADD) {
@@ -96,12 +101,16 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 				window.setContent(new UserFormDPage(window.getContentId()));
 				window.show(target);
 			}
-		});
+		}.setVisible(hasPermission(DemeterPrivilegeKey.UserAdd)));
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("username")
 			.setLabel(new ResourceModel("User.username")));
+		floatTable.add(new WTextInput("person.firstName")
+			.setLabel(new ResourceModel("Person.firstName")));
+		floatTable.add(new WTextInput("person.lastName")
+			.setLabel(new ResourceModel("Person.lastName")));
 		floatTable.add(new WSelectionInput("authMechanism", EAuthMechanism.list(), true)
 			.setLabel(new ResourceModel("User.authMechanism")));
 		floatTable.add(new WSelectionInput("status", EUserStatus.list(), true)
@@ -128,6 +137,20 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		floatTable.add(new WSelectionInput("authorizations", userService.getAuthorizationsList(), true)
 			.setLabel(new ResourceModel("User.authorizations")));
 
+		floatTable.add(new WSelectionInput("person.rowMod", ERowMod.list(), true)
+			.setLabel(new ResourceModel("entity.rowMod"))
+			.setVisible(getCurrentUser().isRoot()));
+		floatTable.add(new WDateRangeInput("person.creationDate")
+			.setTimePartVisible(true)
+			.setLabel(new ResourceModel("entity.creationDate")));
+		floatTable.add(new WSelectionInput("person.creatorUser", personService.getCreatorUserList(), true)
+			.setLabel(new ResourceModel("entity.creatorUser")));
+		floatTable.add(new WDateRangeInput("person.modificationDate")
+			.setTimePartVisible(true)
+			.setLabel(new ResourceModel("entity.modificationDate")));
+		floatTable.add(new WSelectionInput("person.modifierUser", personService.getModifierUserList(), true)
+			.setLabel(new ResourceModel("entity.modifierUser")));
+
 		Form<UserFVO> form = new Form<>("form", new CompoundPropertyModel<>(filter));
 		form.add(floatTable);
 		form.add(new DAjaxButton("search", new ResourceModel("label.search"), DemeterIcon.SEARCH) {
@@ -143,6 +166,11 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 
 		OColumnList<User> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.username"), "username"));
+
+		// -- Person
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("Person.firstName"), "person.firstName"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("Person.lastName"), "person.lastName"));
+
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.authMechanism"), "authMechanism"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.status"), "status"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.locale"), "locale"));
@@ -161,15 +189,33 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.roles"), "roles"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.authorizations"), "authorizations"));
 
-		columnList.add(new OEditAjaxColumn<User>() {
-			private static final long serialVersionUID = 1830759784L;
+		// -- Person
+		if (getCurrentUser().isRoot()) {
+			columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.rowMod"), "person.rowMod"));
+		}
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.creationDate"), "person.creationDate")
+			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
+			.setStyle("direction:ltr"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.creatorUser"), "person.creatorUser"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.modificationDate"), "person.modificationDate")
+			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
+			.setStyle("direction:ltr"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.modifierUser"), "person.modifierUser"));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.version"), "person.version")
+			.setFormatter(ONumberFormatter.integer())
+			.setStyle("direction:ltr"));
 
-			@Override
-			public void onClick(AjaxRequestTarget target, IModel<User> rowData) {
-				window.setContent(new UserFormDPage(window.getContentId(), rowData.getObject()));
-				window.show(target);
-			}
-		});
+		if (hasPermission(DemeterPrivilegeKey.UserEdit)) {
+			columnList.add(new OEditAjaxColumn<User>() {
+				private static final long serialVersionUID = 1830759784L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target, IModel<User> rowData) {
+					window.setContent(new UserFormDPage(window.getContentId(), rowData.getObject()));
+					window.show(target);
+				}
+			});
+		}
 
 		OGrid<User> oGrid = new OGrid<>();
 		oGrid

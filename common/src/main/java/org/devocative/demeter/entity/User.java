@@ -6,7 +6,6 @@ import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @Table(name = "t_dmt_user", uniqueConstraints = {
 	@UniqueConstraint(name = "uk_dmt_user_username", columnNames = {"c_username"})
 })
-public class User implements Serializable {
+public class User implements IRowMod, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	private static final long serialVersionUID = 1580426811623477680L;
 
 	@Id
@@ -35,7 +34,7 @@ public class User implements Serializable {
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_auth_mech", nullable = false))
-	private EAuthMechanism authMechanism;
+	private EAuthMechanism authMechanism = EAuthMechanism.DATABASE;
 
 	//@NotNull
 	@Embedded
@@ -202,6 +201,9 @@ public class User implements Serializable {
 	}
 
 	public Person getPerson() {
+		if (person == null) {
+			setPerson(new Person());
+		}
 		return person;
 	}
 
@@ -225,7 +227,69 @@ public class User implements Serializable {
 		this.authorizations = authorizations;
 	}
 
-	// ------------------------------
+	// ---------------
+
+	@Override
+	public ERowMod getRowMod() {
+		return getPerson().getRowMod();
+	}
+
+	@Override
+	public void setRowMod(ERowMod rowMod) {
+		getPerson().setRowMod(rowMod);
+	}
+
+	@Override
+	public Date getCreationDate() {
+		return getPerson().getCreationDate();
+	}
+
+	@Override
+	public void setCreationDate(Date date) {
+		getPerson().setCreationDate(date);
+	}
+
+	@Override
+	public Long getCreatorUserId() {
+		return getPerson().getCreatorUserId();
+	}
+
+	@Override
+	public void setCreatorUserId(Long userId) {
+		getPerson().setCreatorUserId(userId);
+	}
+
+	@Override
+	public Date getModificationDate() {
+		return getPerson().getModificationDate();
+	}
+
+	@Override
+	public void setModificationDate(Date date) {
+		getPerson().setModificationDate(date);
+	}
+
+	@Override
+	public Long getModifierUserId() {
+		return getPerson().getModifierUserId();
+	}
+
+	@Override
+	public void setModifierUserId(Long userId) {
+		getPerson().setModifierUserId(userId);
+	}
+
+	@Override
+	public Integer getVersion() {
+		return getPerson().getVersion();
+	}
+
+	@Override
+	public void setVersion(Integer version) {
+		getPerson().setVersion(version);
+	}
+
+	// ---------------
 
 	@Override
 	public boolean equals(Object o) {

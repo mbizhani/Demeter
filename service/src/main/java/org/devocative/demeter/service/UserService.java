@@ -7,6 +7,7 @@ import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
+import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserInputVO;
@@ -25,6 +26,9 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private IPersistorService persistorService;
+
+	@Autowired
+	private IPersonService personService;
 
 	// ------------------------------
 
@@ -89,16 +93,12 @@ public class UserService implements IUserService {
 	public void saveOrUpdate(User user, String password) {
 		user.getPerson().setHasUser(true);
 
-		if (user.getUsername() != null) {
-			user.setUsername(user.getUsername().toLowerCase());
-		}
-
 		if (password != null) {
 			user.setPassword(StringEncryptorUtil.hash(password));
 		}
 
-		persistorService.saveOrUpdate(user.getPerson());
-		persistorService.saveOrUpdate(user);
+		personService.saveOrUpdate(user.getPerson());
+		saveOrUpdate(user);
 		persistorService.endSession();
 	}
 
