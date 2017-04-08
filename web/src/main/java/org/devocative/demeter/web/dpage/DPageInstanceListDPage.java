@@ -87,7 +87,6 @@ public class DPageInstanceListDPage extends DPage implements IGridDataSource<DPa
 		add(window);
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("title")
 			.setLabel(new ResourceModel("DPageInstance.title")));
 		floatTable.add(new WTextInput("uri")

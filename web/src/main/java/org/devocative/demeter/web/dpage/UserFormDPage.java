@@ -61,7 +61,6 @@ public class UserFormDPage extends DPage {
 		super.onInitialize();
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 
 		// -- Person
 		floatTable.add(new WTextInput("person.firstName")

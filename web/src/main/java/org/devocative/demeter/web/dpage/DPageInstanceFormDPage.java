@@ -60,7 +60,6 @@ public class DPageInstanceFormDPage extends DPage {
 		super.onInitialize();
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("title")
 			.setRequired(true)
 			.setLabel(new ResourceModel("DPageInstance.title")));

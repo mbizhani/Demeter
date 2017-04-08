@@ -104,7 +104,6 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		}.setVisible(hasPermission(DemeterPrivilegeKey.UserAdd)));
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("username")
 			.setLabel(new ResourceModel("User.username")));
 		floatTable.add(new WTextInput("person.firstName")

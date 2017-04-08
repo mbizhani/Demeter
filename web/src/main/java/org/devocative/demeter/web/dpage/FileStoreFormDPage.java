@@ -61,7 +61,6 @@ public class FileStoreFormDPage extends DPage {
 		super.onInitialize();
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("name")
 			.setLabel(new ResourceModel("FileStore.name")));
 		floatTable.add(new WSelectionInput("status", EFileStatus.list(), false)

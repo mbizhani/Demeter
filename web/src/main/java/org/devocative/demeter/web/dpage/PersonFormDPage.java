@@ -59,7 +59,6 @@ public class PersonFormDPage extends DPage {
 		super.onInitialize();
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("firstName")
 			.setLabel(new ResourceModel("Person.firstName")));
 		floatTable.add(new WTextInput("lastName")

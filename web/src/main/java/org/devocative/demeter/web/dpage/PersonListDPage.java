@@ -99,7 +99,6 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 		});
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("firstName")
 			.setLabel(new ResourceModel("Person.firstName")));
 		floatTable.add(new WTextInput("lastName")

@@ -91,7 +91,6 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 		add(window);
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("name")
 			.setLabel(new ResourceModel("FileStore.name")));
 		floatTable.add(new WSelectionInput("status", EFileStatus.list(), true)
