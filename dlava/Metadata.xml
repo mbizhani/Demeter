@@ -329,6 +329,9 @@
 				<field name="name">
 					<finfo/>
 				</field>
+				<field name="dynamic">
+					<finfo hasForm="false"/>
+				</field>
 				<field name="permissions">
 					<finfo/>
 				</field>

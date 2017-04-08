@@ -79,7 +79,10 @@ public class UserService implements IUserService {
 
 	@Override
 	public List<Role> getRolesList() {
-		return persistorService.list(Role.class);
+		return persistorService.createQueryBuilder()
+			.addFrom(Role.class, "ent")
+			.addWhere("and ent.dynamic = false")
+			.list();
 	}
 
 	@Override

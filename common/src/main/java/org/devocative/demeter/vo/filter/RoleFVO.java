@@ -16,6 +16,7 @@ public class RoleFVO implements Serializable {
 	private static final long serialVersionUID = -1494627878L;
 
 	private String name;
+	private Boolean dynamic;
 	private List<Privilege> permissions;
 	private List<Privilege> denials;
 	private List<ERowMod> rowMod;
@@ -32,6 +33,14 @@ public class RoleFVO implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Boolean getDynamic() {
+		return dynamic;
+	}
+
+	public void setDynamic(Boolean dynamic) {
+		this.dynamic = dynamic;
 	}
 
 	public List<Privilege> getPermissions() {

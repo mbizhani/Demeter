@@ -91,12 +91,13 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public void createOrUpdateRole(String name, ERowMod rowMod) {
+	public void createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();
 			role.setName(name);
 		}
+		role.setDynamic(dynamic);
 		role.setRowMod(rowMod);
 		saveOrUpdate(role);
 		persistorService.commitOrRollback();

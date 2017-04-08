@@ -84,13 +84,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("User", ERowMod.ROOT);
-		roleService.createOrUpdateRole("Admin", ERowMod.ROOT);
-		roleService.createOrUpdateRole("Root", ERowMod.SYSTEM);
+		roleService.createOrUpdateRole("User", ERowMod.ROOT, true);
+		roleService.createOrUpdateRole("Admin", ERowMod.ROOT, true);
+		roleService.createOrUpdateRole("Root", ERowMod.SYSTEM, true);
 
-		roleService.createOrUpdateRole("AuthByDB", ERowMod.ROOT);
-		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.ROOT);
-		roleService.createOrUpdateRole("AuthByOther", ERowMod.ROOT);
+		roleService.createOrUpdateRole("AuthByDB", ERowMod.ROOT, true);
+		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.ROOT, true);
+		roleService.createOrUpdateRole("AuthByOther", ERowMod.ROOT, true);
 	}
 
 	@Override

@@ -79,6 +79,7 @@ CREATE TABLE a_t_dmt_role (
 	f_modifier_user BIGINT,
 	c_name          VARCHAR(255),
 	e_mod           INTEGER,
+	b_dynamic       BOOLEAN,
 	PRIMARY KEY (id, r_num)
 );
 
@@ -238,6 +239,7 @@ CREATE TABLE t_dmt_role (
 	d_modification  DATE,
 	f_modifier_user BIGINT,
 	c_name          VARCHAR(255) NOT NULL,
+	b_dynamic       BOOLEAN      NOT NULL,
 	e_mod           INTEGER      NOT NULL,
 	n_version       INTEGER      NOT NULL,
 	PRIMARY KEY (id)

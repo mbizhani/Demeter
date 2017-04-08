@@ -15,9 +15,11 @@ import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
+import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.form.range.WDateRangeInput;
+import org.devocative.wickomp.formatter.OBooleanFormatter;
 import org.devocative.wickomp.formatter.ODateFormatter;
 import org.devocative.wickomp.formatter.ONumberFormatter;
 import org.devocative.wickomp.grid.IGridDataSource;
@@ -97,9 +99,10 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		});
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
-		floatTable.setEqualWidth(true);
 		floatTable.add(new WTextInput("name")
 			.setLabel(new ResourceModel("Role.name")));
+		floatTable.add(new WBooleanInput("dynamic")
+			.setLabel(new ResourceModel("Role.dynamic")));
 		floatTable.add(new WSelectionInput("permissions", roleService.getPermissionsList(), true)
 			.setLabel(new ResourceModel("Role.permissions")));
 		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
@@ -133,6 +136,8 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 
 		OColumnList<Role> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.name"), "name"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.dynamic"), "dynamic")
+			.setFormatter(OBooleanFormatter.bool()));
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions"), "permissions"));
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials"), "denials"));
 		if (getCurrentUser().isRoot()) {

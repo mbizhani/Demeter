@@ -30,6 +30,9 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Column(name = "c_name", nullable = false)
 	private String name;
 
+	@Column(name = "b_dynamic", nullable = false)
+	private Boolean dynamic = false;
+
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "mt_dmt_prvlg_role_perm",
@@ -101,6 +104,14 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Boolean getDynamic() {
+		return dynamic;
+	}
+
+	public void setDynamic(Boolean dynamic) {
+		this.dynamic = dynamic;
 	}
 
 	public List<Privilege> getPermissions() {
