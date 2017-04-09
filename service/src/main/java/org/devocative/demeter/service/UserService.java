@@ -106,6 +106,18 @@ public class UserService implements IUserService {
 	}
 
 	@Override
+	public void updateUser(User user, String password, String oldPassword) {
+		String old = StringEncryptorUtil.hash(oldPassword);
+
+		if (!old.equals(user.getPassword())) {
+			throw new DemeterException(DemeterErrorCode.InvalidCurrentPassword);
+		}
+
+		user.setPassword(StringEncryptorUtil.hash(password));
+		saveOrUpdate(user);
+	}
+
+	@Override
 	public UserVO createOrUpdateUser(UserInputVO userInputVO) {
 		User user = loadByUsername(userInputVO.getUsername());
 

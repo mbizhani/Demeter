@@ -30,6 +30,8 @@ public interface IUserService {
 
 	void saveOrUpdate(User user, String password);
 
+	void updateUser(User user, String password, String oldPassword);
+
 	UserVO createOrUpdateUser(UserInputVO userInputVO);
 
 	UserVO loadVOByUsername(String username);

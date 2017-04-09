@@ -1,26 +1,49 @@
 package org.devocative.demeter.entity;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ELayoutDirection implements Serializable {
 	private static final long serialVersionUID = 581360386297611032L;
 
-	public static final ELayoutDirection LTR = new ELayoutDirection(1);
-	public static final ELayoutDirection RTL = new ELayoutDirection(2);
+	private static final Map<Integer, ELayoutDirection> ID_TO_LIT = new LinkedHashMap<>();
+
+	// ------------------------------
+
+	public static final ELayoutDirection LTR = new ELayoutDirection(1, "LTR");
+	public static final ELayoutDirection RTL = new ELayoutDirection(2, "RTL");
+
+	// ------------------------------
 
 	private Integer id;
 
-	private ELayoutDirection(Integer id) {
+	@Transient
+	private String name;
+
+	// ------------------------------
+
+	private ELayoutDirection(Integer id, String name) {
 		this.id = id;
+		this.name = name;
+
+		ID_TO_LIT.put(id, this);
 	}
 
 	public ELayoutDirection() {
 	}
 
+	// ------------------------------
+
 	public Integer getId() {
 		return id;
+	}
+
+	public String getName() {
+		return ID_TO_LIT.get(getId()).name;
 	}
 
 	public String getHtmlDir() {
@@ -32,6 +55,8 @@ public class ELayoutDirection implements Serializable {
 		}
 		throw new RuntimeException("Invalid Layout Direction: " + getId());
 	}
+
+	// ------------------------------
 
 	@Override
 	public boolean equals(Object o) {
@@ -50,13 +75,14 @@ public class ELayoutDirection implements Serializable {
 		return getId() != null ? getId().hashCode() : 0;
 	}
 
-	/* TODO
 	@Override
 	public String toString() {
-		return literalToString != null ? literalToString.literalToString(getId()) : getId().toString();
-	}*/
+		return getName();
+	}
+
+	// ------------------------------
 
 	public static List<ELayoutDirection> list() {
-		return Arrays.asList(LTR, RTL);
+		return new ArrayList<>(ID_TO_LIT.values());
 	}
 }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+	<table wicket:id="userInfo">
+		<tr>
+			<th><wicket:message key="User.username"/></th>
+			<td wicket:id="username"></td>
+		</tr>
+		<tr>
+			<th><wicket:message key="User.authMechanism"/></th>
+			<td wicket:id="authMechanism"></td>
+		</tr>
+
+		<tr>
+			<th><wicket:message key="User.roles"/></th>
+			<td wicket:id="roles"></td>
+		</tr>
+		<tr>
+			<th><wicket:message key="Role.permissions"/></th>
+			<td wicket:id="permissions"></td>
+		</tr>
+		<tr>
+			<th><wicket:message key="Role.denials"/></th>
+			<td wicket:id="denials"></td>
+		</tr>
+	</table>
+
+	<form wicket:id="form">
+		<div class="dmt-form">
+			<div wicket:id="floatTable">
+				<div wicket:id="oldPassword" ></div>
+				<div wicket:id="password" ></div>
+				<div wicket:id="password2" ></div>
+				<div wicket:id="locale" ></div>
+				<div wicket:id="calendarType" ></div>
+				<div wicket:id="layoutDirectionType" ></div>
+				<div wicket:id="datePatternType" ></div>
+				<div wicket:id="dateTimePatternType" ></div>
+			</div>
+
+			<button wicket:id="save"></button>
+			<button type="reset">
+				<wicket:message key="label.reset"/>
+				<i class="fa fa-history"></i>
+			</button>
+		</div>
+	</form>
+
+</wicket:panel>
+</html>

@@ -1,27 +1,52 @@
 package org.devocative.demeter.entity;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ECalendar implements Serializable {
 	private static final long serialVersionUID = -8563152792867832546L;
 
-	public static final ECalendar JALALI = new ECalendar(1);
-	public static final ECalendar GREGORIAN = new ECalendar(2);
+	private static final Map<Integer, ECalendar> ID_TO_LIT = new LinkedHashMap<>();
+
+	// ------------------------------
+
+	public static final ECalendar JALALI = new ECalendar(1, "Jalali");
+	public static final ECalendar GREGORIAN = new ECalendar(2, "Gregorian");
+
+	// ------------------------------
 
 	private Integer id;
 
-	private ECalendar(Integer id) {
+	@Transient
+	private String name;
+
+	// ------------------------------
+
+	private ECalendar(Integer id, String name) {
 		this.id = id;
+		this.name = name;
+
+		ID_TO_LIT.put(id, this);
 	}
 
 	public ECalendar() {
 	}
 
+	// ------------------------------
+
 	public Integer getId() {
 		return id;
 	}
+
+	public String getName() {
+		return ID_TO_LIT.get(getId()).name;
+	}
+
+	// ------------------------------
 
 	@Override
 	public boolean equals(Object o) {
@@ -40,14 +65,15 @@ public class ECalendar implements Serializable {
 		return getId() != null ? getId().hashCode() : 0;
 	}
 
-	/*TODO
 	@Override
 	public String toString() {
-		return literalToString != null ? literalToString.literalToString(getId()) : getId().toString();
-	}*/
+		return getName();
+	}
+
+	// ------------------------------
 
 	public static List<ECalendar> list() {
-		return Arrays.asList(JALALI, GREGORIAN);
+		return new ArrayList<>(ID_TO_LIT.values());
 	}
 
 }

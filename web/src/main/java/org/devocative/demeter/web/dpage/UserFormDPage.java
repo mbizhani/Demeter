@@ -90,7 +90,8 @@ public class UserFormDPage extends DPage {
 
 		floatTable.add(new WSelectionInput("authMechanism", EAuthMechanism.list(), false)
 			.setRequired(true)
-			.setLabel(new ResourceModel("User.authMechanism")));
+			.setLabel(new ResourceModel("User.authMechanism"))
+			.setEnabled(entity.getId() != null));
 		floatTable.add(new WSelectionInput("status", EUserStatus.list(), false)
 			.setRequired(true)
 			.setLabel(new ResourceModel("User.status")));

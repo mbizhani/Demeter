@@ -31,11 +31,13 @@ import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.dpage.LoginDPage;
+import org.devocative.demeter.web.panel.EditProfilePanel;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.async.AsyncBehavior;
 import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
+import org.devocative.wickomp.html.window.WModalWindow;
 import org.devocative.wickomp.wrcs.FontAwesomeBehavior;
 import org.devocative.wickomp.wrcs.Resource;
 import org.slf4j.Logger;
@@ -65,6 +67,7 @@ public class Index extends WebPage {
 
 	// ------------------------------
 
+	private WModalWindow window;
 	private Component content;
 	private UserVO currentUser;
 	private WebMarkupContainer signIn, signOut, editProfile;
@@ -88,6 +91,9 @@ public class Index extends WebPage {
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
 		html.add(new AttributeModifier("dir", DemeterWebSession.get().getLayoutDirection().toString()));
 		add(html);
+
+		window = new WModalWindow("window");
+		html.add(window);
 
 
 		DPageInstance pageInstance;
@@ -149,7 +155,8 @@ public class Index extends WebPage {
 
 			@Override
 			public void onClick(AjaxRequestTarget target) {
-				//TODO implement it!!!
+				window.setContent(new EditProfilePanel(window.getContentId()));
+				window.show(target);
 			}
 		};
 		userMenu.add(editProfile);
