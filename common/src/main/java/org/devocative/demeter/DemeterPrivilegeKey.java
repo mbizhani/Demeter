@@ -5,7 +5,9 @@ import org.devocative.demeter.entity.IPrivilegeKey;
 public enum DemeterPrivilegeKey implements IPrivilegeKey {
 	RoleAdd, RoleEdit,
 	UserAdd, UserEdit,
-	PersonAdd, PersonEdit;
+	PersonAdd, PersonEdit,
+	DPageInstEdit,
+	FileStoreEdit;
 
 	private String name;
 

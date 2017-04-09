@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
@@ -96,7 +97,7 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 				window.setContent(new RoleFormDPage(window.getContentId()));
 				window.show(target);
 			}
-		});
+		}.setVisible(hasPermission(DemeterPrivilegeKey.RoleAdd)));
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
@@ -155,15 +156,17 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OEditAjaxColumn<Role>() {
-			private static final long serialVersionUID = -1491493091L;
+		if (hasPermission(DemeterPrivilegeKey.RoleEdit)) {
+			columnList.add(new OEditAjaxColumn<Role>() {
+				private static final long serialVersionUID = -1491493091L;
 
-			@Override
-			public void onClick(AjaxRequestTarget target, IModel<Role> rowData) {
-				window.setContent(new RoleFormDPage(window.getContentId(), rowData.getObject()));
-				window.show(target);
-			}
-		});
+				@Override
+				public void onClick(AjaxRequestTarget target, IModel<Role> rowData) {
+					window.setContent(new RoleFormDPage(window.getContentId(), rowData.getObject()));
+					window.show(target);
+				}
+			});
+		}
 
 		OGrid<Role> oGrid = new OGrid<>();
 		oGrid

@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.vo.filter.DPageInstanceFVO;
@@ -143,15 +144,17 @@ public class DPageInstanceListDPage extends DPage implements IGridDataSource<DPa
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OEditAjaxColumn<DPageInstance>() {
-			private static final long serialVersionUID = -1083932431L;
+		if (hasPermission(DemeterPrivilegeKey.DPageInstEdit)) {
+			columnList.add(new OEditAjaxColumn<DPageInstance>() {
+				private static final long serialVersionUID = -1083932431L;
 
-			@Override
-			public void onClick(AjaxRequestTarget target, IModel<DPageInstance> rowData) {
-				window.setContent(new DPageInstanceFormDPage(window.getContentId(), rowData.getObject()));
-				window.show(target);
-			}
-		});
+				@Override
+				public void onClick(AjaxRequestTarget target, IModel<DPageInstance> rowData) {
+					window.setContent(new DPageInstanceFormDPage(window.getContentId(), rowData.getObject()));
+					window.show(target);
+				}
+			});
+		}
 
 		OGrid<DPageInstance> oGrid = new OGrid<>();
 		oGrid

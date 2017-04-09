@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.IPersonService;
@@ -96,7 +97,7 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 				window.setContent(new PersonFormDPage(window.getContentId()));
 				window.show(target);
 			}
-		});
+		}.setVisible(hasPermission(DemeterPrivilegeKey.PersonAdd)));
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("firstName")
@@ -168,15 +169,17 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OEditAjaxColumn<Person>() {
-			private static final long serialVersionUID = -1094579746L;
+		if (hasPermission(DemeterPrivilegeKey.PersonEdit)) {
+			columnList.add(new OEditAjaxColumn<Person>() {
+				private static final long serialVersionUID = -1094579746L;
 
-			@Override
-			public void onClick(AjaxRequestTarget target, IModel<Person> rowData) {
-				window.setContent(new PersonFormDPage(window.getContentId(), rowData.getObject()));
-				window.show(target);
-			}
-		});
+				@Override
+				public void onClick(AjaxRequestTarget target, IModel<Person> rowData) {
+					window.setContent(new PersonFormDPage(window.getContentId(), rowData.getObject()));
+					window.show(target);
+				}
+			});
+		}
 
 		OGrid<Person> oGrid = new OGrid<>();
 		oGrid

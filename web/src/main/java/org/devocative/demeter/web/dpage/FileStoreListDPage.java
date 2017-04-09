@@ -6,6 +6,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.EFileStatus;
 import org.devocative.demeter.entity.EFileStorage;
 import org.devocative.demeter.entity.EMimeType;
@@ -16,6 +17,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
@@ -29,7 +31,6 @@ import org.devocative.wickomp.grid.WSortField;
 import org.devocative.wickomp.grid.column.OColumn;
 import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
-import org.devocative.wickomp.grid.column.link.OAjaxLinkColumn;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
 import org.devocative.wickomp.opt.OSize;
@@ -152,15 +153,17 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 
-		columnList.add(new OAjaxLinkColumn<FileStore>(new Model<String>(), DemeterIcon.EDIT) {
-			private static final long serialVersionUID = 99372548L;
+		if (hasPermission(DemeterPrivilegeKey.FileStoreEdit)) {
+			columnList.add(new OEditAjaxColumn<FileStore>() {
+				private static final long serialVersionUID = 99372548L;
 
-			@Override
-			public void onClick(AjaxRequestTarget target, IModel<FileStore> rowData) {
-				window.setContent(new FileStoreFormDPage(window.getContentId(), rowData.getObject()));
-				window.show(target);
-			}
-		}.setField("EDIT"));
+				@Override
+				public void onClick(AjaxRequestTarget target, IModel<FileStore> rowData) {
+					window.setContent(new FileStoreFormDPage(window.getContentId(), rowData.getObject()));
+					window.show(target);
+				}
+			});
+		}
 
 		columnList.add(new OColumn<FileStore>(new Model<String>(), "DOWNLOAD") {
 			private static final long serialVersionUID = -501065240513534269L;
