@@ -132,6 +132,7 @@ public class UserService implements IUserService {
 		user.setStatus(userInputVO.getStatus());
 		user.setAdmin(userInputVO.isAdmin());
 		user.setAuthMechanism(userInputVO.getAuthMechanism());
+		user.setSessionTimeout(userInputVO.getSessionTimeout());
 
 		Person person = user.getPerson();
 		if (person == null) {

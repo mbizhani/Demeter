@@ -64,6 +64,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMod(ERowMod.SYSTEM)
+				.setSessionTimeout(0)
 		);
 		authenticate(system);
 
@@ -71,12 +72,14 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
 				.setRowMod(ERowMod.SYSTEM)
+				.setSessionTimeout(10)
 		);
 
 		guest = userService.createOrUpdateUser(
 			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMod(ERowMod.SYSTEM)
+				.setSessionTimeout(-1)
 		);
 
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
