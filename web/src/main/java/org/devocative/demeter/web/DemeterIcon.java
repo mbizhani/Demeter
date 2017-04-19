@@ -22,4 +22,6 @@ public class DemeterIcon {
 	public static final IconFont DOWNLOAD = new FontAwesome("download", new ResourceModel("label.download", "Download"));
 	public static final IconFont ATTACHMENT = new FontAwesome("paperclip", new ResourceModel("label.attachment", "Attachment"));
 	public static final IconFont INFO = new FontAwesome("bug", new ResourceModel("label.info", "Info"));
+
+	public static final IconFont SHOW = new FontAwesome("eye", new ResourceModel("label.show", "Show"));
 }
