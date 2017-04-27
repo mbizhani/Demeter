@@ -14,6 +14,7 @@ import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.task.DTask;
+import org.devocative.demeter.iservice.task.DTaskResult;
 import org.devocative.demeter.iservice.task.ITaskResultCallback;
 import org.devocative.demeter.iservice.task.ITaskService;
 import org.quartz.*;
@@ -174,8 +175,10 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			.object();
 	}
 
+	// ==============================
+
 	@Override
-	public Future<?> start(String taskBeanId, Object id, Object inputData, ITaskResultCallback resultCallback) {
+	public DTaskResult start(String taskBeanId, Object id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
 			throw new DSystemException("Task handling is not enabled");
 		}
@@ -187,7 +190,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	}
 
 	@Override
-	public Future<?> start(Long taskInfoId, String id, Object inputData, ITaskResultCallback resultCallback) {
+	public DTaskResult start(Long taskInfoId, Object id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
 			throw new DSystemException("Task handling is not enabled");
 		}
@@ -206,7 +209,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	// ------------------------------ Private
 
 	// Main
-	private Future<?> start(DTaskInfo taskInfo, Object id, Object inputData, ITaskResultCallback resultCallback) {
+	private DTaskResult start(DTaskInfo taskInfo, Object id, Object inputData, ITaskResultCallback resultCallback) {
 		if (taskInfo.getEnabled()) {
 			try {
 				Class taskClass = Class.forName(taskInfo.getType());
@@ -227,7 +230,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	}
 
 	// Main start DTask Method
-	private Future<?> startDTask(DTask dTask, Object id, Object inputData, ITaskResultCallback resultCallback) {
+	private DTaskResult startDTask(DTask dTask, Object id, Object inputData, ITaskResultCallback resultCallback) {
 		if (id == null) {
 			id = String.valueOf(System.currentTimeMillis()); //TODO using DTaskLog.id
 		}
@@ -246,7 +249,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			result = threadPoolExecutor.submit(dTask);
 			logger.info("Started Task: {}", dTask.getKey());
 		}
-		return result;
+		return new DTaskResult(result, dTask);
 	}
 
 	private void addOrUpdateTask(String module, XDTask xdTask) {

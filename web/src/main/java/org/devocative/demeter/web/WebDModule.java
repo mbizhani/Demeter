@@ -13,13 +13,13 @@ public abstract class WebDModule implements ITaskResultCallback {
 	// ------------------------------
 
 	@Override
-	public void onTaskResult(Object token, Object result) {
-		pushResponseToPage((AsyncToken) token, (Serializable) result);
+	public void onTaskResult(Object id, Object result) {
+		pushResponseToPage((AsyncToken) id, (Serializable) result);
 	}
 
 	@Override
-	public void onTaskError(Object token, Exception e) {
-		pushErrorToPage((AsyncToken) token, e);
+	public void onTaskError(Object id, Exception e) {
+		pushErrorToPage((AsyncToken) id, e);
 	}
 
 	// ------------------------------
