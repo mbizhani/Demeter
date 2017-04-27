@@ -18,19 +18,19 @@ function setupFunc() {
 	});
 
 	try {
-		if (pingServerInterval) {
+		if (WebSocketPingInterval) {
 			Wicket.Event.subscribe("/websocket/open", function (jqEvent, message) {
-				console.log('Demeter Wicket.Event: websocket/open!, ' + message);
-				webSocketPingHandler = setInterval(pingServerByWS, pingServerInterval);
+				console.log('Demeter: websocket/open!, ', message);
+				webSocketPingHandler = setInterval(pingWebSocket, WebSocketPingInterval);
 			});
 
 			Wicket.Event.subscribe("/websocket/closed", function (jqEvent, message) {
-				console.log('Demeter Wicket.Event: websocket/closed!, ' + message);
+				console.log('Demeter: websocket/closed!, ', message);
 				window.clearInterval(webSocketPingHandler);
 			});
 
 			Wicket.Event.subscribe("/websocket/error", function (jqEvent, message) {
-				console.log('Demeter Wicket.Event: websocket/error!, ' + message);
+				console.log('Demeter: websocket/error!, ', message);
 				window.clearInterval(webSocketPingHandler);
 			});
 		}
@@ -52,8 +52,8 @@ function showBusySign() {
 	$("#ajaxVeil").css("display", "inline");
 }
 
-function pingServerByWS() {
-	Wicket.WebSocket.send('{msg:"p"}');
+function pingWebSocket() {
+	Wicket.WebSocket.send('PING');
 }
 
 function onBeforeSessionTimeout() {

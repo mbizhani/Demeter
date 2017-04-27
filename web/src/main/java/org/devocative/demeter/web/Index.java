@@ -34,7 +34,6 @@ import org.devocative.demeter.web.dpage.LoginDPage;
 import org.devocative.demeter.web.panel.EditProfilePanel;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.async.AsyncBehavior;
-import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.html.menu.OMenuItem;
 import org.devocative.wickomp.html.menu.WMenuBar;
 import org.devocative.wickomp.html.window.WModalWindow;
@@ -188,9 +187,7 @@ public class Index extends WebPage {
 			});
 		}
 
-		if (AsyncMediator.hasHandler()) {
-			add(new AsyncBehavior());
-		}
+		add(new AsyncBehavior());
 	}
 
 	// ------------------------------
@@ -212,9 +209,9 @@ public class Index extends WebPage {
 			String.format("var sessionTO=%d;var ajaxUrl='%s';", alertPeriodBeforeSessionTimeout, ajaxUrl),
 			"initJSVariables"));
 
-		if (ConfigUtil.getBoolean(DemeterConfigKey.PingServerEnabled)) {
-			int pingPeriodBeforeWSTimeout = ConfigUtil.getInteger(DemeterConfigKey.PingServerPeriod);
-			response.render(JavaScriptHeaderItem.forScript(String.format("var pingServerInterval=%d;", pingPeriodBeforeWSTimeout), "pingServer"));
+		if (ConfigUtil.getBoolean(DemeterConfigKey.PingWebSocketEnabled)) {
+			int webSocketPingInterval = ConfigUtil.getInteger(DemeterConfigKey.PingWebSocketPeriod);
+			response.render(JavaScriptHeaderItem.forScript(String.format("var WebSocketPingInterval=%d;", webSocketPingInterval), "WebSocketPingInterval"));
 		}
 
 		response.render(INDEX_JS);
