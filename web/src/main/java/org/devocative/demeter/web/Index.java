@@ -77,7 +77,7 @@ public class Index extends WebPage {
 	// ------------------------------
 
 	public Index(PageParameters pageParameters) {
-		securityService.authenticate(WebUtil.toMap(true, true));
+		securityService.authenticateByUrlParams(WebUtil.toMap(true, true));
 		currentUser = securityService.getCurrentUser();
 
 		if (currentUser.isPageEmpty()) {

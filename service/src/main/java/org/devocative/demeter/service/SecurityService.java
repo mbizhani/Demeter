@@ -139,6 +139,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		User user = userService.loadByUsername(username);
 
 		if (user != null) {
+			logger.info("Authenticate: user in DB, status=[{}] auth=[{}]", user.getStatus(), user.getAuthMechanism());
 			verifyUser(user);
 
 			if (EAuthMechanism.DATABASE.equals(user.getAuthMechanism())) {
@@ -156,6 +157,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			}
 		} else {
 			String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
+			logger.info("Authenticate: user not in DB, default auth mode = {}", mode);
 
 			if ("database".equalsIgnoreCase(mode)) {
 				throw new DemeterException(DemeterErrorCode.InvalidUser);
@@ -176,14 +178,23 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	}
 
 	@Override
-	public void authenticate(Map<String, List<String>> params) {
-		/*if (params.containsKey(USERNAME_KEY) && params.containsKey(PASSWORD_KEY)) {
-			authenticate(params.get(USERNAME_KEY).get(0), params.get(PASSWORD_KEY).get(0));
-		} else */
-		if (otherAuthenticationService != null) {
-			UserVO authenticatedUserVO = otherAuthenticationService.authenticate(params);
-			if (authenticatedUserVO != null) {
-				afterAuthentication(authenticatedUserVO);
+	public void authenticateByUrlParams(Map<String, List<String>> params) {
+		String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
+
+		if ("other".equalsIgnoreCase(mode) && otherAuthenticationService != null) {
+			UserVO authUserVO = otherAuthenticationService.authenticate(params);
+
+			if (authUserVO != null) {
+				authUserVO.setAuthMechanism(EAuthMechanism.OTHER);
+
+				if (!getCurrentUser().getUsername().equals(authUserVO.getUsername())) {
+					logger.info("Authenticate: user by URL params user=[{}] roles=[{}] permissions={} denials={}",
+						authUserVO.getUsername(),
+						authUserVO.getRoles(),
+						authUserVO.getPermissions(),
+						authUserVO.getDenials());
+					afterAuthentication(authUserVO);
+				}
 			}
 		}
 	}
@@ -281,6 +292,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	}
 
 	private UserVO authenticateByLDAP(String username, String password) {
+		logger.info("Authenticate: Start authenticateByLDAP user = [{}]", username);
+
 		String dnTemplate = ConfigUtil.getString(DemeterConfigKey.LdapDnTemplate);
 		String dn = String.format(dnTemplate, username);
 

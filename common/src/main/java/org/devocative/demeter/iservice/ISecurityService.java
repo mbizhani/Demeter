@@ -12,7 +12,7 @@ public interface ISecurityService {
 
 	void authenticate(String username, String password);
 
-	void authenticate(Map<String, List<String>> params);
+	void authenticateByUrlParams(Map<String, List<String>> params);
 
 	void signOut();
 
