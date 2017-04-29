@@ -70,7 +70,7 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 	private User creatorUser;
 
 	@NotAudited
-	@Column(name = "f_creator_user")
+	@Column(name = "f_creator_user", nullable = false)
 	private Long creatorUserId;
 
 	@Column(name = "d_modification", columnDefinition = "date")

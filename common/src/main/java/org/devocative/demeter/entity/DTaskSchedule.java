@@ -49,7 +49,7 @@ public class DTaskSchedule implements ICreationDate, ICreatorUser, IModification
 	private User creatorUser;
 
 	@NotAudited
-	@Column(name = "f_creator_user")
+	@Column(name = "f_creator_user", nullable = false)
 	private Long creatorUserId;
 
 	@NotAudited
