@@ -19,4 +19,6 @@ public interface ISecurityService {
 	String getUserDigest(String username);
 
 	UserVO getSystemUser();
+
+	UserVO getGuestUser();
 }

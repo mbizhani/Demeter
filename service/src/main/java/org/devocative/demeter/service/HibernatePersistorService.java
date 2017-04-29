@@ -103,7 +103,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
-		return ApplicationLifecyclePriority.High;
+		return ApplicationLifecyclePriority.First;
 	}
 
 	// -------------------------- IRequestLifecycle implementation
@@ -367,12 +367,12 @@ public class HibernatePersistorService implements IPersistorService {
 			if (entity instanceof ICreationDate ||
 				entity instanceof ICreatorUser ||
 				entity instanceof IRowMod) {
-				setCreatedValues(state, propertyNames);
+				setCreatedValues(entity, id, state, propertyNames);
 				return true;
 			}
 
 			if (entity instanceof IModificationDate || entity instanceof IModifierUser) {
-				setModifiedValues(state, propertyNames);
+				setModifiedValues(entity, id, state, propertyNames);
 				return true;
 			}
 
@@ -391,18 +391,28 @@ public class HibernatePersistorService implements IPersistorService {
 			if (entity instanceof IModificationDate ||
 				entity instanceof IModifierUser ||
 				entity instanceof IRowMod) {
-				setModifiedValues(currentState, propertyNames);
+				setModifiedValues(entity, id, currentState, propertyNames);
 				return true;
 			}
 
 			return false;
 		}
 
-		private void setCreatedValues(Object[] state, String[] propertyNames) {
+		private void setCreatedValues(Object entity, Serializable id, Object[] state, String[] propertyNames) {
 			for (int i = 0; i < propertyNames.length; i++) {
 				if ("creatorUserId".equals(propertyNames[i])) {
 					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
+					} else {
+						logger.error("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
+						if (entity instanceof Person) {
+							Person p = (Person) entity;
+							if (!"system".equals(p.getLastName())) {
+								throw new RuntimeException("Invalid CurrentUser");
+							}
+						} else {
+							throw new RuntimeException("Invalid CurrentUser");
+						}
 					}
 				} else if ("creationDate".equals(propertyNames[i])) {
 					state[i] = new Date();
@@ -414,11 +424,21 @@ public class HibernatePersistorService implements IPersistorService {
 			}
 		}
 
-		private void setModifiedValues(Object[] state, String[] propertyNames) {
+		private void setModifiedValues(Object entity, Serializable id, Object[] state, String[] propertyNames) {
 			for (int i = 0; i < propertyNames.length; i++) {
 				if ("modifierUserId".equals(propertyNames[i])) {
 					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
+					} else {
+						logger.error("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
+						if (entity instanceof Person) {
+							Person p = (Person) entity;
+							if (!"system".equals(p.getLastName())) {
+								throw new RuntimeException("Invalid CurrentUser");
+							}
+						} else {
+							throw new RuntimeException("Invalid CurrentUser");
+						}
 					}
 				} else if ("modificationDate".equals(propertyNames[i])) {
 					state[i] = new Date();

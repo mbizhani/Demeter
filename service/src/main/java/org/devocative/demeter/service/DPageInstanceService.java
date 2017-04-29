@@ -169,7 +169,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
-		return ApplicationLifecyclePriority.Low;
+		return ApplicationLifecyclePriority.Third;
 	}
 
 	// ------------------------------ IPageService methods

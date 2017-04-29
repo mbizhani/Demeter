@@ -14,6 +14,6 @@ public class DemeterDModule implements DModule {
 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
-		return ApplicationLifecyclePriority.Low;
+		return ApplicationLifecyclePriority.Fourth;
 	}
 }

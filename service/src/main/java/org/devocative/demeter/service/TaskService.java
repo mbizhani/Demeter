@@ -131,7 +131,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
-		return ApplicationLifecyclePriority.Medium;
+		return ApplicationLifecyclePriority.Third;
 	}
 
 	// ------------------------------ RejectedExecutionHandler

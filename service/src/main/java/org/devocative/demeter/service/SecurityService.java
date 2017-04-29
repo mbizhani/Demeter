@@ -35,7 +35,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	private static final String USERNAME_KEY = "username";
 	private static final String PASSWORD_KEY = "password";
 
-	private static ThreadLocal<UserVO> CURRENT_USER = new ThreadLocal<>();
+	private static final ThreadLocal<UserVO> CURRENT_USER = new ThreadLocal<>();
 
 	private UserVO system, guest;
 
@@ -102,7 +102,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public ApplicationLifecyclePriority getLifecyclePriority() {
-		return ApplicationLifecyclePriority.Medium;
+		return ApplicationLifecyclePriority.Second;
 	}
 
 	// -------------------------- IRequestLifecycle implementation
@@ -120,7 +120,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO getCurrentUser() {
-		return CURRENT_USER.get() != null ? CURRENT_USER.get() : guest;
+		return CURRENT_USER.get();
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		if (userVO != null) {
 			CURRENT_USER.set(userVO);
 		} else {
-			CURRENT_USER.set(guest);
+			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}
 	}
 
@@ -221,7 +221,18 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO getSystemUser() {
+		if(system == null) {
+			throw new RuntimeException("Can't find UserVO of 'system' ");
+		}
 		return system;
+	}
+
+	@Override
+	public UserVO getGuestUser() {
+		if(guest == null) {
+			throw new RuntimeException("Can't find UserVO of 'guest' ");
+		}
+		return guest;
 	}
 
 	// ------------------------------

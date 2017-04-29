@@ -9,6 +9,7 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.imodule.DModule;
+import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.slf4j.Logger;
@@ -26,9 +27,7 @@ public class ModuleLoader {
 
 	private static final Map<String, XModule> MODULES = new LinkedHashMap<>();
 
-	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_HIGH = new HashMap<>();
-	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_MEDIUM = new HashMap<>();
-	private static final Map<String, IApplicationLifecycle> APP_LIFECYCLE_BEANS_LOW = new HashMap<>();
+	private static final Map<ApplicationLifecyclePriority, Map<String, IApplicationLifecycle>> APP_LIFECYCLE_BEANS = new HashMap<>();
 
 	private static ApplicationContext appCtx;
 	private static boolean inited = false;
@@ -232,32 +231,21 @@ public class ModuleLoader {
 				throw new DSystemException("IApplicationLifecycle has no priority: " + entry.getKey());
 			}
 
-			switch (entry.getValue().getLifecyclePriority()) {
-				case High:
-					APP_LIFECYCLE_BEANS_HIGH.put(entry.getKey(), entry.getValue());
-					break;
-				case Medium:
-					APP_LIFECYCLE_BEANS_MEDIUM.put(entry.getKey(), entry.getValue());
-					break;
-				case Low:
-					APP_LIFECYCLE_BEANS_LOW.put(entry.getKey(), entry.getValue());
-					break;
+			if (!APP_LIFECYCLE_BEANS.containsKey(entry.getValue().getLifecyclePriority())) {
+				APP_LIFECYCLE_BEANS.put(entry.getValue().getLifecyclePriority(), new HashMap<String, IApplicationLifecycle>());
 			}
+
+			APP_LIFECYCLE_BEANS
+				.get(entry.getValue().getLifecyclePriority())
+				.put(entry.getKey(), entry.getValue());
 		}
 
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_HIGH.entrySet()) {
-			entry.getValue().init();
-			logger.info("Application lifecycle bean (High) init(): {}", entry.getKey());
-		}
-
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_MEDIUM.entrySet()) {
-			entry.getValue().init();
-			logger.info("Application lifecycle bean (Medium) init(): {}", entry.getKey());
-		}
-
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_LOW.entrySet()) {
-			entry.getValue().init();
-			logger.info("Application lifecycle bean (Low) init(): {}", entry.getKey());
+		for (ApplicationLifecyclePriority priority : ApplicationLifecyclePriority.values()) {
+			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
+			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
+				entry.getValue().init();
+				logger.info("Application lifecycle bean ({}) init(): {}", priority, entry.getKey());
+			}
 		}
 
 		Map<String, IPersistorService> iPersistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
@@ -267,19 +255,15 @@ public class ModuleLoader {
 	}
 
 	private static void shutdownApplicationLifecycle() {
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_LOW.entrySet()) {
-			entry.getValue().shutdown();
-			logger.info("Application lifecycle bean (Low) shutdown(): {}", entry.getKey());
-		}
+		List<ApplicationLifecyclePriority> priorities = Arrays.asList(ApplicationLifecyclePriority.values());
+		Collections.reverse(priorities);
 
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_MEDIUM.entrySet()) {
-			entry.getValue().shutdown();
-			logger.info("Application lifecycle bean (Medium) shutdown(): {}", entry.getKey());
-		}
-
-		for (Map.Entry<String, IApplicationLifecycle> entry : APP_LIFECYCLE_BEANS_HIGH.entrySet()) {
-			entry.getValue().shutdown();
-			logger.info("Application lifecycle bean (High) shutdown(): {}", entry.getKey());
+		for (ApplicationLifecyclePriority priority : ApplicationLifecyclePriority.values()) {
+			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
+			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
+				entry.getValue().shutdown();
+				logger.info("Application lifecycle bean ({}) shutdown(): {}", priority, entry.getKey());
+			}
 		}
 	}
 

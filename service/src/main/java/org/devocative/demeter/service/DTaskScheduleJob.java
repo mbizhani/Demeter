@@ -2,8 +2,10 @@ package org.devocative.demeter.service;
 
 import org.devocative.demeter.core.ModuleLoader;
 import org.devocative.demeter.entity.DTaskSchedule;
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.task.ITaskService;
+import org.devocative.demeter.vo.UserVO;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -20,6 +22,11 @@ public class DTaskScheduleJob implements Job {
 
 		IPersistorService persistorService = (IPersistorService) ModuleLoader.getApplicationContext().getBean("dmtPersistorService");
 		ITaskService taskService = ModuleLoader.getApplicationContext().getBean(ITaskService.class);
+		ISecurityService securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+		UserVO currentUser = securityService.getCurrentUser();
+		if (currentUser == null) {
+			securityService.authenticate(securityService.getSystemUser());
+		}
 
 		try {
 			DTaskSchedule schedule = persistorService.get(DTaskSchedule.class, new Long(scheduleId));
@@ -31,6 +38,5 @@ public class DTaskScheduleJob implements Job {
 		} finally {
 			persistorService.endSession();
 		}
-
 	}
 }

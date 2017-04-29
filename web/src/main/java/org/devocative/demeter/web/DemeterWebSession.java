@@ -2,6 +2,8 @@ package org.devocative.demeter.web;
 
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.Request;
+import org.devocative.demeter.DemeterErrorCode;
+import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.opt.OCalendar;
@@ -38,6 +40,9 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	}
 
 	public void setUserVO(UserVO userVO) {
+		if (userVO == null) {
+			throw new DemeterException(DemeterErrorCode.InvalidUser);
+		}
 		this.userVO = userVO;
 	}
 
