@@ -2,7 +2,7 @@ package org.devocative.demeter.web.http;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +24,13 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	public void contextInitialized(ServletContextEvent sce) {
 		logger.info("##========================");
 		logger.info("##== Context Initialized!");
-		ModuleLoader.init();
+		DemeterCore.init();
 		logger.info("##========================");
 
 		boolean deployment = ConfigUtil.getBoolean(DemeterConfigKey.DeploymentMode);
 		sce.getServletContext().setInitParameter("configuration", deployment ? "deployment" : "development");
 
-		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		for (String beanName : requestLifecycleBeans.keySet()) {
 			logger.info("DemeterWebListener: IRequestLifecycle Bean = {}", beanName);
 		}
@@ -39,7 +39,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		logger.info("##== Context Destroyed!");
-		ModuleLoader.shutdown();
+		DemeterCore.shutdown();
 		logger.info("##========================");
 	}
 

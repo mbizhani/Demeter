@@ -10,7 +10,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.wickomp.WDefaults;
 import org.devocative.wickomp.async.AsyncMediator;
@@ -48,7 +48,7 @@ public class DemeterWebApplication extends WebApplication {
 		logger.info("** Demeter Application **");
 		logger.info("** Context Path: {}", getServletContext().getContextPath());
 
-		getComponentInstantiationListeners().add(new SpringComponentInjector(this, ModuleLoader.getApplicationContext()));
+		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.getApplicationContext()));
 
 		getMarkupSettings().setStripWicketTags(true);
 		getMarkupSettings().setStripComments(true);
@@ -63,7 +63,7 @@ public class DemeterWebApplication extends WebApplication {
 
 		mountPage(APP_INNER_CTX, Index.class);
 
-		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(ModuleLoader.getApplicationContext()));
+		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(DemeterCore.getApplicationContext()));
 
 		initModulesForWeb();
 
@@ -97,7 +97,7 @@ public class DemeterWebApplication extends WebApplication {
 	private void initModulesForWeb() {
 		String appBaseDir = getServletContext().getRealPath(".");
 
-		Map<String, XModule> modules = ModuleLoader.getModules();
+		Map<String, XModule> modules = DemeterCore.getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
 			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(xModule.getMainResource()));
@@ -125,7 +125,7 @@ public class DemeterWebApplication extends WebApplication {
 		}
 
 		if (webDModule != null) {
-			ModuleLoader.registerSpringBean(module + "WebDModule", webDModule);
+			DemeterCore.registerSpringBean(module + "WebDModule", webDModule);
 			webDModule.init();
 			logger.info("WebDModule created and inited successfully: {}", module);
 		}

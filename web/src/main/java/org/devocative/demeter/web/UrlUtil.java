@@ -2,7 +2,7 @@ package org.devocative.demeter.web;
 
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 
@@ -62,7 +62,7 @@ public class UrlUtil {
 
 	private static IDPageInstanceService getPageInstanceService() {
 		if (pageInstanceService == null) {
-			pageInstanceService = ModuleLoader.getApplicationContext().getBean(IDPageInstanceService.class);
+			pageInstanceService = DemeterCore.getApplicationContext().getBean(IDPageInstanceService.class);
 		}
 		return pageInstanceService;
 	}

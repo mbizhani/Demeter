@@ -3,7 +3,7 @@ package org.devocative.demeter.web;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
@@ -22,12 +22,12 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private ISecurityService securityService;
 
 	public DemeterRequestCycleListener() {
-		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		for (String beanName : requestLifecycleBeans.keySet()) {
 			logger.info("DemeterRequestCycleListener: IRequestLifecycle Bean = {}", beanName);
 		}
 
-		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 	}
 
 	@Override

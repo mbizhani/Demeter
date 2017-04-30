@@ -2,7 +2,7 @@ package org.devocative.demeter.web.test;
 
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.web.DemeterWebApplication;
 import org.devocative.demeter.web.dpage.LoginDPage;
@@ -23,8 +23,8 @@ public class TestDemeter {
 
 	@BeforeClass
 	public static void setUp() {
-		ModuleLoader.init();
-		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+		DemeterCore.init();
+		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 		tester = new WicketTester(new DemeterWebApplication());
 	}
 

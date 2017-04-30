@@ -1,7 +1,7 @@
 package org.devocative.demeter.web.component.grid;
 
 import org.apache.wicket.model.IModel;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.ICreatorUser;
 import org.devocative.demeter.entity.IRowMod;
@@ -18,7 +18,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 	public ORowModAjaxColumn(IModel<String> text, HTMLBase linkContent) {
 		super(text, linkContent);
 
-		currentUser = ModuleLoader.getApplicationContext().getBean(ISecurityService.class).getCurrentUser();
+		currentUser = DemeterCore.getApplicationContext().getBean(ISecurityService.class).getCurrentUser();
 	}
 
 	@Override

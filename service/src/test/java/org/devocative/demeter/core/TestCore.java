@@ -33,9 +33,9 @@ public class TestCore {
 			.addScript("src/test/resources/init_hsqldb.sql")
 			.build();*/
 
-		ModuleLoader.init();
+		DemeterCore.init();
 
-		persistorService = ModuleLoader.getApplicationContext().getBean(IPersistorService.class);
+		persistorService = DemeterCore.getApplicationContext().getBean(IPersistorService.class);
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class TestCore {
 
 	@Test
 	public void testStringTemplate() {
-		IStringTemplateService templateService = ModuleLoader.getApplicationContext().getBean(IStringTemplateService.class);
+		IStringTemplateService templateService = DemeterCore.getApplicationContext().getBean(IStringTemplateService.class);
 
 		IStringTemplate stringTemplate = templateService.create(
 			"int=${C_INT?c}&long=${C_Long?c}&bigDecimal=${BIG?c}&float=${FlT?c}&double=${dbl?c}&name=${f_name}",
@@ -183,6 +183,6 @@ public class TestCore {
 
 	@AfterClass
 	public static void shutdown() {
-		ModuleLoader.shutdown();
+		DemeterCore.shutdown();
 	}
 }

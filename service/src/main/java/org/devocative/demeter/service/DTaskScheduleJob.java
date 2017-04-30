@@ -1,6 +1,6 @@
 package org.devocative.demeter.service;
 
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.DTaskSchedule;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -20,9 +20,9 @@ public class DTaskScheduleJob implements Job {
 		String scheduleId = context.getJobDetail().getKey().getName();
 		logger.info("DemeterSimpleTaskJob: scheduleId={}", scheduleId);
 
-		IPersistorService persistorService = (IPersistorService) ModuleLoader.getApplicationContext().getBean("dmtPersistorService");
-		ITaskService taskService = ModuleLoader.getApplicationContext().getBean(ITaskService.class);
-		ISecurityService securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
+		IPersistorService persistorService = (IPersistorService) DemeterCore.getApplicationContext().getBean("dmtPersistorService");
+		ITaskService taskService = DemeterCore.getApplicationContext().getBean(ITaskService.class);
+		ISecurityService securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 		UserVO currentUser = securityService.getCurrentUser();
 		if (currentUser == null) {
 			securityService.authenticate(securityService.getSystemUser());

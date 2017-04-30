@@ -3,7 +3,7 @@ package org.devocative.demeter.web.http;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.wickomp.http.filter.WAuthMethod;
@@ -71,8 +71,8 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 			}, 1, 1, TimeUnit.MINUTES);
 		}
 
-		securityService = ModuleLoader.getApplicationContext().getBean(ISecurityService.class);
-		userService = ModuleLoader.getApplicationContext().getBean(IUserService.class);
+		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
+		userService = DemeterCore.getApplicationContext().getBean(IUserService.class);
 
 		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 

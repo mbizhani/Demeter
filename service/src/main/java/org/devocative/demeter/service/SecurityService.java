@@ -7,7 +7,7 @@ import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.*;
@@ -238,7 +238,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	// ------------------------------
 
 	private void storePrivilegeKeys() {
-		Collection<XModule> xModules = ModuleLoader.getModules().values();
+		Collection<XModule> xModules = DemeterCore.getModules().values();
 		for (XModule xModule : xModules) {
 			try {
 				String privilegeKeyClass = xModule.getPrivilegeKeyClass();

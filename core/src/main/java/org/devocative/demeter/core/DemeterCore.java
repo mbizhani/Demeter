@@ -22,8 +22,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.InputStream;
 import java.util.*;
 
-public class ModuleLoader {
-	private static final Logger logger = LoggerFactory.getLogger(ModuleLoader.class);
+public class DemeterCore {
+	private static final Logger logger = LoggerFactory.getLogger(DemeterCore.class);
 
 	private static final Map<String, XModule> MODULES = new LinkedHashMap<>();
 
@@ -115,7 +115,7 @@ public class ModuleLoader {
 			if (tokenValue != null && paramValue != null) {
 				String entry = ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreEntry);
 				try {
-					StringEncryptorUtil.init(ModuleLoader.class.getResourceAsStream("/demeter.ks"), tokenValue, entry, paramValue);
+					StringEncryptorUtil.init(DemeterCore.class.getResourceAsStream("/demeter.ks"), tokenValue, entry, paramValue);
 					logger.info("StringEncryptorUtil INITED");
 				} catch (Exception e) {
 					logger.error("StringEncryptorUtil Init Error: " + e);
@@ -141,7 +141,7 @@ public class ModuleLoader {
 
 		Set<String> moduleShortNames = new HashSet<>();
 		for (String moduleName : modulesName) {
-			InputStream moduleXMLResource = ModuleLoader.class.getResourceAsStream(String.format("/%s.xml", moduleName));
+			InputStream moduleXMLResource = DemeterCore.class.getResourceAsStream(String.format("/%s.xml", moduleName));
 			XModule xModule = (XModule) xStream.fromXML(moduleXMLResource);
 			logger.info("Module Found: {}", moduleName);
 

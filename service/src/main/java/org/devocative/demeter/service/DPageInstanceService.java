@@ -4,7 +4,7 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.adroit.cache.IMissedHitHandler;
 import org.devocative.demeter.DSystemException;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XDPage;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DPageInfo;
@@ -116,7 +116,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
 
 		int totalDPageSize = 0;
-		Map<String, XModule> modules = ModuleLoader.getModules();
+		Map<String, XModule> modules = DemeterCore.getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
 

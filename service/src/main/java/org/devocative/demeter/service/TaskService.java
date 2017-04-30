@@ -3,7 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.core.ModuleLoader;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XDTask;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DTaskInfo;
@@ -69,7 +69,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
 
-		requestLifecycleBeans = ModuleLoader.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -88,13 +88,13 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			.update();
 		persistorService.commitOrRollback();
 
-		Map<String, XModule> modules = ModuleLoader.getModules();
+		Map<String, XModule> modules = DemeterCore.getModules();
 		for (XModule xModule : modules.values()) {
 			if (xModule.getTasks() != null) {
 				for (XDTask xdTask : xModule.getTasks()) {
 					try {
 						Class<?> beanType = Class.forName(xdTask.getType());
-						ModuleLoader.getApplicationContext().getBean(beanType);
+						DemeterCore.getApplicationContext().getBean(beanType);
 					} catch (ClassNotFoundException e) {
 						throw new DSystemException("Unknown task type as bean: " + xdTask.getType());
 					}
@@ -185,7 +185,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskBeanId, id, inputData);
 
-		Class<?> type = ModuleLoader.getApplicationContext().getType(taskBeanId);
+		Class<?> type = DemeterCore.getApplicationContext().getType(taskBeanId);
 		return start(loadByType(type.getName()), id, inputData, resultCallback);
 	}
 
@@ -216,7 +216,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 				logger.info("Starting Task: class=[{}] - taskInfo=[{}]", taskClass, taskInfo.getId());
 
-				DTask dTask = (DTask) ModuleLoader.getApplicationContext().getBean(taskClass);
+				DTask dTask = (DTask) DemeterCore.getApplicationContext().getBean(taskClass);
 				return startDTask(dTask, id, inputData, resultCallback);
 			} catch (ClassNotFoundException e) {
 				logger.error("Can't find task class: class=[{}] taskInfo=[{}]", taskInfo.getType(), taskInfo.getId());
