@@ -14,25 +14,27 @@ function setupFunc() {
 	});
 	Wicket.Event.subscribe('/ajax/call/failure', function (attributes, jqXHR, errorThrown, textStatus) {
 		hideBusySign();
-		$.messager.alert('', errorThrown);
+		$.messager.alert('Err', errorThrown);
 	});
 
 	try {
 		if (WebSocketPingInterval) {
+			console.log('Demeter WebSocket: ping = ' + WebSocketPingInterval);
+
 			Wicket.Event.subscribe("/websocket/open", function (jqEvent, message) {
-				console.log('Demeter: websocket/open!, ', message);
-				webSocketPingHandler = setInterval(pingWebSocket, WebSocketPingInterval);
+				console.log('Demeter: websocket/open', message);
 			});
 
 			Wicket.Event.subscribe("/websocket/closed", function (jqEvent, message) {
-				console.log('Demeter: websocket/closed!, ', message);
+				console.warn('Demeter: websocket/closed', message);
 				window.clearInterval(webSocketPingHandler);
 			});
 
 			Wicket.Event.subscribe("/websocket/error", function (jqEvent, message) {
-				console.log('Demeter: websocket/error!, ', message);
-				window.clearInterval(webSocketPingHandler);
+				console.error('Demeter: websocket/error', message, jqEvent);
 			});
+
+			webSocketPingHandler = setInterval(pingWebSocket, WebSocketPingInterval);
 		}
 
 		if (sessionTO && sessionTO > 3000) {
@@ -53,7 +55,7 @@ function showBusySign() {
 }
 
 function pingWebSocket() {
-	Wicket.WebSocket.send('PING');
+	Wicket.WebSocket.send('W.PING');
 }
 
 function onBeforeSessionTimeout() {
