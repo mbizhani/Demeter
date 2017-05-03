@@ -79,8 +79,8 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@JoinTable(name = "mt_dmt_user_role",
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)},
-		foreignKey = @ForeignKey(name = "userrole2user"),
-		inverseForeignKey = @ForeignKey(name = "userrole2role")
+		foreignKey = @ForeignKey(name = "userRole2user"),
+		inverseForeignKey = @ForeignKey(name = "userRole2role")
 	)
 	private List<Role> roles;
 

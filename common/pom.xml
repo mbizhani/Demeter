@@ -33,4 +33,17 @@
 			<version>${d.hibernate.ver}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>sql/*.sql</include>
+					<include>sql/*_versions.txt</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>

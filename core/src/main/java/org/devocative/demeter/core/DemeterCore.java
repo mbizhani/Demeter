@@ -92,6 +92,13 @@ public class DemeterCore {
 		}
 	}
 
+	public static void applySQLSchemas() {
+		initEncDec();
+		initModules();
+
+		DemeterCoreHelper.applySQLSchemas(MODULES.values());
+	}
+
 	public static void initEncDec() {
 		boolean enableSecurity = true;
 		try {
