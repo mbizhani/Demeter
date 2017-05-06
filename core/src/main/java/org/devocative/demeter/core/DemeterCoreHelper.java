@@ -9,12 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class DemeterCoreHelper {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterCoreHelper.class);
 
-	public static void applySQLSchemas(Collection<XModule> xModules) {
+	public static void applySQLSchemas(Collection<XModule> xModules, String... filters) {
 		Connection connection = null;
 		try {
 			Class.forName(ConfigUtil.getString(true, "dmt.db.driver"));
@@ -26,11 +28,23 @@ public class DemeterCoreHelper {
 
 			logger.info("Create database connection!");
 
+			List<String> filterList = new ArrayList<>();
+			if (filters != null) {
+				for (String filter : filters) {
+					filterList.add(filter.trim().toLowerCase());
+				}
+			}
+
 			for (XModule xModule : xModules) {
 				logger.info("Process DModule: {}", xModule.getShortName());
+				String module = xModule.getShortName().toLowerCase();
+
+				if (!filterList.contains(module)) {
+					logger.warn("Module [{}] ignored: filters={}", module, filterList);
+					continue;
+				}
 
 				String db = "oracle"; //TODO
-				String module = xModule.getShortName().toLowerCase();
 				URL verUrl = DemeterCoreHelper.class.getResource(String.format("/sql/%s_versions.txt", module));
 				if (verUrl != null) {
 					LineIterator iterator = IOUtils.lineIterator(verUrl.openStream(), "UTF-8");

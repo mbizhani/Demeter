@@ -92,11 +92,11 @@ public class DemeterCore {
 		}
 	}
 
-	public static void applySQLSchemas() {
+	public static void applySQLSchemas(String... filters) {
 		initEncDec();
 		initModules();
 
-		DemeterCoreHelper.applySQLSchemas(MODULES.values());
+		DemeterCoreHelper.applySQLSchemas(MODULES.values(), filters);
 	}
 
 	public static void initEncDec() {
