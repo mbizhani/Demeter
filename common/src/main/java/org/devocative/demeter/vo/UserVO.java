@@ -1,7 +1,5 @@
 package org.devocative.demeter.vo;
 
-import org.devocative.adroit.ConfigUtil;
-import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.*;
 
 import java.io.Serializable;
@@ -24,10 +22,16 @@ public class UserVO implements Serializable {
 	private Set<String> denials = new HashSet<>();
 
 	private PageVO pageVO;
-	private Integer sessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.DefaultSessionTimeoutInterval);
 	private Map<String, Object> otherProfileInfo = new HashMap<>();
 
 	private String otherId;
+
+	private ELocale locale;
+	private ECalendar calendar;
+	private ELayoutDirection layoutDirection;
+	private EDatePatternType datePatternType;
+	private EDateTimePatternType dateTimePatternType;
+	private Integer sessionTimeout;
 
 	// ------------------------------
 
@@ -145,15 +149,6 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
-	public Integer getSessionTimeout() {
-		return isAuthenticated() ? sessionTimeout : -1;
-	}
-
-	public UserVO setSessionTimeout(Integer sessionTimeout) {
-		this.sessionTimeout = sessionTimeout;
-		return this;
-	}
-
 	public Object getOtherProfileInfo(String key) {
 		return otherProfileInfo.get(key);
 	}
@@ -164,6 +159,62 @@ public class UserVO implements Serializable {
 
 	public UserVO setOtherId(String otherId) {
 		this.otherId = otherId;
+		return this;
+	}
+
+	// ------------------------------
+
+	public ELocale getLocale() {
+		return locale;
+	}
+
+	public UserVO setLocale(ELocale locale) {
+		this.locale = locale;
+		return this;
+	}
+
+	public ECalendar getCalendar() {
+		return calendar;
+	}
+
+	public UserVO setCalendar(ECalendar calendar) {
+		this.calendar = calendar;
+		return this;
+	}
+
+	public ELayoutDirection getLayoutDirection() {
+		return layoutDirection;
+	}
+
+	public UserVO setLayoutDirection(ELayoutDirection layoutDirection) {
+		this.layoutDirection = layoutDirection;
+		return this;
+	}
+
+	public EDatePatternType getDatePatternType() {
+		return datePatternType;
+	}
+
+	public UserVO setDatePatternType(EDatePatternType datePatternType) {
+		this.datePatternType = datePatternType;
+		return this;
+	}
+
+	public EDateTimePatternType getDateTimePatternType() {
+		return dateTimePatternType;
+	}
+
+	public UserVO setDateTimePatternType(EDateTimePatternType dateTimePatternType) {
+		this.dateTimePatternType = dateTimePatternType;
+		return this;
+	}
+
+	public Integer getSessionTimeout() {
+		return sessionTimeout;
+	}
+
+	public UserVO setSessionTimeout(Integer sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
 		return this;
 	}
 

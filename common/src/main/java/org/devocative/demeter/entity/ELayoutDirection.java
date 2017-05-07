@@ -85,4 +85,15 @@ public class ELayoutDirection implements Serializable {
 	public static List<ELayoutDirection> list() {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
+
+	public static ELayoutDirection findByName(String name) {
+		ELayoutDirection result = null;
+		for (ELayoutDirection direction : ID_TO_LIT.values()) {
+			if (direction.getName().equals(name)) {
+				result = direction;
+				break;
+			}
+		}
+		return result;
+	}
 }

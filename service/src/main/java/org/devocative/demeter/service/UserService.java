@@ -1,12 +1,11 @@
 package org.devocative.demeter.service;
 
+import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.StringEncryptorUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.Person;
-import org.devocative.demeter.entity.Privilege;
-import org.devocative.demeter.entity.Role;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -159,9 +158,21 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserVO getUserVO(User user) {
+		ELocale defLocale = ELocale.findByCode(ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
+		ECalendar defCalendar = ECalendar.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultCalendar));
+		ELayoutDirection defDirection = ELayoutDirection.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultLayout));
+		Integer defSessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.UserDefaultSessionTimeout);
+
 		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
 			.setAdmin(user.getAdmin())
-			.setAuthMechanism(user.getAuthMechanism());
+			.setAuthMechanism(user.getAuthMechanism())
+
+			.setLocale(user.getLocale() != null ? user.getLocale() : defLocale)
+			.setCalendar(user.getCalendarType() != null ? user.getCalendarType() : defCalendar)
+			.setLayoutDirection(user.getLayoutDirectionType() != null ? user.getLayoutDirectionType() : defDirection)
+			.setDatePatternType(user.getDatePatternType() != null ? user.getDatePatternType() : EDatePatternType.P01)
+			.setDateTimePatternType(user.getDateTimePatternType() != null ? user.getDateTimePatternType() : EDateTimePatternType.P01)
+			.setSessionTimeout(user.getSessionTimeout() != null ? user.getSessionTimeout() : defSessionTimeout);
 
 		if (user.getRoles() != null) {
 			for (Role role : user.getRoles()) {

@@ -4,6 +4,8 @@ import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.Request;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.entity.ECalendar;
+import org.devocative.demeter.entity.ELayoutDirection;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.opt.OCalendar;
@@ -29,8 +31,6 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	public DemeterWebSession(Request request) {
 		super(request);
-
-		setLocale(new Locale("fa", "IR"));
 	}
 
 	// ------------------------------ ACCESSORS
@@ -44,6 +44,7 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}
 		this.userVO = userVO;
+		setLocale(new Locale(userVO.getLocale().getCode()));
 	}
 
 	public Class<? extends DPage> getOriginalDPage() {
@@ -66,10 +67,13 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	// ------------------------------ OUserPreference
 
-	//TODO add following methods to UserVO and return from userVO reference
 	@Override
 	public OCalendar getCalendar() {
-		return OCalendar.Persian;
+		OCalendar result = OCalendar.Gregorian;
+		if (ECalendar.JALALI.equals(userVO.getCalendar())) {
+			result = OCalendar.Persian;
+		}
+		return result;
 	}
 
 	@Override
@@ -79,17 +83,21 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	@Override
 	public String getDatePattern() {
-		return "yyyy/MM/dd";
+		return userVO.getDatePatternType().toString();
 	}
 
 	@Override
 	public String getDateTimePattern() {
-		return "yyyy/MM/dd HH:mm:ss";
+		return userVO.getDateTimePatternType().toString();
 	}
 
 	@Override
 	public OLayoutDirection getLayoutDirection() {
-		return OLayoutDirection.RTL;
+		OLayoutDirection result = OLayoutDirection.LTR;
+		if (ELayoutDirection.RTL.equals(userVO.getLayoutDirection())) {
+			result = OLayoutDirection.RTL;
+		}
+		return result;
 	}
 
 	@Override

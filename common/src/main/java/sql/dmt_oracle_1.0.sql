@@ -266,9 +266,9 @@ CREATE TABLE t_dmt_user (
 	e_date_time_pattern NUMBER(10, 0),
 	d_last_login        DATE,
 	e_laydir_type       NUMBER(10, 0),
-	e_locale            NUMBER(10, 0)      NOT NULL,
+	e_locale            NUMBER(10, 0),
 	c_password          VARCHAR2(255 CHAR),
-	n_session_timeout   NUMBER(10, 0)      NOT NULL,
+	n_session_timeout   NUMBER(10, 0),
 	e_status            NUMBER(10, 0)      NOT NULL,
 	c_username          VARCHAR2(255 CHAR) NOT NULL,
 	PRIMARY KEY (id)

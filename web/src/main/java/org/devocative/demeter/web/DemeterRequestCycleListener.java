@@ -40,6 +40,7 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 			if (currentUser == null) {
 				currentUser = securityService.getGuestUser();
 			}
+			DemeterWebSession.get().setUserVO(currentUser);
 			securityService.authenticate(currentUser);
 		} catch (Exception e) {
 			logger.error("DemeterRequestCycleListener.onBeginRequest: setting currentUser", e);

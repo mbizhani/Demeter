@@ -42,8 +42,8 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	private EUserStatus status = EUserStatus.ENABLED;
 
 	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_locale", nullable = false))
-	private ELocale locale = ELocale.FA;
+	@AttributeOverride(name = "id", column = @Column(name = "e_locale"))
+	private ELocale locale;
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_cal_type"))
@@ -68,8 +68,8 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Column(name = "b_admin", nullable = false)
 	private Boolean admin = false;
 
-	@Column(name = "n_session_timeout", nullable = false)
-	private Integer sessionTimeout = 60;
+	@Column(name = "n_session_timeout")
+	private Integer sessionTimeout;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "user2person"))

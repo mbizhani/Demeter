@@ -83,4 +83,15 @@ public class ELocale implements Serializable {
 	public static List<ELocale> list() {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
+
+	public static ELocale findByCode(String code) {
+		ELocale result = null;
+		for (ELocale locale : ID_TO_LIT.values()) {
+			if (locale.getCode().equals(code)) {
+				result = locale;
+				break;
+			}
+		}
+		return result;
+	}
 }

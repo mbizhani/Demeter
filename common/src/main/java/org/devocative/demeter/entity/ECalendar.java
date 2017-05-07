@@ -76,4 +76,14 @@ public class ECalendar implements Serializable {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
 
+	public static ECalendar findByName(String name) {
+		ECalendar result = null;
+		for (ECalendar calendar : ID_TO_LIT.values()) {
+			if (calendar.getName().equals(name)) {
+				result = calendar;
+				break;
+			}
+		}
+		return result;
+	}
 }

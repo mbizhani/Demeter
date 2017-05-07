@@ -21,7 +21,6 @@ public enum DemeterConfigKey implements IConfigKey {
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
-	DefaultSessionTimeoutInterval("dmt.web.session.timeout", -1),
 	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
 
@@ -37,7 +36,13 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	StringTemplateCacheEnabled("dmt.string.template.cache.enabled", true, Arrays.asList(true, false)),
 
-	FileBaseDir(true, "dmt.file.base.dir"),;
+	FileBaseDir(true, "dmt.file.base.dir"),
+
+	UserDefaultSessionTimeout("dmt.user.def.session.timeout", 60),
+	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
+	UserDefaultCalendar("dmt.user.def.calendar", "Jalali", Arrays.asList("Jalali", "Gregorian")),
+	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR")),
+	;
 
 
 	private String key;
