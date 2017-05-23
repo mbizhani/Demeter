@@ -92,7 +92,7 @@ public class StringTemplateService implements IStringTemplateService {
 
 	@Override
 	public void clearCacheFor(String id) {
-		if (templateCache.containsKey(id)) {
+		if (templateCache != null && templateCache.containsKey(id)) {
 			templateCache.remove(id);
 		}
 	}

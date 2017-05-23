@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.iservice;
 
 import org.devocative.demeter.entity.DPageInfo;
@@ -11,7 +10,7 @@ import org.devocative.demeter.vo.filter.DPageInstanceFVO;
 import java.util.Collection;
 import java.util.List;
 
-public interface IDPageInstanceService {
+public interface IDPageInstanceService extends IEntityService<DPageInstance> {
 	void saveOrUpdate(DPageInstance entity);
 
 	DPageInstance load(Long id);

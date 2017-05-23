@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -14,7 +13,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
-import org.devocative.wickomp.WModel;
+import org.devocative.demeter.web.model.DEntityLazyLoadModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
@@ -236,6 +235,6 @@ public class DPageInstanceListDPage extends DPage implements IGridDataSource<DPa
 
 	@Override
 	public IModel<DPageInstance> model(DPageInstance object) {
-		return new WModel<>(object);
+		return new DEntityLazyLoadModel<>(object.getId(), dPageInstanceService);
 	}
 }
