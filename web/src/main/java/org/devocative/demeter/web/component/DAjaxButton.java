@@ -21,6 +21,9 @@ public abstract class DAjaxButton extends WAjaxButton {
 		this(id, caption, null);
 	}
 
+	public DAjaxButton(String id, HTMLBase icon) {
+		this(id, null, icon);
+	}
 	// Main Constructor
 	public DAjaxButton(String id, IModel<String> caption, HTMLBase icon) {
 		super(id, caption, icon);
