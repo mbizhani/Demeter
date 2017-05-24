@@ -9,3 +9,11 @@
 #ajaxVeilSign {
 	display: inline-block;
 }
+
+table.w-file {
+	opacity: 0.3;
+}
+
+table.w-file:hover {
+	opacity: 1;
+}

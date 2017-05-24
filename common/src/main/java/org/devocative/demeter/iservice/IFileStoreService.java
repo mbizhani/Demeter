@@ -15,13 +15,13 @@ public interface IFileStoreService {
 
 	FileStore load(Long id);
 
+	FileStore loadByFileId(String fileId);
+
 	List<FileStore> list();
 
 	List<FileStore> search(FileStoreFVO filter, long pageIndex, long pageSize);
 
 	long count(FileStoreFVO filter);
-
-	FileStore loadByFileId(String fileId);
 
 	List<User> getCreatorUserList();
 
@@ -34,4 +34,6 @@ public interface IFileStoreService {
 	void writeFile(FileStore fileStore, OutputStream outputStream);
 
 	void doExpire();
+
+	List<FileStore> listByCurrentUserAsCreator();
 }

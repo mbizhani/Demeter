@@ -1,6 +1,10 @@
 package org.devocative.demeter.entity;
 
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
+
 import javax.persistence.*;
+import java.io.File;
 import java.util.Date;
 
 @Entity
@@ -231,5 +235,12 @@ public class FileStore implements ICreationDate, ICreatorUser, IModificationDate
 	@Override
 	public String toString() {
 		return getName() != null ? getName() : String.format("[%s]", getId());
+	}
+
+	// ---------------
+
+	public String getPath() {
+		String baseDir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir);
+		return baseDir + File.separator + getFileId();
 	}
 }

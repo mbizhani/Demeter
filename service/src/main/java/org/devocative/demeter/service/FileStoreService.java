@@ -8,7 +8,9 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.FileStoreHandler;
 import org.devocative.demeter.iservice.IFileStoreService;
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
+import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.vo.filter.FileStoreFVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +24,13 @@ import java.util.UUID;
 
 @Service("dmtFileStoreService")
 public class FileStoreService implements IFileStoreService {
-	private static Logger logger = LoggerFactory.getLogger(FileStoreService.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileStoreService.class);
 
 	@Autowired
 	private IPersistorService persistorService;
+
+	@Autowired
+	private ISecurityService securityService;
 
 	// ------------------------------
 
@@ -37,6 +42,16 @@ public class FileStoreService implements IFileStoreService {
 	@Override
 	public FileStore load(Long id) {
 		return persistorService.get(FileStore.class, id);
+	}
+
+	@Override
+	public FileStore loadByFileId(String fileId) {
+		return persistorService
+			.createQueryBuilder()
+			.addFrom(FileStore.class, "ent")
+			.addWhere("and ent.fileId = :fileId")
+			.addParam("fileId", fileId)
+			.object();
 	}
 
 	@Override
@@ -61,16 +76,6 @@ public class FileStoreService implements IFileStoreService {
 			.addSelect("select count(1)")
 			.addFrom(FileStore.class, "ent")
 			.applyFilter(FileStore.class, "ent", filter)
-			.object();
-	}
-
-	@Override
-	public FileStore loadByFileId(String fileId) {
-		return persistorService
-			.createQueryBuilder()
-			.addFrom(FileStore.class, "ent")
-			.addWhere("and ent.fileId = :fileId")
-			.addParam("fileId", fileId)
 			.object();
 	}
 
@@ -135,8 +140,7 @@ public class FileStoreService implements IFileStoreService {
 	@Override
 	public void writeFile(FileStore fileStore, OutputStream outputStream) {
 		if (EFileStorage.DISK.equals(fileStore.getStorage())) {
-			String baseDir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir);
-			String path = baseDir + File.separator + fileStore.getFileId();
+			String path = fileStore.getPath();
 
 			try {
 				IOUtils.copy(new FileInputStream(path), outputStream);
@@ -190,6 +194,16 @@ public class FileStoreService implements IFileStoreService {
 			logger.error("FileStoreDTask: ", e);
 		}
 
+	}
+
+	@Override
+	public List<FileStore> listByCurrentUserAsCreator() {
+		UserVO currentUser = securityService.getCurrentUser();
+		return persistorService.createQueryBuilder()
+			.addFrom(FileStore.class, "ent")
+			.addWhere("and ent.creatorUserId = :userId")
+			.addParam("userId", currentUser.getUserId())
+			.list();
 	}
 
 	// ------------------------------

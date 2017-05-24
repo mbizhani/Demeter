@@ -88,7 +88,6 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 		super.onInitialize();
 
 		final WModalWindow window = new WModalWindow("window");
-		window.getOptions().setHeight(OSize.percent(80)).setWidth(OSize.percent(80));
 		add(window);
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
@@ -120,7 +119,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 
 		Form<FileStoreFVO> form = new Form<>("form", new CompoundPropertyModel<>(filter));
 		form.add(floatTable);
-		form.add(new DAjaxButton("search", new ResourceModel("label.search")) {
+		form.add(new DAjaxButton("search", new ResourceModel("label.search"), DemeterIcon.SEARCH) {
 			private static final long serialVersionUID = -1714821893L;
 
 			@Override
@@ -155,7 +154,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 
 		if (hasPermission(DemeterPrivilegeKey.FileStoreEdit)) {
 			columnList.add(new OEditAjaxColumn<FileStore>() {
-				private static final long serialVersionUID = 99372548L;
+				private static final long serialVersionUID = 1588198164L;
 
 				@Override
 				public void onClick(AjaxRequestTarget target, IModel<FileStore> rowData) {

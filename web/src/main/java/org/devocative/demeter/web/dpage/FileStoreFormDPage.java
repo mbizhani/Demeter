@@ -10,6 +10,7 @@ import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.web.DPage;
+import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.wickomp.form.WDateInput;
@@ -62,6 +63,7 @@ public class FileStoreFormDPage extends DPage {
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
+			.setRequired(true)
 			.setLabel(new ResourceModel("FileStore.name")));
 		floatTable.add(new WSelectionInput("status", EFileStatus.list(), false)
 			.setLabel(new ResourceModel("FileStore.status")));
@@ -75,7 +77,8 @@ public class FileStoreFormDPage extends DPage {
 
 		Form<FileStore> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);
-		form.add(new DAjaxButton("save", new ResourceModel("label.save")) {
+
+		form.add(new DAjaxButton("save", new ResourceModel("label.save"), DemeterIcon.SAVE) {
 			private static final long serialVersionUID = -1906861675L;
 
 			@Override
