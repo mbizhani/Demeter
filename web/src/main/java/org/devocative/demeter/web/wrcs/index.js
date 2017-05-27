@@ -1,5 +1,6 @@
 window.onload = setupFunc;
 var webSocketPingHandler;
+var sessionRenewConfirm = false;
 
 function setupFunc() {
 	console.log('Demeter SetupFunc');
@@ -37,9 +38,9 @@ function setupFunc() {
 			webSocketPingHandler = setInterval(pingWebSocket, WebSocketPingInterval);
 		}
 
-		if (sessionTO && sessionTO > 3000) {
-			// alert user 3 sec before session timeout
-			setInterval(onBeforeSessionTimeout, sessionTO - 3000);
+		if (sessionTO && sessionTO > 10000) {
+			// alert user 10 sec before session timeout
+			setInterval(onBeforeSessionTimeout, sessionTO - 10000);
 		}
 	} catch (e) {
 		console.log("Undefined init var: " + e);
@@ -59,9 +60,14 @@ function pingWebSocket() {
 }
 
 function onBeforeSessionTimeout() {
-	$.messager.confirm('', 'Session is to expired. Reconnect?', function (r) {
-		if (r) {
-			Wicket.Ajax.get({u: ajaxUrl});
-		}
-	});
+	if (sessionRenewConfirm == false) {
+		sessionRenewConfirm = true;
+
+		$.messager.confirm('', 'Session is to expired. Reconnect?', function (r) {
+			if (r) {
+				Wicket.Ajax.get({u: ajaxUrl});
+				sessionRenewConfirm = false;
+			}
+		});
+	}
 }
