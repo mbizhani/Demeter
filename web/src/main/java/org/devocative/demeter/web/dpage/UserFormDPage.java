@@ -28,7 +28,7 @@ public class UserFormDPage extends DPage {
 
 	private User entity;
 
-	private WTextInput password;
+	private WTextInput password, password2;
 
 	// ------------------------------
 
@@ -80,18 +80,40 @@ public class UserFormDPage extends DPage {
 			.setLabel(new ResourceModel("User.username")));
 
 		password = new WTextInput("password", new Model<String>(), true);
-		password.setRequired(entity.getId() == null);
-		password.setLabel(new ResourceModel("User.password"));
+		password
+			.setRequired(entity.getId() == null)
+			.setLabel(new ResourceModel("User.password"))
+			.setOutputMarkupId(true)
+			.setEnabled(EAuthMechanism.DATABASE.equals(entity.getAuthMechanism()));
 		floatTable.add(password);
-		WTextInput password2 = new WTextInput("password2", new Model<String>(), true);
-		password2.setRequired(entity.getId() == null);
-		password2.setLabel(new ResourceModel("User.password2"));
+		password2 = new WTextInput("password2", new Model<String>(), true);
+		password2
+			.setRequired(entity.getId() == null)
+			.setLabel(new ResourceModel("User.password2"))
+			.setOutputMarkupId(true)
+			.setEnabled(EAuthMechanism.DATABASE.equals(entity.getAuthMechanism()));
 		floatTable.add(password2);
 
 		floatTable.add(new WSelectionInput("authMechanism", EAuthMechanism.list(), false)
-			.setRequired(true)
-			.setLabel(new ResourceModel("User.authMechanism"))
-			.setEnabled(entity.getId() != null));
+				.addToChoices(new WSelectionInputAjaxUpdatingBehavior() {
+					private static final long serialVersionUID = -1053874895135070466L;
+
+					@Override
+					protected void onUpdate(AjaxRequestTarget target) {
+						EAuthMechanism authMechanism = (EAuthMechanism) getComponent().getDefaultModelObject();
+						boolean isEnabled = EAuthMechanism.DATABASE.equals(authMechanism);
+
+						if (isEnabled != password.isEnabled()) {
+							password.setEnabled(isEnabled);
+							password2.setEnabled(isEnabled);
+
+							target.add(password, password2);
+						}
+					}
+				})
+				.setRequired(true)
+				.setLabel(new ResourceModel("User.authMechanism"))
+		);
 		floatTable.add(new WSelectionInput("status", EUserStatus.list(), false)
 			.setRequired(true)
 			.setLabel(new ResourceModel("User.status")));
