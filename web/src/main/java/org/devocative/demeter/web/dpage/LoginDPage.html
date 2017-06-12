@@ -4,20 +4,20 @@
 	<form wicket:id="form">
 		<table class="dmt-box">
 			<tr>
-				<td>
+				<td style="font-weight:bold">
 					<wicket:message key="User.username"/>
 				</td>
 				<!-- TODO using another way instead of w-input for styling -->
 				<td><input class="w-input" type="text" wicket:id="username" style="direction:ltr"/></td>
 			</tr>
 			<tr>
-				<td>
+				<td style="font-weight:bold">
 					<wicket:message key="User.password"/>
 				</td>
 				<td><input class="w-input" type="password" wicket:id="password" style="direction:ltr"/></td>
 			</tr>
 			<tr>
-				<td colspan="2">
+				<td align="center" colspan="2">
 					<button type="submit" wicket:id="signIn">
 						<wicket:message key="User.sign.in"/>
 						<i class="fa fa-sign-in"></i>

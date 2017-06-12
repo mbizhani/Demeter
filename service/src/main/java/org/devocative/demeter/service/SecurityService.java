@@ -105,7 +105,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		return ApplicationLifecyclePriority.Second;
 	}
 
-	// -------------------------- IRequestLifecycle implementation
+	// --------------- IRequestLifecycle implementation
 
 	@Override
 	public void beforeRequest() {
@@ -116,7 +116,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		CURRENT_USER.remove();
 	}
 
-	// ------------------------------
+	// ---------------
 
 	@Override
 	public UserVO getCurrentUser() {
@@ -135,42 +135,50 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void authenticate(String username, String password) {
-		UserVO authenticatedUserVO;
+		UserVO authenticatedUserVO = null;
 		User user = userService.loadByUsername(username);
 
 		if (user != null) {
-			logger.info("Authenticate: user in DB, status=[{}] auth=[{}]", user.getStatus(), user.getAuthMechanism());
+			logger.info("Authenticating: username[{}] in DB, status=[{}], auth=[{}]",
+				username, user.getStatus(), user.getAuthMechanism());
+
 			verifyUser(user);
 
 			if (EAuthMechanism.DATABASE.equals(user.getAuthMechanism())) {
 				authenticatedUserVO = authenticateByDatabase(user, password);
 			} else if (EAuthMechanism.LDAP.equals(user.getAuthMechanism())) {
-				authenticatedUserVO = authenticateByLDAP(username, password);
+				authenticatedUserVO = authenticateByLDAP(username, password, user);
 			} else if (EAuthMechanism.OTHER.equals(user.getAuthMechanism())) {
 				if (otherAuthenticationService != null) {
-					authenticatedUserVO = authenticateByOther(username, password);
+					authenticatedUserVO = authenticateByOther(username, password, user);
 				} else {
 					throw new DSystemException("No IOtherAuthenticationService bean defined: user = " + username);
 				}
 			} else {
-				throw new DSystemException("Unknown authenticate mechanism: user = " + username);
+				throw new DSystemException(String.format("Unknown authenticate mechanism: username=[%s] authMethod=[%s]",
+					username, user.getAuthMechanism()));
 			}
 		} else {
-			String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
-			logger.info("Authenticate: user not in DB, default auth mode = {}", mode);
+			Boolean autoRegister = ConfigUtil.getBoolean(DemeterConfigKey.UserAutoRegister);
+			logger.info("Authenticating: username[{}] not in DB, autoRegister=[{}]", username, autoRegister);
 
-			if ("database".equalsIgnoreCase(mode)) {
-				throw new DemeterException(DemeterErrorCode.InvalidUser);
-			} else if ("ldap".equalsIgnoreCase(mode)) {
-				authenticatedUserVO = authenticateByLDAP(username, password);
-			} else if ("other".equalsIgnoreCase(mode)) {
-				if (otherAuthenticationService != null) {
-					authenticatedUserVO = authenticateByOther(username, password);
-				} else {
-					throw new DSystemException("No IOtherAuthenticationService bean defined, but mode is 'other'!");
+			if (autoRegister) {
+				List<String> allowedAuthModes = ConfigUtil.getList(DemeterConfigKey.AuthenticationMode);
+				logger.info("Authenticating & AutoRegister: username[{}], authModes={}", username, allowedAuthModes);
+
+				if (allowedAuthModes.contains("ldap")) {
+					authenticatedUserVO = authenticateByLDAP(username, password, null);
+				}
+
+				if (authenticatedUserVO == null && allowedAuthModes.contains("other") && otherAuthenticationService != null) {
+					authenticatedUserVO = authenticateByOther(username, password, null);
+				}
+
+				if (authenticatedUserVO == null) {
+					throw new DemeterException(DemeterErrorCode.InvalidUser);
 				}
 			} else {
-				throw new DSystemException("Unknown authenticate mode: " + mode);
+				throw new DemeterException(DemeterErrorCode.InvalidUser);
 			}
 		}
 
@@ -179,9 +187,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void authenticateByUrlParams(Map<String, List<String>> params) {
-		String mode = ConfigUtil.getString(DemeterConfigKey.AuthenticationMode);
+		List<String> allowedAuthModes = ConfigUtil.getList(DemeterConfigKey.AuthenticationMode);
 
-		if ("other".equalsIgnoreCase(mode) && otherAuthenticationService != null) {
+		if (allowedAuthModes.contains("other") && otherAuthenticationService != null) {
 			UserVO authUserVO = otherAuthenticationService.authenticate(params);
 
 			if (authUserVO != null) {
@@ -221,7 +229,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO getSystemUser() {
-		if(system == null) {
+		if (system == null) {
 			throw new RuntimeException("Can't find UserVO of 'system' ");
 		}
 		return system;
@@ -229,7 +237,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO getGuestUser() {
-		if(guest == null) {
+		if (guest == null) {
 			throw new RuntimeException("Can't find UserVO of 'guest' ");
 		}
 		return guest;
@@ -288,6 +296,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		}
 	}
 
+	// ---------------
 
 	private UserVO authenticateByDatabase(User user, String password) {
 		if (password != null) {
@@ -302,8 +311,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		}
 	}
 
-	private UserVO authenticateByLDAP(String username, String password) {
-		logger.info("Authenticate: Start authenticateByLDAP user = [{}]", username);
+	private UserVO authenticateByLDAP(String username, String password, User eqUserInDB) {
+		logger.info("Authenticating: by LDAP username = [{}]", username);
 
 		String dnTemplate = ConfigUtil.getString(DemeterConfigKey.LdapDnTemplate);
 		String dn = String.format(dnTemplate, username);
@@ -333,28 +342,42 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 				lastName = getValue(attrs.get(lastNameAttr));
 			}
 
-			return userService.createOrUpdateUser(new UserInputVO(username, password, firstName, lastName, EAuthMechanism.LDAP));
+			if (eqUserInDB == null) {
+				logger.info("Create user authenticated by LDAP: username=[{}]", username);
+				return userService.createOrUpdateUser(new UserInputVO(username, null, firstName, lastName, EAuthMechanism.LDAP));
+			} else {
+				return userService.getUserVO(eqUserInDB);
+			}
 		} catch (AuthenticationException e) {
-			logger.warn("authenticateByLDAP failed for user: {}", username);
+			logger.warn("Authentication By LDAP failed for user: {}", username);
 			throw new DemeterException(DemeterErrorCode.InvalidUser, username);
 		} catch (NamingException e) {
-			logger.error("AUTHENTICATE BY LDAP ERROR: ", e);
+			logger.error("Authentication by LDAP error: ", e);
 			throw new DSystemException("LDAP Server Problem: ", e);
 		}
 	}
 
-	private UserVO authenticateByOther(String username, String password) {
+	private UserVO authenticateByOther(String username, String password, User eqUserInDB) {
 		Map<String, List<String>> params = new HashMap<>();
 		params.put(USERNAME_KEY, Collections.singletonList(username));
 		params.put(PASSWORD_KEY, Collections.singletonList(password));
 		UserVO userVO = otherAuthenticationService.authenticate(params);
+
 		if (userVO == null) {
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}
-		return userService.createOrUpdateUser(new UserInputVO(username, password, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER));
+
+		if (eqUserInDB == null) {
+			logger.info("Create user authenticated by Other: username=[{}]", username);
+			return userService.createOrUpdateUser(new UserInputVO(username, null, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER));
+		} else {
+			return userService.getUserVO(eqUserInDB);
+		}
 	}
 
 	private void afterAuthentication(UserVO authenticatedUserVO) {
+		userService.updateLastLoginDate(authenticatedUserVO.getUsername());
+
 		authenticatedUserVO.setAuthenticated(true);
 
 		authenticatedUserVO.addRole(roleService.loadByName("User"));

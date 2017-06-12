@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service("dmtUserService")
@@ -203,8 +204,20 @@ public class UserService implements IUserService {
 			}
 		}
 
-		logger.info("UserVO: permissions={}, denials={}", userVO.getPermissions(), userVO.getDenials());
+		logger.info("UserVO: username=[{}] permissions=[{}], denials=[{}]",
+			userVO.getUsername(), userVO.getPermissions(), userVO.getDenials());
 
 		return userVO;
+	}
+
+	@Override
+	public void updateLastLoginDate(String username) {
+		persistorService.createQueryBuilder()
+			.addSelect("update User ent set ent.lastLoginDate = :lld where ent.username = :username")
+			.addParam("lld", new Date())
+			.addParam("username", username)
+			.update();
+
+		persistorService.commitOrRollback();
 	}
 }

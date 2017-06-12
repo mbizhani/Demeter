@@ -37,4 +37,6 @@ public interface IUserService {
 	UserVO loadVOByUsername(String username);
 
 	UserVO getUserVO(User user);
+
+	void updateLastLoginDate(String username);
 }

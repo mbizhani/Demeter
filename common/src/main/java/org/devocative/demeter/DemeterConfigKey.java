@@ -3,6 +3,7 @@ package org.devocative.demeter;
 import org.devocative.adroit.IConfigKey;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public enum DemeterConfigKey implements IConfigKey {
@@ -15,8 +16,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	SecurityKeyStoreToken("dmt.security.ks.token", "DEMETER_TOKEN"),
 	SecurityKeyStoreParam("dmt.security.ks.param", "DEMETER_PARAM"),
 	SecurityKeyStoreEntry("dmt.security.ks.entry", "Demeter"),
-	AuthenticationMode("dmt.security.auth.mode", "database", Arrays.asList("database", "ldap", "other")),
+	AuthenticationMode("dmt.security.auth.mode", (Object) Collections.emptyList()),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
+	UserAutoRegister("dmt.security.register.auto", true, Arrays.asList(true, false)),
 
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
@@ -41,8 +43,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	UserDefaultSessionTimeout("dmt.user.def.session.timeout", 60),
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", "Jalali", Arrays.asList("Jalali", "Gregorian")),
-	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR")),
-	;
+	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR"));
 
 
 	private String key;
