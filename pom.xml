@@ -50,20 +50,20 @@
 	</scm>
 
 	<properties>
-		<lang.level>1.7</lang.level>
+		<lang.level>1.8</lang.level>
 		<jetty.port>8080</jetty.port>
 		<jetty.context>/ctx</jetty.context>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<d.adroit.ver>1.2</d.adroit.ver>
-		<d.wickomp.ver>1.2-SNAPSHOT</d.wickomp.ver>
+		<d.wickomp.ver>2.0</d.wickomp.ver>
 
-		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
-		<d.spring.ver>4.3.3.RELEASE</d.spring.ver>
+		<d.hibernate.ver>5.2.10.Final</d.hibernate.ver>
+		<d.spring.ver>4.3.9.RELEASE</d.spring.ver>
 
-		<d.slf4j.ver>1.7.21</d.slf4j.ver>
+		<d.slf4j.ver>1.7.25</d.slf4j.ver>
 		<d.servlet.ver>3.1.0</d.servlet.ver>
-		<d.wicket.ver>7.4.0</d.wicket.ver>
+		<d.wicket.ver>7.7.0</d.wicket.ver>
 
 		<p.jetty.ver>9.2.15.v20160210</p.jetty.ver>
 		<p.compiler.ver>3.5.1</p.compiler.ver>
@@ -96,7 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>

@@ -1,6 +1,7 @@
 package org.devocative.demeter.service;
 
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.obuilder.MapBuilder;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -8,10 +9,14 @@ import org.devocative.demeter.iservice.persistor.ELockMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.SessionFactoryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.Work;
+import org.hibernate.query.Query;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 
 public class HibernatePersistorService implements IPersistorService {
@@ -33,8 +38,8 @@ public class HibernatePersistorService implements IPersistorService {
 	private List<Class> entities;
 	private String prefix;
 
-	private Configuration config;
 	private SessionFactory sessionFactory;
+	private Metadata metaData;
 
 	@Autowired
 	private ISecurityService securityService;
@@ -43,42 +48,40 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void init() {
-		config = new Configuration();
-		for (Class entity : entities) {
-			config.addAnnotatedClass(entity);
+		String username = ConfigUtil.getString(true, getConfig("db.username"));
+
+		MapBuilder<String, Object> settingsBuilder = new MapBuilder<String, Object>(new HashMap<>())
+			.put("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
+			.put("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
+			.put("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
+			.put("hibernate.connection.username", username)
+			.put("hibernate.connection.password", ConfigUtil.getString(getConfig("db.password"), ""))
+			.put("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
+
+		String schema = ConfigUtil.getString(false, getConfig("db.schema"));
+		if (schema != null) {
+			settingsBuilder.put("hibernate.default_schema", schema);
 		}
+
+		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistry serviceRegistry = serviceRegistryBuilder
+			.applySettings(settingsBuilder.get())
+			.configure("hibernate.cfg.xml")
+			.build();
+		MetadataSources metadataSources = new MetadataSources(serviceRegistry);
+		entities.forEach(metadataSources::addAnnotatedClass);
+		metaData = metadataSources.buildMetadata();
+		SessionFactoryBuilder sessionFactoryBuilder = metaData.getSessionFactoryBuilder();
 
 		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
 		if ("CreateModify".equals(interceptor)) {
-			config.setInterceptor(new MainInterceptor());
+			sessionFactoryBuilder.applyInterceptor(new MainInterceptor());
 		} else {
 			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
 		}
 
-		String username = ConfigUtil.getString(true, getConfig("db.username"));
+		sessionFactory = sessionFactoryBuilder.build();
 
-		config.configure("hibernate.cfg.xml")
-			.setProperty("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
-			.setProperty("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
-			.setProperty("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
-			.setProperty("hibernate.connection.username", username)
-			.setProperty("hibernate.connection.password", ConfigUtil.getString(getConfig("db.password"), ""))
-			.setProperty("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
-
-		String schema = ConfigUtil.getString(false, getConfig("db.schema"));
-		if (schema != null) {
-			config.setProperty("hibernate.default_schema", schema);
-		}
-
-		/*Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.apply.ddl"), false);
-		if (applyDDL) {
-			config.setProperty("hibernate.hbm2ddl.auto", "update");
-		}*/
-
-		// In Hibernate 4.3:
-		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
-		serviceRegistryBuilder.applySettings(config.getProperties());
-		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
 		logger.info("HibernatePersistorService init()");
 
 		String scriptFile = ConfigUtil.getString(getConfig("db.script"), null);
@@ -197,7 +200,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public <T> T get(Class<T> entity, Serializable id) {
-		return (T) getCurrentSession().get(entity, id);
+		return getCurrentSession().get(entity, id);
 	}
 
 	@Override
@@ -211,7 +214,7 @@ public class HibernatePersistorService implements IPersistorService {
 				lockOptions = LockOptions.UPGRADE;
 				break;
 		}
-		return (T) getCurrentSession().load(entity, id, lockOptions);
+		return getCurrentSession().load(entity, id, lockOptions);
 	}
 
 	@Override
@@ -239,8 +242,8 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public <T> List<T> list(String simpleQuery) {
 		Session session = getCurrentSession();
-		Query query = session.createQuery(simpleQuery);
-		return (List<T>) query.list();
+		Query<T> query = session.createQuery(simpleQuery);
+		return query.list();
 	}
 
 	@Override
@@ -267,27 +270,24 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void generateSchemaDiff() {
-		SchemaUpdate schemaUpdate = new SchemaUpdate(config);
+		SchemaUpdate schemaUpdate = new SchemaUpdate();
 		schemaUpdate.setDelimiter(";");
 		schemaUpdate.setFormat(true);
-		schemaUpdate.execute(true, false);
+		schemaUpdate.execute(EnumSet.of(TargetType.STDOUT), metaData);
 	}
 
 	@Override
 	public void executeScript(final String script, final String delimiter) {
 		Session session = getSession();
-		session.doWork(new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				String[] statements = script.split(delimiter);
-				for (String statement : statements) {
-					statement = statement.trim();
-					if (!statement.isEmpty()) {
-						logger.info("Execute: {}", statement);
-						Statement st = connection.createStatement();
-						st.execute(statement);
-						st.close();
-					}
+		session.doWork(connection -> {
+			String[] statements = script.split(delimiter);
+			for (String statement : statements) {
+				statement = statement.trim();
+				if (!statement.isEmpty()) {
+					logger.info("Execute: {}", statement);
+					Statement st = connection.createStatement();
+					st.execute(statement);
+					st.close();
 				}
 			}
 		});
@@ -303,7 +303,7 @@ public class HibernatePersistorService implements IPersistorService {
 			currentSession.set(session);
 		} else {
 			try {
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
 			} catch (HibernateException e) {
 				logger.warn("Check current session error", e);
 				currentSession.remove();
@@ -327,7 +327,7 @@ public class HibernatePersistorService implements IPersistorService {
 		while (true) {
 			try {
 				Session session = sessionFactory.openSession();
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
 				return session;
 			} catch (HibernateException e) {
 				logger.error("Problem getting new session", e);
