@@ -4,6 +4,8 @@ import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface IPersistorService extends IApplicationLifecycle, IRequestLifecycle {
@@ -44,4 +46,6 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 	void generateSchemaDiff();
 
 	void executeScript(String script, String delimiter);
+
+	Connection createSqlConnection() throws SQLException;
 }

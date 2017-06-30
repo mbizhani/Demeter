@@ -58,7 +58,7 @@
 		<d.adroit.ver>1.2</d.adroit.ver>
 		<d.wickomp.ver>2.0</d.wickomp.ver>
 
-		<d.hibernate.ver>5.2.10.Final</d.hibernate.ver>
+		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
 		<d.spring.ver>4.3.9.RELEASE</d.spring.ver>
 
 		<d.slf4j.ver>1.7.25</d.slf4j.ver>

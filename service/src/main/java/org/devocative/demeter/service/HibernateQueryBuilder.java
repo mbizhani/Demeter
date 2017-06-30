@@ -8,8 +8,8 @@ import org.devocative.demeter.iservice.persistor.FilterOption;
 import org.devocative.demeter.iservice.persistor.Filterer;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,7 +322,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		if (query == null) {
 			Session session = persistorService.getCurrentSession();
 			query = sqlMode ?
-				session.createNativeQuery(buildQueryString(true)) :
+				session.createSQLQuery(buildQueryString(true)) :
 				session.createQuery(buildQueryString(true));
 		}
 
