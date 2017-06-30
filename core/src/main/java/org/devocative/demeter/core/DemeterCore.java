@@ -49,8 +49,14 @@ public class DemeterCore {
 		beanFactory.autowireBean(bean);
 	}
 
-	public synchronized static void init() {
+	public static void init() {
+		init(getDefaultConfig());
+	}
+
+	public synchronized static void init(InputStream configInputStream) {
 		if (!inited) {
+			ConfigUtil.load(configInputStream);
+
 			initEncDec();
 			initModules();
 			initSpringContext();
@@ -75,6 +81,12 @@ public class DemeterCore {
 	}
 
 	public static void generatePersistorSchemaDiff() {
+		generatePersistorSchemaDiff(getDefaultConfig());
+	}
+
+	public static void generatePersistorSchemaDiff(InputStream configInputStream) {
+		ConfigUtil.load(configInputStream);
+
 		initEncDec();
 		initModules();
 		initSpringContext();
@@ -93,6 +105,10 @@ public class DemeterCore {
 	}
 
 	public static void applySQLSchemas(String... filters) {
+		applySQLSchemas(getDefaultConfig(), filters);
+	}
+
+	public static void applySQLSchemas(InputStream configInputStream, String... filters) {
 		initEncDec();
 		initModules();
 
@@ -134,7 +150,7 @@ public class DemeterCore {
 		}
 	}
 
-	// ---------------
+	// ------------------------------
 
 	private static void initModules() {
 		XStream xStream = new XStream();
@@ -306,5 +322,9 @@ public class DemeterCore {
 		} catch (Exception e) {
 			logger.error(String.format("Loading module [%s] config keys", xModule.getShortName()), e);
 		}
+	}
+
+	private static InputStream getDefaultConfig() {
+		return DemeterCore.class.getResourceAsStream("/config.properties");
 	}
 }
