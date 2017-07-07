@@ -149,7 +149,7 @@
 				<configuration>
 					<outputDirectory>src/test/webapp</outputDirectory>
 					<resourceBundles>
-						<resourceBundle>org.devocative:diadem:1.0</resourceBundle>
+						<resourceBundle>org.devocative:diadem:${d.diadem.ver}</resourceBundle>
 					</resourceBundles>
 				</configuration>
 				<executions>
