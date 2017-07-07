@@ -9,7 +9,7 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 	private static final long serialVersionUID = 473223768980930103L;
 
 	@Override
-	public String handleMessage(Component component, Exception e) {
+	public String handleMessage(Component component, Throwable e) {
 		if (e instanceof DModuleException) {
 			DModuleException de = (DModuleException) e;
 			String error = getMessage(component, de.getMessage(), de.getDefaultDescription());

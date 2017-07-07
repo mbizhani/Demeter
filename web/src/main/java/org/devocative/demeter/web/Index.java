@@ -32,6 +32,7 @@ import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.dpage.LoginDPage;
 import org.devocative.demeter.web.panel.EditProfilePanel;
+import org.devocative.wickomp.WDefaults;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.async.AsyncBehavior;
 import org.devocative.wickomp.html.menu.OMenuItem;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +91,7 @@ public class Index extends WebPage {
 
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
 		html.add(new AttributeModifier("dir", DemeterWebSession.get().getLayoutDirection().toString()));
+		html.add(new AttributeModifier("class", String.format("dmt-%s", DemeterWebSession.get().getLayoutDirection().toString())));
 		add(html);
 
 		window = new WModalWindow("window");
@@ -269,6 +272,9 @@ public class Index extends WebPage {
 		} catch (ClassNotFoundException e) {
 			logger.error("DPage class not found", e);
 			content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
+		} catch (InvocationTargetException e) {
+			logger.error("DPage call problem", e.getTargetException());
+			content = new Label("content", WDefaults.getExceptionToMessageHandler().handleMessage(this, e.getTargetException()));
 		} catch (Exception e) {
 			logger.error("DPage instantiation problem", e);
 			content = new Label("content", new ResourceModel("err.dmt.DPageInstantiation"));
