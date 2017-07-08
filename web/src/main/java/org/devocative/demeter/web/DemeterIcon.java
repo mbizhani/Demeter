@@ -26,4 +26,6 @@ public class DemeterIcon {
 	public static final IconFont SHOW = new FontAwesome("eye", new ResourceModel("label.show", "Show"));
 
 	public static final IconFont UPLOAD = new FontAwesome("upload", new ResourceModel("label.upload", "Upload"));
+
+	public static final IconFont EXPORT_IMPORT = new FontAwesome("exchange", new ResourceModel("label.exchange", "Export/Import"));
 }
