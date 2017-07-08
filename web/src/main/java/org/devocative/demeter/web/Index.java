@@ -5,6 +5,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -139,10 +140,18 @@ public class Index extends WebPage {
 		html.add(new Label("headerTitle", headerTitle));
 		html.add(content);
 
+		boolean printable = !pageParameters.get(DemeterWebParam.PRINTABLE).isNull();
+
 		WebMarkupContainer header = new WebMarkupContainer("header");
 		header.add(new WMenuBar("menu", oMenuItems));
-		header.setVisible(pageParameters.get(DemeterWebParam.PRINTABLE).isNull());
+		header.setVisible(!printable);
 		html.add(header);
+
+		if (printable) {
+			html.add(new AttributeAppender("class", " dmt-no-header"));
+		} else {
+			html.add(new AttributeAppender("class", " dmt-has-header"));
+		}
 
 		// ---------------------- User Menu: FullName, Sign In & Out
 
