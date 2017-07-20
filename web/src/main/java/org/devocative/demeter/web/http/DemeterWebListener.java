@@ -20,6 +20,8 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 	private Map<String, IRequestLifecycle> requestLifecycleBeans;
 
+	// ------------------------------
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		logger.info("##========================");
@@ -42,6 +44,8 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 		DemeterCore.shutdown();
 		logger.info("##========================");
 	}
+
+	// ---------------
 
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {

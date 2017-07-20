@@ -138,6 +138,9 @@
 					<httpConnector>
 						<port>${jetty.port}</port>
 					</httpConnector>
+
+					<stopKey>Demeter</stopKey>
+					<stopPort>${jetty.port.stop}</stopPort>
 				</configuration>
 			</plugin>
 

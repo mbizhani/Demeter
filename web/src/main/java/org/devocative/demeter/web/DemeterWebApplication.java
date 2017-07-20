@@ -78,6 +78,11 @@ public class DemeterWebApplication extends WebApplication {
 		return new DemeterWebSession(request);
 	}
 
+	@Override
+	protected void onDestroy() {
+		AsyncMediator.shutdown();
+	}
+
 	// ------------------------------
 
 	public String getInnerContext() {

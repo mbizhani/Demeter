@@ -52,6 +52,7 @@
 	<properties>
 		<lang.level>1.8</lang.level>
 		<jetty.port>8080</jetty.port>
+		<jetty.port.stop>9090</jetty.port.stop>
 		<jetty.context>/ctx</jetty.context>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
