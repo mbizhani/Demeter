@@ -21,6 +21,7 @@ public class EMimeType implements Serializable {
 	// Text
 	public static final EMimeType TEXT = new EMimeType(30, "Text", "text/plain");
 	public static final EMimeType HTML = new EMimeType(31, "HTML", "text/html");
+	public static final EMimeType XML = new EMimeType(32, "XML", "text/xml");
 	// IMAGE
 	public static final EMimeType IMAGE = new EMimeType(50, "Image", "image");
 	public static final EMimeType IMAGE_PNG = new EMimeType(51, "PNG Image", "image/png");
