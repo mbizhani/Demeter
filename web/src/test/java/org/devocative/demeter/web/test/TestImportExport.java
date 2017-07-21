@@ -1,5 +1,7 @@
 package org.devocative.demeter.web.test;
 
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.sql.NamedParameterStatement;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.ei.ExportImportHelper;
 import org.devocative.demeter.ei.Importer;
@@ -11,12 +13,9 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestImportExport {
 	private static final Logger logger = LoggerFactory.getLogger(TestImportExport.class);
@@ -41,9 +40,113 @@ commit;
 	public static void main(String[] args) throws FileNotFoundException, SQLException {
 		TestImportExport tie = new TestImportExport();
 
-//		tie.s01CheckExport();
-		tie.s02CheckImport();
+		//tie.s01CheckExport();
+		//tie.s02CheckImport();
+
+		tie.validateExpImp();
 	}
+
+	private void validateExpImp() throws SQLException {
+		Connection master = createConnection("/config_OraDbExp.properties");
+		Connection slave = createConnection("/config_OraDbImp.properties");
+
+		String q =
+			"select " +
+				"  ds.id, " +
+				"  ds.c_name, " +
+				"  ds.c_title, " +
+				"  ds.n_version, " +
+				"  ds.c_title_field, " +
+				"  ds.c_key_field, " +
+				"  ds.c_self_rel_pointer_field, " +
+				"  ds.f_config, " +
+				"  cfg.c_value " +
+				"from t_mts_data_src ds " +
+				"join t_mts_cfg_lob cfg on cfg.id = ds.f_config";
+
+		Map<Object, Map<String, Object>> mast = create(master, q, "id");
+
+		Map<Object, Map<String, Object>> sl = create(slave, q, "id");
+
+		for (Map.Entry<Object, Map<String, Object>> entry : mast.entrySet()) {
+			Map<String, Object> m = entry.getValue();
+			Map<String, Object> s = sl.get(entry.getKey());
+
+			if (s == null) {
+				System.out.println("ERROR");
+			} else {
+				if (!m.get("c_value").equals(s.get("c_value"))) {
+					System.out.println("ERROR: " + entry.getKey());
+					System.out.println("MASTER: \n" + m.get("c_value"));
+					System.out.println("SLAVE: \n" + s.get("c_value"));
+					System.out.println("++++++++++++++++++++++++++++++++++++++++++");
+				}
+			}
+		}
+
+		master.close();
+		slave.close();
+	}
+
+	private Connection createConnection(String file) {
+		ConfigUtil.load(TestImportExport.class.getResourceAsStream(file));
+
+		try {
+			Class.forName(ConfigUtil.getString(true, "dmt.db.driver"));
+
+			return DriverManager.getConnection(
+				ConfigUtil.getString(true, "dmt.db.url"),
+				ConfigUtil.getString(true, "dmt.db.username"),
+				ConfigUtil.getString(true, "dmt.db.password"));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Map<Object, Map<String, Object>> create(Connection conn, String sql, String id) throws SQLException {
+		NamedParameterStatement nps = new NamedParameterStatement(conn, sql);
+
+		ResultSet rs = nps.executeQuery();
+		ResultSetMetaData metaData = rs.getMetaData();
+
+		Map<Object, Map<String, Object>> rows = new LinkedHashMap<>();
+		while (rs.next()) {
+			Map<String, Object> row = new LinkedHashMap<>();
+
+			for (int i = 1; i <= metaData.getColumnCount(); i++) {
+				String column = metaData.getColumnName(i).toLowerCase();
+				Object value = findCellValue(rs, column, metaData.getColumnType(i));
+				row.put(column, value);
+			}
+
+			rows.put(row.get(id), row);
+		}
+
+		return rows;
+	}
+
+	private Object findCellValue(ResultSet rs, String column, int type) throws SQLException {
+		Object value;
+		switch (type) {
+			case Types.DATE:
+				value = rs.getDate(column);
+				break;
+			case Types.TIME:
+				value = rs.getTime(column);
+				break;
+			case Types.TIMESTAMP:
+				value = rs.getTimestamp(column);
+				break;
+			case Types.CLOB:
+				value = rs.getString(column);
+				break;
+			default:
+				value = rs.getObject(column);
+		}
+
+		return value;
+	}
+	// ------------------------------
 
 	public void s01CheckExport() throws SQLException, FileNotFoundException {
 		DemeterCore.init(TestImportExport.class.getResourceAsStream("/config_OraDbExp.properties"));
@@ -176,7 +279,7 @@ commit;
 		DemeterCore.shutdown();
 	}
 
-	// ------------------------------
+	// ---------------
 
 	private void dbConn(ExportImportHelper helper) throws SQLException {
 		Map<Object, Object> currentDbConnGrp = helper.selectAsMap("select id, n_version from t_mts_db_conn_grp");

@@ -57,8 +57,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<d.adroit.ver>1.2</d.adroit.ver>
-		<d.wickomp.ver>2.1-SNAPSHOT</d.wickomp.ver>
-		<d.diadem.ver>1.1-SNAPSHOT</d.diadem.ver>
+		<d.wickomp.ver>2.1</d.wickomp.ver>
+		<d.diadem.ver>1.1</d.diadem.ver>
 
 		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
 		<d.spring.ver>4.3.9.RELEASE</d.spring.ver>
