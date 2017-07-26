@@ -95,8 +95,19 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void shutdown() {
-		endSession();
-		sessionFactory.close();
+		try {
+			endSession();
+		} catch (Exception e) {
+			logger.error("HibernatePersistorService.shutdown(): endSession", e);
+		}
+
+		try {
+			sessionFactory.close();
+		} catch (HibernateException e) {
+			logger.error("HibernatePersistorService.shutdown(): sessionFactory.close()", e);
+		}
+
+		currentSession.remove();
 	}
 
 	@Override

@@ -3,10 +3,7 @@ package org.devocative.demeter.service;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.StringEncryptorUtil;
-import org.devocative.demeter.DSystemException;
-import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.DemeterErrorCode;
-import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.*;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.*;
@@ -98,6 +95,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void shutdown() {
+		CURRENT_USER.remove();
 	}
 
 	@Override
@@ -128,6 +126,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		//TODO some checking, and maybe reloading the user's data
 		if (userVO != null) {
 			CURRENT_USER.set(userVO);
+			DLogCtx.put("user", userVO.getUsername());
 		} else {
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}

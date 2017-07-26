@@ -75,6 +75,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>net.logstash.log4j</groupId>
+			<artifactId>jsonevent-layout</artifactId>
+			<version>1.7</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
