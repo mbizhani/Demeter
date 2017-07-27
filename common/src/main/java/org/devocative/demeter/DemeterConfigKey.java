@@ -43,7 +43,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	UserDefaultSessionTimeout("dmt.user.def.session.timeout", 60),
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", "Jalali", Arrays.asList("Jalali", "Gregorian")),
-	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR"));
+	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR")),
+
+	LogMDCEnabled("dmt.log.mdc.enabled", true, Arrays.asList(true, false));
 
 
 	private String key;

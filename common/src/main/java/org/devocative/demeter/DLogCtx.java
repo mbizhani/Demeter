@@ -1,6 +1,7 @@
 package org.devocative.demeter;
 
 import org.apache.log4j.MDC;
+import org.devocative.adroit.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,8 @@ public final class DLogCtx {
 	// ------------------------------
 
 	public static DLogCtx put(String key, Object val) {
-		if (key != null && val != null) {
+		Boolean enabled = ConfigUtil.getBoolean(DemeterConfigKey.LogMDCEnabled);
+		if (enabled && key != null && val != null) {
 			try {
 				MDC.put(key, val);
 			} catch (Exception e) {
@@ -27,7 +29,8 @@ public final class DLogCtx {
 	}
 
 	public static DLogCtx putAsList(String key, Object... val) {
-		if (key != null && val != null && val.length > 0) {
+		Boolean enabled = ConfigUtil.getBoolean(DemeterConfigKey.LogMDCEnabled);
+		if (enabled && key != null && val != null && val.length > 0) {
 			List<Object> list = (List<Object>) MDC.get(key);
 			if (list == null) {
 				list = new ArrayList<>();
@@ -40,10 +43,13 @@ public final class DLogCtx {
 	}
 
 	public static DLogCtx remove(String key) {
-		try {
-			MDC.remove(key);
-		} catch (Exception e) {
-			logger.error("DLogCtx.remove: key=[{}]", key, e);
+		Boolean enabled = ConfigUtil.getBoolean(DemeterConfigKey.LogMDCEnabled);
+		if (enabled) {
+			try {
+				MDC.remove(key);
+			} catch (Exception e) {
+				logger.error("DLogCtx.remove: key=[{}]", key, e);
+			}
 		}
 		return INST;
 	}
