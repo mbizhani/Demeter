@@ -1,38 +1,74 @@
 package org.devocative.demeter.web;
 
+import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
+import org.apache.wicket.util.string.StringValue;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
+import java.util.Set;
 
 public class UrlUtil {
 	private static IDPageInstanceService pageInstanceService;
 
-	public static void redirectTo(Class<? extends DPage> dPageClass, List<String> restParams) {
+	// ------------------------------
+
+	public static void redirectTo(Class<? extends DPage> dPageClass, List<String> restParams, IRequestParameters requestParameters) {
 		String[] restParamsArr = null;
-		if (restParams != null && restParams.size() > 0) {
+		if (restParams != null && !restParams.isEmpty()) {
 			restParamsArr = restParams.toArray(new String[restParams.size()]);
 		}
-		redirectTo(dPageClass, restParamsArr);
+		redirectTo(dPageClass, requestParameters, restParamsArr);
+	}
+
+	public static void redirectTo(Class<? extends DPage> dPageClass, String... restParams) {
+		redirectTo(dPageClass, null, restParams);
 	}
 
 	// Main Method
-	public static void redirectTo(Class<? extends DPage> dPageClass, String... restParams) {
-		String uri = createUri(dPageClass, false);
+	public static void redirectTo(Class<? extends DPage> dPageClass, IRequestParameters requestParameters, String... restParams) {
+		StringBuilder uri = new StringBuilder(createUri(dPageClass, false));
+
 		if (restParams != null) {
 			for (String param : restParams) {
 				if (param.startsWith("/")) {
-					uri += param;
+					uri.append(param);
 				} else {
-					uri += "/" + param;
+					uri.append("/").append(param);
 				}
 			}
 		}
-		RequestCycle.get().scheduleRequestHandlerAfterCurrent(new RedirectRequestHandler(uri));
+
+		if (requestParameters != null && !requestParameters.getParameterNames().isEmpty()) {
+			uri.append("?");
+			Set<String> parameterNames = requestParameters.getParameterNames();
+			for (String parameterName : parameterNames) {
+				List<StringValue> parameterValues = requestParameters.getParameterValues(parameterName);
+				parameterValues.stream()
+					.filter(parameterValue -> !parameterValue.isEmpty())
+					.forEach(parameterValue -> {
+							try {
+								uri.append("&")
+									.append(URLEncoder.encode(parameterName, "UTF-8"))
+									.append("=")
+									.append(URLEncoder.encode(parameterValue.toString(), "UTF-8"));
+							} catch (UnsupportedEncodingException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					);
+			}
+		}
+
+		RequestCycle.get().scheduleRequestHandlerAfterCurrent(new RedirectRequestHandler(uri.toString()));
 	}
+
+	// ---------------
 
 	public static String createUri(Class<? extends DPage> dPageClass, boolean needAbsolute) {
 		String href = getPageInstanceService().getUriByPage(dPageClass);
@@ -56,9 +92,13 @@ public class UrlUtil {
 		return result;
 	}
 
+	// ---------------
+
 	public static String getFileUri(String fileId) {
 		return createUri(String.format("/dmt/getfile/%s", fileId), true);
 	}
+
+	// ------------------------------
 
 	private static IDPageInstanceService getPageInstanceService() {
 		if (pageInstanceService == null) {

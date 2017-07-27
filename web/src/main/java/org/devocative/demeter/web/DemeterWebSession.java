@@ -1,6 +1,7 @@
 package org.devocative.demeter.web;
 
 import org.apache.wicket.protocol.http.WebSession;
+import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.Request;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
@@ -26,14 +27,15 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	private UserVO userVO;
 	private Class<? extends DPage> originalDPage;
 	private List<String> originalParams;
+	private IRequestParameters queryParameters;
 
-	// ------------------------------ CONSTRUCTORS
+	// ------------------------------
 
 	public DemeterWebSession(Request request) {
 		super(request);
 	}
 
-	// ------------------------------ ACCESSORS
+	// ------------------------------
 
 	public UserVO getUserVO() {
 		return userVO;
@@ -65,7 +67,16 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 		return this;
 	}
 
-	// ------------------------------ OUserPreference
+	public IRequestParameters getQueryParameters() {
+		return queryParameters;
+	}
+
+	public DemeterWebSession setQueryParameters(IRequestParameters queryParameters) {
+		this.queryParameters = queryParameters;
+		return this;
+	}
+
+	// ---------------
 
 	@Override
 	public OCalendar getCalendar() {
@@ -107,12 +118,15 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 		AsyncMediator.handleSessionExpiration(userVO.getUsername(), getId());
 	}
 
-	// ------------------------------
+	// ---------------
 
 	public void removeOriginal() {
 		setOriginalDPage(null);
 		setOriginalParams(null);
+		setQueryParameters(null);
 	}
+
+	// ---------------
 
 	public static DemeterWebSession get() {
 		return (DemeterWebSession) WebSession.get();

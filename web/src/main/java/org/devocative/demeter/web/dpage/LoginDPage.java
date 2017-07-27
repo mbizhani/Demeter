@@ -5,6 +5,7 @@ import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.IRequestParameters;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -32,10 +33,10 @@ public class LoginDPage extends DPage {
 		form.setEnabled(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 		add(form);
 
-		form.add(new TextField<>("username", new PropertyModel<String>(this, "username"))
+		form.add(new TextField<>("username", new PropertyModel<>(this, "username"))
 			.setLabel(new ResourceModel("User.username"))
 			.setRequired(true));
-		form.add(new PasswordTextField("password", new PropertyModel<String>(this, "password"))
+		form.add(new PasswordTextField("password", new PropertyModel<>(this, "password"))
 			.setLabel(new ResourceModel("User.password"))
 			.setRequired(true));
 
@@ -48,10 +49,11 @@ public class LoginDPage extends DPage {
 
 				Class<? extends DPage> originalDPage = DemeterWebSession.get().getOriginalDPage();
 				List<String> params = DemeterWebSession.get().getOriginalParams();
+				IRequestParameters queryParameters = DemeterWebSession.get().getQueryParameters();
 				DemeterWebSession.get().removeOriginal();
 
 				if (originalDPage != null) {
-					UrlUtil.redirectTo(originalDPage, params);
+					UrlUtil.redirectTo(originalDPage, params, queryParameters);
 				} else {
 					setResponsePage(Index.class);
 				}

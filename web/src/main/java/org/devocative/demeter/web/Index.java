@@ -270,7 +270,8 @@ public class Index extends WebPage {
 				} else {
 					DemeterWebSession.get()
 						.setOriginalDPage(dPageClass)
-						.setOriginalParams(params);
+						.setOriginalParams(params)
+						.setQueryParameters(getRequest().getQueryParameters());
 					UrlUtil.redirectTo(LoginDPage.class);
 					content = new WebComponent("content");
 				}
