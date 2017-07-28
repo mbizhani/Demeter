@@ -36,9 +36,12 @@ public class CacheService implements ICacheService {
 
 	@Override
 	public void clear(String id) {
-		logger.warn("ICache cleared: ID=[{}] User=[{}]", id, securityService.getCurrentUser());
-
-		ALL_CACHES.get(id).clear();
+		if (ALL_CACHES.containsKey(id)) {
+			logger.warn("ICache cleared: ID=[{}] User=[{}]", id, securityService.getCurrentUser());
+			ALL_CACHES.get(id).clear();
+		} else {
+			logger.warn("Try to clear cache which has not been created: {}", id);
+		}
 	}
 
 	@Override
