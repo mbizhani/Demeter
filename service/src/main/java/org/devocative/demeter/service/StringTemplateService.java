@@ -125,7 +125,7 @@ public class StringTemplateService implements IStringTemplateService {
 
 	private ICache<String, IStringTemplate> getTemplateCache() {
 		if (templateCache == null) {
-			templateCache = cacheService.create("DMT_STRING_TEMPLATE", 50);
+			templateCache = cacheService.create(CACHE_KEY, 50);
 		}
 
 		return templateCache;
