@@ -70,7 +70,6 @@ public class Index extends WebPage {
 	// ------------------------------
 
 	private WModalWindow window;
-	private Component content;
 	private UserVO currentUser;
 	private WebMarkupContainer signIn, signOut, editProfile;
 	private List<OMenuItem> oMenuItems = new ArrayList<>();
@@ -79,17 +78,6 @@ public class Index extends WebPage {
 	// ------------------------------
 
 	public Index(PageParameters pageParameters) {
-		securityService.authenticateByUrlParams(WebUtil.toMap(true, true));
-		currentUser = securityService.getCurrentUser();
-
-		if (currentUser.isPageEmpty()) {
-			UserVO.PageVO pageVO = pageInstanceService.getAccessiblePages(currentUser.getRoles());
-			currentUser.setPageVO(pageVO);
-			if (logger.isDebugEnabled()) {
-				logger.debug("User=[{}] {}", currentUser.getUsername(), pageVO);
-			}
-		}
-
 		TransparentWebMarkupContainer html = new TransparentWebMarkupContainer("html");
 		html.add(new AttributeModifier("dir", DemeterWebSession.get().getLayoutDirection().toString()));
 		html.add(new AttributeModifier("class", String.format("dmt-%s", DemeterWebSession.get().getLayoutDirection().toString())));
@@ -106,35 +94,38 @@ public class Index extends WebPage {
 		// PARAMS: /<MODULE>/<D PAGE>[/REF ID PARAM]
 		// INDEX   0         1         2
 
-		if (pageParameters.getIndexedCount() > 0) {
-			StringBuilder uriBuilder = new StringBuilder();
-			for (int i = 0; i < pageParameters.getIndexedCount() && i < 2; i++) {
-				uriBuilder.append("/").append(pageParameters.get(i));
-			}
-			String refIdParam = pageParameters.getIndexedCount() >= 2 ? pageParameters.get(2).toString() : null;
-			pageInstance = pageInstanceService.getPageInstanceByURI(uriBuilder.toString(), refIdParam);
-			if (pageInstance != null) {
-				headerTitle = getDPageTitle(pageInstance);
-
-				List<String> params = new ArrayList<>();
-				if (pageInstance.getRefId() != null) {
-					params.add(pageInstance.getRefId());
-					for (int i = 3; i < pageParameters.getIndexedCount(); i++) {
-						params.add(pageParameters.get(i).toString());
-					}
-				} else {
-					for (int i = 2; i < pageParameters.getIndexedCount(); i++) {
-						params.add(pageParameters.get(i).toString());
-					}
+		Component content = authenticateByHTTP();
+		if (content == null) {
+			if (pageParameters.getIndexedCount() > 0) {
+				StringBuilder uriBuilder = new StringBuilder();
+				for (int i = 0; i < pageParameters.getIndexedCount() && i < 2; i++) {
+					uriBuilder.append("/").append(pageParameters.get(i));
 				}
+				String refIdParam = pageParameters.getIndexedCount() >= 2 ? pageParameters.get(2).toString() : null;
+				pageInstance = pageInstanceService.getPageInstanceByURI(uriBuilder.toString(), refIdParam);
+				if (pageInstance != null) {
+					headerTitle = getDPageTitle(pageInstance);
 
-				createDPageFromType(pageInstance.getUri(), pageInstance.getPageInfo(), params);
+					List<String> params = new ArrayList<>();
+					if (pageInstance.getRefId() != null) {
+						params.add(pageInstance.getRefId());
+						for (int i = 3; i < pageParameters.getIndexedCount(); i++) {
+							params.add(pageParameters.get(i).toString());
+						}
+					} else {
+						for (int i = 2; i < pageParameters.getIndexedCount(); i++) {
+							params.add(pageParameters.get(i).toString());
+						}
+					}
+
+					content = createDPageFromType(pageInstance.getUri(), pageInstance.getPageInfo(), params);
+				} else {
+					content = new Label("content", new ResourceModel("err.dmt.UnknownDPage"));
+				}
 			} else {
-				content = new Label("content", new ResourceModel("err.dmt.UnknownDPage"));
+				content = new Label("content", "");
+				content.setVisible(false);
 			}
-		} else {
-			content = new Label("content", "");
-			content.setVisible(false);
 		}
 
 		html.add(new Label("headerTitle", headerTitle));
@@ -258,37 +249,63 @@ public class Index extends WebPage {
 
 	// ------------------------------
 
-	private void createDPageFromType(String uri, DPageInfo pageInfo, List<String> params) {
+	private Component authenticateByHTTP() {
+		Component result = null;
+		try {
+			//TODO authenticate by Basic & Digest based on configuration!
+			securityService.authenticateByUrlParams(WebUtil.toMap(true, true));
+		} catch (Exception e) {
+			logger.error("Index.authenticateByHTTP()", e);
+			result = new Label("content", WDefaults.getExceptionToMessageHandler().handleMessage(this, e));
+		}
+
+		currentUser = securityService.getCurrentUser();
+
+		if (currentUser.isPageEmpty()) {
+			UserVO.PageVO pageVO = pageInstanceService.getAccessiblePages(currentUser.getRoles());
+			currentUser.setPageVO(pageVO);
+			if (logger.isDebugEnabled()) {
+				logger.debug("User=[{}] {}", currentUser.getUsername(), pageVO);
+			}
+		}
+
+		return result;
+	}
+
+	private Component createDPageFromType(String uri, DPageInfo pageInfo, List<String> params) {
+		Component result;
 		try {
 			Class<? extends DPage> dPageClass = findDPageClass(pageInfo);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
 				if (currentUser.hasAccessToURI(uri)) {
 					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
-					content = (DPage) constructor.newInstance("content", params);
+					result = (DPage) constructor.newInstance("content", params);
 				} else if (currentUser.isAuthenticated()) {
-					content = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
+					result = new Label("content", new ResourceModel("err.dmt.AccessDenied"));
 				} else {
 					DemeterWebSession.get()
 						.setOriginalDPage(dPageClass)
 						.setOriginalParams(params)
 						.setQueryParameters(getRequest().getQueryParameters());
 					UrlUtil.redirectTo(LoginDPage.class);
-					content = new WebComponent("content");
+					result = new WebComponent("content");
 				}
 			} else {
 				logger.error("The class is not DPage: {}", dPageClass.getName());
-				content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
+				result = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 			}
 		} catch (ClassNotFoundException e) {
 			logger.error("DPage class not found", e);
-			content = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
+			result = new Label("content", new ResourceModel("err.dmt.DPageNotFound"));
 		} catch (InvocationTargetException e) {
 			logger.error("DPage call problem", e.getTargetException());
-			content = new Label("content", WDefaults.getExceptionToMessageHandler().handleMessage(this, e.getTargetException()));
+			result = new Label("content", WDefaults.getExceptionToMessageHandler().handleMessage(this, e.getTargetException()));
 		} catch (Exception e) {
 			logger.error("DPage instantiation problem", e);
-			content = new Label("content", new ResourceModel("err.dmt.DPageInstantiation"));
+			result = new Label("content", new ResourceModel("err.dmt.DPageInstantiation"));
 		}
+
+		return result;
 	}
 
 	private Class<? extends DPage> findDPageClass(DPageInfo pageInfo) throws ClassNotFoundException {
