@@ -15,9 +15,11 @@ public interface ITaskService {
 
 	// ==============================
 
-	DTaskResult start(Long taskInfoId, Object id, Object inputData, ITaskResultCallback resultCallback);
+	DTaskResult start(Class<? extends DTask> taskBeanClass, Object inputData, ITaskResultCallback resultCallback);
 
-	DTaskResult start(String taskBeanId, Object id, Object inputData, ITaskResultCallback resultCallback);
+	DTaskResult start(Class<? extends DTask> taskBeanClass, Object id, Object inputData, ITaskResultCallback resultCallback);
+
+	DTaskResult start(Long taskInfoId, Object id, Object inputData, ITaskResultCallback resultCallback);
 
 	void stop(String key);
 

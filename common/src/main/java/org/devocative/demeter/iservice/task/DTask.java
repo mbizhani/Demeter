@@ -26,11 +26,11 @@ public abstract class DTask implements Runnable {
 
 	// ------------------------------ ABSTRACT METHODS
 
-	public abstract void init();
+	public abstract void init() throws Exception;
 
-	public abstract boolean canStart();
+	public abstract boolean canStart() throws Exception;
 
-	public abstract void execute();
+	public abstract void execute() throws Exception;
 
 	// ------------------------------ ACCESSORS
 
@@ -104,23 +104,21 @@ public abstract class DTask implements Runnable {
 		Thread.currentThread().setName(key);
 		logger.info("Executing DTask: key=[{}]", key);
 
-		init();
-		if (canStart()) {
-			startDate = new Date();
-			state = DTaskState.Running;
-			try {
+		try {
+			init();
+			if (canStart()) {
+				startDate = new Date();
+				state = DTaskState.Running;
 				execute();
 				state = DTaskState.Finished;
-			} catch (Exception e) {
-				logger.error("DTask error: " + key, e);
-				state = DTaskState.Error;
-				exception = e;
-				if (resultCallback != null) {
-					resultCallback.onTaskError(id, e);
-				}
+			} else {
+				state = DTaskState.Invalid;
 			}
-		} else {
-			state = DTaskState.Invalid;
+		} catch (Exception e) {
+			logger.error("DTask error: " + key, e);
+			state = DTaskState.Error;
+			exception = e;
+			sendError(e);
 		}
 
 		duration = System.currentTimeMillis() - start;
@@ -139,9 +137,17 @@ public abstract class DTask implements Runnable {
 		return continue_.get();
 	}
 
-	protected void setResult(Object result) {
+	protected void sendResult(Object result) {
 		if (resultCallback != null) {
 			resultCallback.onTaskResult(id, result);
+		} else {
+			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
+		}
+	}
+
+	protected void sendError(Exception exception) {
+		if (resultCallback != null) {
+			resultCallback.onTaskError(id, exception);
 		} else {
 			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
 		}

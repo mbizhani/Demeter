@@ -178,15 +178,19 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	// ==============================
 
 	@Override
-	public DTaskResult start(String taskBeanId, Object id, Object inputData, ITaskResultCallback resultCallback) {
+	public DTaskResult start(Class<? extends DTask> taskBeanClass, Object inputData, ITaskResultCallback resultCallback) {
+		return start(taskBeanClass, null, inputData, resultCallback);
+	}
+
+	@Override
+	public DTaskResult start(Class<? extends DTask> taskBeanClass, Object id, Object inputData, ITaskResultCallback resultCallback) {
 		if (!enabled) {
 			throw new DSystemException("Task handling is not enabled");
 		}
 
-		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskBeanId, id, inputData);
+		logger.info("Starting Task: class=[{}] - id=[{}] - inputData=[{}]", taskBeanClass, id, inputData);
 
-		Class<?> type = DemeterCore.getApplicationContext().getType(taskBeanId);
-		return start(loadByType(type.getName()), id, inputData, resultCallback);
+		return start(loadByType(taskBeanClass.getName()), id, inputData, resultCallback);
 	}
 
 	@Override
