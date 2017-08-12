@@ -8,7 +8,6 @@ import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.ECalendar;
 import org.devocative.demeter.entity.ELayoutDirection;
 import org.devocative.demeter.vo.UserVO;
-import org.devocative.wickomp.async.AsyncMediator;
 import org.devocative.wickomp.opt.OCalendar;
 import org.devocative.wickomp.opt.OLayoutDirection;
 import org.devocative.wickomp.opt.OUserPreference;
@@ -114,8 +113,6 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	@Override
 	public void onInvalidate() {
 		logger.info("Session invalidated: user={}", userVO.getUsername());
-
-		AsyncMediator.handleSessionExpiration(userVO.getUsername(), getId());
 	}
 
 	// ---------------

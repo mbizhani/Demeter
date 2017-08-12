@@ -13,7 +13,6 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.wickomp.WDefaults;
-import org.devocative.wickomp.async.AsyncMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +66,6 @@ public class DemeterWebApplication extends WebApplication {
 
 		initModulesForWeb();
 
-		AsyncMediator.init(this);
-
 		logger.info("** Demeter Application Up! **");
 		logger.info("*****************************");
 	}
@@ -80,7 +77,7 @@ public class DemeterWebApplication extends WebApplication {
 
 	@Override
 	protected void onDestroy() {
-		AsyncMediator.shutdown();
+		logger.info("DemeterWebApplication.onDestroy()");
 	}
 
 	// ------------------------------
