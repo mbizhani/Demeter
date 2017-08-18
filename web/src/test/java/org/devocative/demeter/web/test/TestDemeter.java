@@ -2,6 +2,8 @@ package org.devocative.demeter.web.test;
 
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.web.DemeterWebApplication;
@@ -26,6 +28,8 @@ public class TestDemeter {
 		DemeterCore.init();
 		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 		tester = new WicketTester(new DemeterWebApplication());
+
+		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");
 	}
 
 	@Test
