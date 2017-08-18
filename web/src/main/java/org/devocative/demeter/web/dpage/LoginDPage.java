@@ -14,6 +14,7 @@ import org.devocative.demeter.web.DemeterWebSession;
 import org.devocative.demeter.web.Index;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DButton;
+import org.devocative.wickomp.form.WCaptchaInput;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -39,6 +40,10 @@ public class LoginDPage extends DPage {
 		form.add(new PasswordTextField("password", new PropertyModel<>(this, "password"))
 			.setLabel(new ResourceModel("User.password"))
 			.setRequired(true));
+
+		form.add(new WCaptchaInput("captcha")
+				.setVisible(ConfigUtil.getBoolean(DemeterConfigKey.LoginCaptchaEnabled))
+		);
 
 		form.add(new DButton("signIn") {
 			private static final long serialVersionUID = 2122837596660815329L;

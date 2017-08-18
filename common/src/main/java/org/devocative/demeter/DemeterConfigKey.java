@@ -19,6 +19,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	AuthenticationMode("dmt.security.auth.mode", (Object) Collections.emptyList()),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 	UserAutoRegister("dmt.security.register.auto", true, Arrays.asList(true, false)),
+	LoginCaptchaEnabled("dmt.security.login.captcha.enabled", true, Arrays.asList(true, false)),
 
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
