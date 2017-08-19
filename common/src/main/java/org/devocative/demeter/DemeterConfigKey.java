@@ -18,6 +18,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	SecurityKeyStoreEntry("dmt.security.ks.entry", "Demeter"),
 	AuthenticationMode("dmt.security.auth.mode", (Object) Collections.emptyList()),
 	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
+	HttpPort("dmt.security.http.port", 8080),
+	HttpsEnabled("dmt.security.https.enabled", false, Arrays.asList(true, false)),
+	HttpsPort("dmt.security.https.port", 8443),
 	UserAutoRegister("dmt.security.register.auto", true, Arrays.asList(true, false)),
 	LoginCaptchaEnabled("dmt.security.login.captcha.enabled", true, Arrays.asList(true, false)),
 
