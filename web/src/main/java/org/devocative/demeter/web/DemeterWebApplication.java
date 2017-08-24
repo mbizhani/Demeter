@@ -1,6 +1,8 @@
 package org.devocative.demeter.web;
 
 import org.apache.wicket.Page;
+import org.apache.wicket.core.request.mapper.CryptoMapper;
+import org.apache.wicket.protocol.http.CsrfPreventionRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.https.HttpsConfig;
@@ -68,11 +70,21 @@ public class DemeterWebApplication extends WebApplication {
 
 		initModulesForWeb();
 
+		if (ConfigUtil.getBoolean(DemeterConfigKey.UrlCrypticEnabled)) {
+			setRootRequestMapper(new CryptoMapper(getRootRequestMapper(), this));
+			logger.info("URL Cryptic Enabled");
+		}
+
 		if (ConfigUtil.getBoolean(DemeterConfigKey.HttpsEnabled)) {
 			int httpPort = ConfigUtil.getInteger(DemeterConfigKey.HttpPort);
 			int httpsPort = ConfigUtil.getInteger(DemeterConfigKey.HttpsPort);
 			setRootRequestMapper(new HttpsMapper(getRootRequestMapper(), new HttpsConfig(httpPort, httpsPort)));
-			logger.info("HTTPS enabled: HTTP Port=[{}], HTTPS Port=[{}]", httpPort, httpsPort);
+			logger.info("HTTPS Enabled: HTTP Port=[{}], HTTPS Port=[{}]", httpPort, httpsPort);
+		}
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.CsrfPreventionEnabled)) {
+			getRequestCycleListeners().add(new CsrfPreventionRequestCycleListener());
+			logger.info("Csrf Prevention Enabled");
 		}
 
 		logger.info("** Demeter Application Up! **");
