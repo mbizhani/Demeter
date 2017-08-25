@@ -32,18 +32,18 @@ public class TaskInfoDPage extends DPage {
 		super(id, params);
 
 		OColumnList<DTaskInfo> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("DTaskInfo.type"), "type"));
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("DTaskInfo.module"), "module"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskInfo.type"), "type"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskInfo.module"), "module"));
 		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("DTaskInfo.enabled"), "enabled")
 			.setFormatter(OBooleanFormatter.bool()));
 
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.creationDate"), "creationDate"));
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.creatorUser"), "creatorUser"));
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.modificationDate"), "modificationDate"));
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.modifierUser"), "modifierUser"));
-		columnList.add(new OPropertyColumn<DTaskInfo>(new ResourceModel("entity.version"), "version"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creationDate"), "creationDate"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modificationDate"), "modificationDate"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.version"), "version"));
 
-		columnList.add(new OAjaxLinkColumn<DTaskInfo>(new Model<String>(), DemeterIcon.EXECUTE) {
+		columnList.add(new OAjaxLinkColumn<DTaskInfo>(new Model<>(), DemeterIcon.EXECUTE) {
 			private static final long serialVersionUID = 1953340922089825679L;
 
 			@Override

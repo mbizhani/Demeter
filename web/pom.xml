@@ -100,16 +100,6 @@
 					<exclude>**/*.java</exclude>
 				</excludes>
 			</resource>
-			<resource>
-				<filtering>false</filtering>
-				<directory>src/base/java</directory>
-				<includes>
-					<include>**</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
 		</resources>
 
 		<testResources>
@@ -170,6 +160,16 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- Demeter Helper Plugin -->
+			<plugin>
+				<groupId>org.devocative</groupId>
+				<artifactId>demeter-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<!--<configuration>
+					<filters>dmt</filters>
+				</configuration>-->
 			</plugin>
 
 		</plugins>

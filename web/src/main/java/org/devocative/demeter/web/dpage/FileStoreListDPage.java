@@ -131,23 +131,23 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 		add(form);
 
 		OColumnList<FileStore> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.name"), "name"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.status"), "status"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.storage"), "storage"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.mimeType"), "mimeType"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.fileId"), "fileId"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.tag"), "tag"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.name"), "name"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.status"), "status"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.storage"), "storage"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.mimeType"), "mimeType"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.fileId"), "fileId"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("FileStore.tag"), "tag"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("FileStore.expiration"), "expiration")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("entity.creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("entity.modificationDate"), "modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("entity.modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
 		columnList.add(new OPropertyColumn<FileStore>(new ResourceModel("entity.version"), "version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
@@ -164,7 +164,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 			});
 		}
 
-		columnList.add(new OColumn<FileStore>(new Model<String>(), "DOWNLOAD") {
+		columnList.add(new OColumn<FileStore>(new Model<>(), "DOWNLOAD") {
 			private static final long serialVersionUID = -501065240513534269L;
 
 			@Override

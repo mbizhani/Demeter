@@ -24,12 +24,15 @@ public abstract class DAjaxButton extends WAjaxButton {
 	public DAjaxButton(String id, HTMLBase icon) {
 		this(id, null, icon);
 	}
+
 	// Main Constructor
 	public DAjaxButton(String id, IModel<String> caption, HTMLBase icon) {
 		super(id, caption, icon);
 
 		add(new EasyUIBehavior());
 	}
+
+	// ------------------------------
 
 	@Override
 	protected void onError(AjaxRequestTarget target, List<Serializable> errors) {

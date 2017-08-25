@@ -87,7 +87,7 @@
 			   title="KEY:dPage.dmt.CacheManagement"
 			   uri="/cache"
 			   inMenu="true"
-			   roles="Root"
+			   roles="Admin"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.TaskInfoDPage"

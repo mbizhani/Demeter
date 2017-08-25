@@ -13,11 +13,14 @@ import org.slf4j.LoggerFactory;
 
 public class DButton extends Button {
 	private static final long serialVersionUID = 3072339866517953276L;
-
 	private static final Logger logger = LoggerFactory.getLogger(DButton.class);
+
+	// ------------------------------
 
 	private IModel<String> caption;
 	private HTMLBase icon;
+
+	// ------------------------------
 
 	public DButton(String id) {
 		this(id, null, null);
@@ -35,6 +38,8 @@ public class DButton extends Button {
 
 		add(new EasyUIBehavior());
 	}
+
+	// ------------------------------
 
 	@Override
 	public final void onError() {
@@ -64,7 +69,6 @@ public class DButton extends Button {
 		}
 	}
 
-
 	@Override
 	public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag) {
 		if ("button".equalsIgnoreCase(openTag.getName()) && (caption != null || icon != null)) {
@@ -80,6 +84,8 @@ public class DButton extends Button {
 			super.onComponentTagBody(markupStream, openTag);
 		}
 	}
+
+	// ------------------------------
 
 	protected void onFormSubmit() {
 	}
@@ -98,6 +104,8 @@ public class DButton extends Button {
 	protected void onAfterRender() {
 		super.onAfterRender();
 
-		WMessager.writeErrorsInAfterRender(this);
+		if (isVisible()) {
+			WMessager.writeErrorsInAfterRender(this);
+		}
 	}
 }

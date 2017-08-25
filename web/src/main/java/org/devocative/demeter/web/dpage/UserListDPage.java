@@ -164,19 +164,19 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		add(form);
 
 		OColumnList<User> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.username"), "username"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.username"), "username"));
 
 		// -- Person
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("Person.firstName"), "person.firstName"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("Person.lastName"), "person.lastName"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.firstName"), "person.firstName"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.lastName"), "person.lastName"));
 
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.authMechanism"), "authMechanism"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.status"), "status"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.locale"), "locale"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.calendarType"), "calendarType"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.layoutDirectionType"), "layoutDirectionType"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.datePatternType"), "datePatternType"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.dateTimePatternType"), "dateTimePatternType"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.authMechanism"), "authMechanism"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.status"), "status"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.locale"), "locale"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.calendarType"), "calendarType"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.layoutDirectionType"), "layoutDirectionType"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.datePatternType"), "datePatternType"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.dateTimePatternType"), "dateTimePatternType"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.lastLoginDate"), "lastLoginDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
@@ -185,21 +185,21 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.sessionTimeout"), "sessionTimeout")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.roles"), "roles"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.authorizations"), "authorizations"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.roles"), "roles"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.authorizations"), "authorizations"));
 
 		// -- Person
 		if (getCurrentUser().isRoot()) {
-			columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.rowMod"), "person.rowMod"));
+			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMod"), "person.rowMod"));
 		}
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.creationDate"), "person.creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.creatorUser"), "person.creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "person.creatorUser"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.modificationDate"), "person.modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.modifierUser"), "person.modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "person.modifierUser"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.version"), "person.version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
