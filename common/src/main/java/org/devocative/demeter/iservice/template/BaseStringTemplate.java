@@ -3,7 +3,7 @@ package org.devocative.demeter.iservice.template;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseStringTemplate implements IStringTemplate {
+public abstract class BaseStringTemplate<W> implements IStringTemplate<W> {
 	private Map<Class, IToStringConverter> map = new HashMap<>();
 
 	protected boolean convertValuesToString = false;

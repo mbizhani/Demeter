@@ -3,6 +3,8 @@ package org.devocative.demeter.service;
 import freemarker.template.*;
 import groovy.lang.GroovyShell;
 import groovy.text.SimpleTemplateEngine;
+import groovy.util.DelegatingScript;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.demeter.DemeterConfigKey;
@@ -11,6 +13,8 @@ import org.devocative.demeter.iservice.template.IStringTemplate;
 import org.devocative.demeter.iservice.template.IStringTemplateService;
 import org.devocative.demeter.iservice.template.TemplateEngineType;
 import org.devocative.demeter.service.template.FreeMarkerStringTemplate;
+import org.devocative.demeter.service.template.GroovyDelegatingScript;
+import org.devocative.demeter.service.template.GroovyScript;
 import org.devocative.demeter.service.template.GroovyStringTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +34,11 @@ public class StringTemplateService implements IStringTemplateService {
 	private Configuration freeMarkerCfg;
 	private ICache<String, IStringTemplate> templateCache;
 
-	private GroovyShell groovyShell;
+	private GroovyShell groovyShellForScript;
+	private GroovyShell groovyShellForDelegatingScript;
 	private SimpleTemplateEngine simpleTemplateEngine;
+
+	// ---------------
 
 	@Autowired
 	private ICacheService cacheService;
@@ -43,7 +50,10 @@ public class StringTemplateService implements IStringTemplateService {
 		freeMarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
 		freeMarkerCfg.setObjectWrapper(new CaseInsensitiveVariableWrapper());
 
-		groovyShell = new GroovyShell();
+		groovyShellForScript = new GroovyShell();
+		CompilerConfiguration gcc = new CompilerConfiguration();
+		gcc.setScriptBaseClass(DelegatingScript.class.getName());
+		groovyShellForDelegatingScript = new GroovyShell(getClass().getClassLoader(), gcc);
 		simpleTemplateEngine = new SimpleTemplateEngine();
 	}
 
@@ -71,12 +81,16 @@ public class StringTemplateService implements IStringTemplateService {
 				result = createFreeMarker(id, template);
 				break;
 
-			case Groovy:
-				result = createGroovy(template);
+			case GroovyTemplate:
+				result = createGroovyTemplate(template);
 				break;
 
 			case GroovyShell:
-				result = createGroovyShell(template);
+				result = createGroovyScript(template);
+				break;
+
+			case GroovyDelegatingScript:
+				result = createGroovyDelegatingScript(template);
 				break;
 
 			default:
@@ -99,11 +113,15 @@ public class StringTemplateService implements IStringTemplateService {
 
 	// ------------------------------
 
-	private IStringTemplate createGroovyShell(String template) {
-		return new GroovyStringTemplate(groovyShell.parse(template));
+	private IStringTemplate createGroovyScript(String template) {
+		return new GroovyScript(groovyShellForScript.parse(template));
 	}
 
-	private IStringTemplate createGroovy(String template) {
+	private IStringTemplate createGroovyDelegatingScript(String template) {
+		return new GroovyDelegatingScript((DelegatingScript) groovyShellForDelegatingScript.parse(template));
+	}
+
+	private IStringTemplate createGroovyTemplate(String template) {
 		try {
 			groovy.text.Template gTemplate = simpleTemplateEngine.createTemplate(template);
 			return new GroovyStringTemplate(gTemplate);

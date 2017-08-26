@@ -1,5 +1,5 @@
 package org.devocative.demeter.iservice.template;
 
 public enum TemplateEngineType {
-	FreeMarker, Groovy, GroovyShell
+	FreeMarker, GroovyTemplate, GroovyScript, GroovyDelegatingScript
 }

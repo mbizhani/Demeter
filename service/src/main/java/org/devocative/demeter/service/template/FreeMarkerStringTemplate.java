@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.Map;
 
-public class FreeMarkerStringTemplate extends BaseStringTemplate {
+public class FreeMarkerStringTemplate extends BaseStringTemplate<Template> {
 	private static final Logger logger = LoggerFactory.getLogger(FreeMarkerStringTemplate.class);
 
 	private String id;
@@ -41,7 +41,7 @@ public class FreeMarkerStringTemplate extends BaseStringTemplate {
 	}
 
 	@Override
-	public Object unwrap() {
+	public Template unwrap() {
 		return template;
 	}
 }
