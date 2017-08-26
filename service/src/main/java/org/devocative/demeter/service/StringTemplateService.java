@@ -85,7 +85,7 @@ public class StringTemplateService implements IStringTemplateService {
 				result = createGroovyTemplate(template);
 				break;
 
-			case GroovyShell:
+			case GroovyScript:
 				result = createGroovyScript(template);
 				break;
 
