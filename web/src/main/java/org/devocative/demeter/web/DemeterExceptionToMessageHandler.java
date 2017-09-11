@@ -12,7 +12,7 @@ public class DemeterExceptionToMessageHandler implements IExceptionToMessageHand
 	public String handleMessage(Component component, Throwable e) {
 		if (e instanceof DModuleException) {
 			DModuleException de = (DModuleException) e;
-			String error = getMessage(component, de.getMessage(), de.getDefaultDescription());
+			String error = getMessage(component, de.getResourceKey(), de.getDefaultDescription());
 
 			if (de.getErrorParameter() != null) {
 				error += ": " + de.getErrorParameter();

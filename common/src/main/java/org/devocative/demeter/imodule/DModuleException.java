@@ -24,6 +24,13 @@ public abstract class DModuleException extends RuntimeException {
 	}
 
 	public String getMessage() {
+		if (errorParameter != null) {
+			return String.format("%s.%s: %s", moduleName, errorCode.getCode(), errorParameter);
+		}
+		return String.format("%s.%s", moduleName, errorCode.getCode());
+	}
+
+	public String getResourceKey() {
 		return String.format("err.%s.%s", moduleName, errorCode.getCode());
 	}
 

@@ -54,7 +54,7 @@ public class DButton extends Button {
 
 			if (e instanceof DModuleException) {
 				DModuleException de = (DModuleException) e;
-				String error = getString(de.getMessage(), null, de.getDefaultDescription());
+				String error = getString(de.getResourceKey(), null, de.getDefaultDescription());
 				if (de.getErrorParameter() != null) {
 					error += ": " + de.getErrorParameter();
 				}
