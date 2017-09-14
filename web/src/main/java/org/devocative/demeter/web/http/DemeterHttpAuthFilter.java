@@ -94,9 +94,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 			response.addHeader(CORS_METHOD, ConfigUtil.getString(DemeterConfigKey.CorsHeaderMethods));
 		}
 
-		if (ConfigUtil.getBoolean(DemeterConfigKey.HttpAuthFilterSkip)) {
-			setProcessAuth(false);
-		}
+		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.HttpAuthFilterEnabled));
 	}
 
 	@Override

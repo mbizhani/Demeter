@@ -25,7 +25,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	LoginCaptchaEnabled("dmt.security.login.captcha.enabled", true, Arrays.asList(true, false)),
 	UrlCrypticEnabled("dmt.security.url.cryptic.enabled", false, Arrays.asList(true, false)),
 	CsrfPreventionEnabled("dmt.security.csrf.prevention.enabled", false, Arrays.asList(true, false)),
-	HttpAuthFilterSkip("dmt.security.filter.skip", false, Arrays.asList(true, false)),
+	HttpAuthFilterEnabled("dmt.security.filter.enabled", true, Arrays.asList(true, false)),
 
 	CorsEnabled("dmt.security.cors.enabled", false, Arrays.asList(true, false)),
 	CorsHeaderOrigins("dmt.security.cors.origins", "*"),
