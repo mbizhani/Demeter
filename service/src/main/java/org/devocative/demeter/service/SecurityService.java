@@ -185,7 +185,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	}
 
 	@Override
-	public void authenticateByUrlParams(Map<String, List<String>> params) {
+	public UserVO authenticateByUrlParams(Map<String, List<String>> params) {
 		List<String> allowedAuthModes = ConfigUtil.getList(DemeterConfigKey.AuthenticationMode);
 
 		if (allowedAuthModes.contains("other") && otherAuthenticationService != null) {
@@ -199,11 +199,15 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 						authUserVO.getUsername(),
 						authUserVO.getRoles(),
 						authUserVO.getPermissions(),
-						authUserVO.getDenials());
+						authUserVO.getDenials()
+					);
 					afterAuthentication(authUserVO);
 				}
 			}
+			return authUserVO;
 		}
+
+		return null;
 	}
 
 	@Override

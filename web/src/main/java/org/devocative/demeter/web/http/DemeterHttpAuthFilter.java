@@ -6,6 +6,8 @@ import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.IUserService;
+import org.devocative.demeter.vo.UserVO;
+import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.http.filter.WAuthMethod;
 import org.devocative.wickomp.http.filter.WBaseHttpAuthFilter;
 import org.devocative.wickomp.http.filter.WHttpAuthBean;
@@ -14,6 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,6 +27,10 @@ import java.util.concurrent.TimeUnit;
 
 public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterHttpAuthFilter.class);
+	private static final String CORS_ORIGINS = "Access-Control-Allow-Origin";
+	private static final String CORS_HEADERS = "Access-Control-Allow-Headers";
+	private static final String CORS_CREDENTIAL = "Access-Control-Allow-Credentials";
+	private static final String CORS_METHOD = "Access-Control-Allow-Methods ";
 
 	private String nonce;
 	private ScheduledExecutorService nonceRefreshExecutor;
@@ -63,12 +73,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 
 			nonceRefreshExecutor = Executors.newScheduledThreadPool(1);
 
-			nonceRefreshExecutor.scheduleAtFixedRate(new Runnable() {
-
-				public void run() {
-					nonce = UUID.randomUUID().toString();
-				}
-			}, 1, 1, TimeUnit.MINUTES);
+			nonceRefreshExecutor.scheduleAtFixedRate(() -> nonce = UUID.randomUUID().toString(), 1, 1, TimeUnit.MINUTES);
 		}
 
 		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
@@ -81,8 +86,33 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	}
 
 	@Override
-	protected void onBeforeChainAuthenticated(WHttpAuthBean authBean) {
+	protected void onRequest(HttpServletRequest request, HttpServletResponse response) {
+		if (ConfigUtil.getBoolean(DemeterConfigKey.CorsEnabled) && response.getHeader(CORS_ORIGINS) == null) {
+			response.addHeader(CORS_ORIGINS, ConfigUtil.getString(DemeterConfigKey.CorsHeaderOrigins));
+			response.addHeader(CORS_HEADERS, ConfigUtil.getString(DemeterConfigKey.CorsHeaderHeaders));
+			response.addHeader(CORS_CREDENTIAL, ConfigUtil.getString(DemeterConfigKey.CorsHeaderMethods));
+			response.addHeader(CORS_METHOD, ConfigUtil.getString(DemeterConfigKey.CorsHeaderMethods));
+		}
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.HttpAuthFilterSkip)) {
+			setProcessAuth(false);
+		}
+	}
+
+	@Override
+	protected void onBeforeChainAuthenticated(WHttpAuthBean authBean, HttpServletRequest request, HttpServletResponse response) {
 		securityService.authenticate(userService.loadVOByUsername(authBean.getUsername()));
+	}
+
+	@Override
+	protected String authenticateByOther(HttpServletRequest request, HttpServletResponse response) {
+		Map<String, List<String>> params = WebUtil.toMap(request, true, true);
+		UserVO userVO = securityService.authenticateByUrlParams(params);
+		if (userVO != null) {
+			logger.info("DemeterHttpAuthFilter: doOtherMechanism, user=[{}]", userVO);
+			return userVO.getUsername();
+		}
+		return null;
 	}
 
 	@Override
