@@ -32,7 +32,7 @@ public interface IUserService {
 
 	void updateUser(User user, String password, String oldPassword);
 
-	UserVO createOrUpdateUser(UserInputVO userInputVO);
+	UserVO createOrUpdateUser(UserInputVO userInputVO, User user, boolean forceUpdate);
 
 	UserVO loadVOByUsername(String username);
 

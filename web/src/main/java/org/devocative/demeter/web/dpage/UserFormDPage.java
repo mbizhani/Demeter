@@ -131,7 +131,7 @@ public class UserFormDPage extends DPage {
 			.setRequired(true)
 			.setLabel(new ResourceModel("User.admin")));
 		floatTable.add(new WNumberInput("sessionTimeout", Integer.class)
-			.setRequired(true)
+			//.setRequired(true)
 			.setLabel(new ResourceModel("User.sessionTimeout")));
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));

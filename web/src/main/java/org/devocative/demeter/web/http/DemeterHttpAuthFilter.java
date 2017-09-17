@@ -8,7 +8,6 @@ import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.WebUtil;
-import org.devocative.wickomp.http.filter.WAuthMethod;
 import org.devocative.wickomp.http.filter.WBaseHttpAuthFilter;
 import org.devocative.wickomp.http.filter.WHttpAuthBean;
 import org.slf4j.Logger;
@@ -20,10 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterHttpAuthFilter.class);
@@ -32,24 +27,27 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 	private static final String CORS_CREDENTIAL = "Access-Control-Allow-Credentials";
 	private static final String CORS_METHOD = "Access-Control-Allow-Methods ";
 
-	private String nonce;
-	private ScheduledExecutorService nonceRefreshExecutor;
+	/*private String nonce;
+	private ScheduledExecutorService nonceRefreshExecutor;*/
 	private ISecurityService securityService;
 	private IUserService userService;
 
 	@Override
 	protected String calculateNonceForDigest(WHttpAuthBean authBean) {
-		return nonce;
+		//return nonce;
+		throw new RuntimeException("Digest not supported");
 	}
 
 	@Override
 	protected String getRealm(WHttpAuthBean authBean) {
-		return ConfigUtil.getString(DemeterConfigKey.SecurityRealm);
+		//return ConfigUtil.getString(DemeterConfigKey.SecurityRealm);
+		throw new RuntimeException("Digest not supported");
 	}
 
 	@Override
 	protected String generateUserHashForDigest(WHttpAuthBean authBean) {
-		return securityService.getUserDigest(authBean.getUsername());
+		//return securityService.getUserDigest(authBean.getUsername());
+		throw new RuntimeException("Digest not supported");
 	}
 
 	@Override
@@ -64,7 +62,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		String httpMode = ConfigUtil.getString(DemeterConfigKey.HttpAuthenticationMode);
+		/*String httpMode = ConfigUtil.getString(DemeterConfigKey.HttpAuthenticationMode);
 
 		if ("digest".equals(httpMode)) {
 			setDesiredAuthMethod(WAuthMethod.DIGEST);
@@ -74,7 +72,7 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 			nonceRefreshExecutor = Executors.newScheduledThreadPool(1);
 
 			nonceRefreshExecutor.scheduleAtFixedRate(() -> nonce = UUID.randomUUID().toString(), 1, 1, TimeUnit.MINUTES);
-		}
+		}*/
 
 		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 		userService = DemeterCore.getApplicationContext().getBean(IUserService.class);
@@ -115,8 +113,8 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 
 	@Override
 	public void destroy() {
-		if (nonceRefreshExecutor != null) {
+		/*if (nonceRefreshExecutor != null) {
 			nonceRefreshExecutor.shutdown();
-		}
+		}*/
 	}
 }

@@ -3,7 +3,6 @@ package org.devocative.demeter;
 import org.devocative.adroit.IConfigKey;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public enum DemeterConfigKey implements IConfigKey {
@@ -11,13 +10,13 @@ public enum DemeterConfigKey implements IConfigKey {
 	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
 	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
-	SecurityRealm(true, "dmt.security.realm"),
+	//SecurityRealm(true, "dmt.security.realm"),
 	SecurityKeyStoreEnabled("dmt.security.ks.enabled", true, Arrays.asList(true, false)),
 	SecurityKeyStoreToken("dmt.security.ks.token", "DEMETER_TOKEN"),
 	SecurityKeyStoreParam("dmt.security.ks.param", "DEMETER_PARAM"),
 	SecurityKeyStoreEntry("dmt.security.ks.entry", "Demeter"),
-	AuthenticationMode("dmt.security.auth.mode", (Object) Collections.emptyList()),
-	HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
+	//AuthenticationMode("dmt.security.auth.mode", (Object) Collections.emptyList()),
+	//HttpAuthenticationMode("dmt.security.http.mode", "basic", Arrays.asList("basic", "digest")),
 	HttpPort("dmt.security.http.port", 8080),
 	HttpsEnabled("dmt.security.https.enabled", false, Arrays.asList(true, false)),
 	HttpsPort("dmt.security.https.port", 8443),
@@ -26,6 +25,17 @@ public enum DemeterConfigKey implements IConfigKey {
 	UrlCrypticEnabled("dmt.security.url.cryptic.enabled", false, Arrays.asList(true, false)),
 	CsrfPreventionEnabled("dmt.security.csrf.prevention.enabled", false, Arrays.asList(true, false)),
 	HttpAuthFilterEnabled("dmt.security.filter.enabled", true, Arrays.asList(true, false)),
+
+	OtherAuthUserPassEnabled("dmt.security.other.userpass.enabled", false, Arrays.asList(true, false)),
+	OtherAuthUsernameParam("dmt.security.other.username.param", "username"),
+	OtherAuthPasswordParam("dmt.security.other.password.param", "password"),
+	OtherAuthUpdate("dmt.security.other.update", false, Arrays.asList(true, false)),
+
+	//STO: Session Time Out
+	STO_Database("dmt.security.sto.database", 60),
+	STO_LDAP("dmt.security.sto.ldap", 40),
+	STO_Other("dmt.security.sto.other", 5),
+	STO_Admin("dmt.security.sto.other", 10),
 
 	CorsEnabled("dmt.security.cors.enabled", false, Arrays.asList(true, false)),
 	CorsHeaderOrigins("dmt.security.cors.origins", "*"),
@@ -41,8 +51,8 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
 	LdapUrl(true, "dmt.ldap.url"),
-	LdapAttrFirstName("dmt.ldap.attr.firstname"),
-	LdapAttrLastName("dmt.ldap.attr.lastname"),
+	LdapAttrFirstName("dmt.ldap.attr.firstname", "givenname"),
+	LdapAttrLastName("dmt.ldap.attr.lastname", "sn"),
 
 	TaskEnabled("dmt.task.enabled", true, Arrays.asList(true, false)),
 	TaskPoolSize("dmt.task.pool.size", 5),
@@ -53,7 +63,6 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	FileBaseDir(true, "dmt.file.base.dir"),
 
-	UserDefaultSessionTimeout("dmt.user.def.session.timeout", 60),
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", "Jalali", Arrays.asList("Jalali", "Gregorian")),
 	UserDefaultLayout("dmt.user.def.layout", "RTL", Arrays.asList("RTL", "LTR")),

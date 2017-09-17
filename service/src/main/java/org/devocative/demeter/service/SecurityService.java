@@ -1,6 +1,5 @@
 package org.devocative.demeter.service;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.*;
@@ -28,9 +27,6 @@ import java.util.*;
 @Service("dmtSecurityService")
 public class SecurityService implements ISecurityService, IApplicationLifecycle, IRequestLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
-
-	private static final String USERNAME_KEY = "username";
-	private static final String PASSWORD_KEY = "password";
 
 	private static final ThreadLocal<UserVO> CURRENT_USER = new ThreadLocal<>();
 
@@ -61,7 +57,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMod(ERowMod.SYSTEM)
-				.setSessionTimeout(0)
+				.setSessionTimeout(0),
+			null,
+			true
 		);
 		authenticate(system);
 
@@ -69,14 +67,18 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
 				.setRowMod(ERowMod.SYSTEM)
-				.setSessionTimeout(10)
+				.setSessionTimeout(10),
+			null,
+			true
 		);
 
 		guest = userService.createOrUpdateUser(
 			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMod(ERowMod.SYSTEM)
-				.setSessionTimeout(-1)
+				.setSessionTimeout(-1),
+			null,
+			true
 		);
 
 		if (!ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity)) {
@@ -149,12 +151,16 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 				authenticatedUserVO = authenticateByLDAP(username, password, user);
 			} else if (EAuthMechanism.OTHER.equals(user.getAuthMechanism())) {
 				if (otherAuthenticationService != null) {
-					authenticatedUserVO = authenticateByOther(username, password, user);
+					if (ConfigUtil.getBoolean(DemeterConfigKey.OtherAuthUserPassEnabled)) {
+						authenticatedUserVO = authenticateByOther(username, password, user);
+					} else {
+						throw new DSystemException("OtherAuthenticationService not enabled for user/pass authentication: user = " + username);
+					}
 				} else {
 					throw new DSystemException("No IOtherAuthenticationService bean defined: user = " + username);
 				}
 			} else {
-				throw new DSystemException(String.format("Unknown authenticate mechanism: username=[%s] authMethod=[%s]",
+				throw new DSystemException(String.format("Invalid authenticate mechanism: username=[%s] authMethod=[%s]",
 					username, user.getAuthMechanism()));
 			}
 		} else {
@@ -162,14 +168,14 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			logger.info("Authenticating: username[{}] not in DB, autoRegister=[{}]", username, autoRegister);
 
 			if (autoRegister) {
-				List<String> allowedAuthModes = ConfigUtil.getList(DemeterConfigKey.AuthenticationMode);
-				logger.info("Authenticating & AutoRegister: username[{}], authModes={}", username, allowedAuthModes);
-
-				if (allowedAuthModes.contains("ldap")) {
+				if (ConfigUtil.hasKey(DemeterConfigKey.LdapUrl)) {
 					authenticatedUserVO = authenticateByLDAP(username, password, null);
 				}
 
-				if (authenticatedUserVO == null && allowedAuthModes.contains("other") && otherAuthenticationService != null) {
+				if (authenticatedUserVO == null &&
+					otherAuthenticationService != null &&
+					ConfigUtil.getBoolean(DemeterConfigKey.OtherAuthUserPassEnabled)) {
+
 					authenticatedUserVO = authenticateByOther(username, password, null);
 				}
 
@@ -186,25 +192,23 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO authenticateByUrlParams(Map<String, List<String>> params) {
-		List<String> allowedAuthModes = ConfigUtil.getList(DemeterConfigKey.AuthenticationMode);
+		if (otherAuthenticationService != null) {
+			UserInputVO authUserInputVO = otherAuthenticationService.authenticate(params);
 
-		if (allowedAuthModes.contains("other") && otherAuthenticationService != null) {
-			UserVO authUserVO = otherAuthenticationService.authenticate(params);
+			if (authUserInputVO != null) {
+				UserVO authUserVO = userService.createOrUpdateUser(authUserInputVO, null, ConfigUtil.getBoolean(DemeterConfigKey.OtherAuthUpdate));
 
-			if (authUserVO != null) {
-				authUserVO.setAuthMechanism(EAuthMechanism.OTHER);
+				logger.info("Authenticate: user by URL params user=[{}] roles=[{}] permissions={} denials={}",
+					authUserVO.getUsername(),
+					authUserVO.getRoles(),
+					authUserVO.getPermissions(),
+					authUserVO.getDenials()
+				);
 
-				if (!getCurrentUser().getUsername().equals(authUserVO.getUsername())) {
-					logger.info("Authenticate: user by URL params user=[{}] roles=[{}] permissions={} denials={}",
-						authUserVO.getUsername(),
-						authUserVO.getRoles(),
-						authUserVO.getPermissions(),
-						authUserVO.getDenials()
-					);
-					afterAuthentication(authUserVO);
-				}
+				afterAuthentication(authUserVO);
+
+				return authUserVO;
 			}
-			return authUserVO;
 		}
 
 		return null;
@@ -215,9 +219,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		CURRENT_USER.set(guest);
 	}
 
-	@Override
+	/*@Override
 	public String getUserDigest(String username) {
-		//TODO the password must be saved symmetric-encoded or the following hash must be persisted somewhere
+		//NOTE: the password must be saved symmetric-encoded or the following hash must be persisted somewhere
 		User user = userService.loadByUsername(username);
 
 		if (user != null) {
@@ -228,7 +232,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		}
 
 		return null;
-	}
+	}*/
 
 	@Override
 	public UserVO getSystemUser() {
@@ -334,26 +338,20 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			Attributes attrs = context.getAttributes(dn);
 
 			String firstName = null;
-			String firstNameAttr = ConfigUtil.getString(DemeterConfigKey.LdapAttrFirstName);
-			if (firstNameAttr != null) {
-				firstName = getValue(attrs.get(firstNameAttr));
-			}
-
 			String lastName = null;
-			String lastNameAttr = ConfigUtil.getString(DemeterConfigKey.LdapAttrLastName);
-			if (lastNameAttr != null) {
-				lastName = getValue(attrs.get(lastNameAttr));
+			try {
+				firstName = getValue(attrs.get(ConfigUtil.getString(DemeterConfigKey.LdapAttrFirstName)));
+				lastName = getValue(attrs.get(ConfigUtil.getString(DemeterConfigKey.LdapAttrLastName)));
+			} catch (Exception e) {
+				logger.error("Getting first name & last name from LDAP attributes", e);
 			}
 
-			if (eqUserInDB == null) {
-				logger.info("Create user authenticated by LDAP: username=[{}]", username);
-				return userService.createOrUpdateUser(new UserInputVO(username, null, firstName, lastName, EAuthMechanism.LDAP));
-			} else {
-				return userService.getUserVO(eqUserInDB);
-			}
+			logger.info("Authenticated by LDAP: username=[{}]", username);
+
+			return userService.createOrUpdateUser(new UserInputVO(username, null, firstName, lastName, EAuthMechanism.LDAP), eqUserInDB, true);
 		} catch (AuthenticationException e) {
 			logger.warn("Authentication By LDAP failed for user: {}", username);
-			throw new DemeterException(DemeterErrorCode.InvalidUser, username);
+			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		} catch (NamingException e) {
 			logger.error("Authentication by LDAP error: ", e);
 			throw new DSystemException("LDAP Server Problem: ", e);
@@ -362,20 +360,16 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	private UserVO authenticateByOther(String username, String password, User eqUserInDB) {
 		Map<String, List<String>> params = new HashMap<>();
-		params.put(USERNAME_KEY, Collections.singletonList(username));
-		params.put(PASSWORD_KEY, Collections.singletonList(password));
-		UserVO userVO = otherAuthenticationService.authenticate(params);
+		params.put(ConfigUtil.getString(DemeterConfigKey.OtherAuthUsernameParam), Collections.singletonList(username));
+		params.put(ConfigUtil.getString(DemeterConfigKey.OtherAuthPasswordParam), Collections.singletonList(password));
+		UserInputVO userInputVO = otherAuthenticationService.authenticate(params);
 
-		if (userVO == null) {
+		if (userInputVO == null) {
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
 		}
 
-		if (eqUserInDB == null) {
-			logger.info("Create user authenticated by Other: username=[{}]", username);
-			return userService.createOrUpdateUser(new UserInputVO(username, null, userVO.getFirstName(), userVO.getLastName(), EAuthMechanism.OTHER));
-		} else {
-			return userService.getUserVO(eqUserInDB);
-		}
+		logger.info("Authenticated by Other: username=[{}]", username);
+		return userService.createOrUpdateUser(userInputVO, eqUserInDB, ConfigUtil.getBoolean(DemeterConfigKey.OtherAuthUpdate));
 	}
 
 	private void afterAuthentication(UserVO authenticatedUserVO) {

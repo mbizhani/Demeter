@@ -118,8 +118,10 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserVO createOrUpdateUser(UserInputVO userInputVO) {
-		User user = loadByUsername(userInputVO.getUsername());
+	public UserVO createOrUpdateUser(UserInputVO userInputVO, User user, boolean forceUpdate) {
+		if (user == null) {
+			user = loadByUsername(userInputVO.getUsername());
+		}
 
 		String password = userInputVO.getPassword();
 		if (user == null) {
@@ -129,8 +131,15 @@ public class UserService implements IUserService {
 		}
 
 		user.setUsername(userInputVO.getUsername());
-		user.setStatus(userInputVO.getStatus());
-		user.setAdmin(userInputVO.isAdmin());
+
+		if (userInputVO.getStatus() != null) {
+			user.setStatus(userInputVO.getStatus());
+		}
+
+		if (userInputVO.getAdmin() != null) {
+			user.setAdmin(userInputVO.getAdmin());
+		}
+
 		user.setAuthMechanism(userInputVO.getAuthMechanism());
 		user.setSessionTimeout(userInputVO.getSessionTimeout());
 
@@ -141,9 +150,19 @@ public class UserService implements IUserService {
 		}
 		person.setFirstName(userInputVO.getFirstName());
 		person.setLastName(userInputVO.getLastName());
-		person.setRowMod(userInputVO.getRowMod());
 
-		saveOrUpdate(user, password);
+		if (userInputVO.getRowMod() != null) {
+			person.setRowMod(userInputVO.getRowMod());
+		} else if (person.getRowMod() == null) {
+			person.setRowMod(ERowMod.NORMAL);
+		}
+
+		//TODO userInputVO.getRoles()
+
+		if (user.getId() == null || forceUpdate) {
+			saveOrUpdate(user, password);
+		}
+
 		return getUserVO(user)
 			.setOtherId(userInputVO.getOtherId());
 	}
@@ -162,7 +181,21 @@ public class UserService implements IUserService {
 		ELocale defLocale = ELocale.findByCode(ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
 		ECalendar defCalendar = ECalendar.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultCalendar));
 		ELayoutDirection defDirection = ELayoutDirection.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultLayout));
-		Integer defSessionTimeout = ConfigUtil.getInteger(DemeterConfigKey.UserDefaultSessionTimeout);
+
+		Integer sto = user.getSessionTimeout();
+		if (sto == null) {
+			if (EAuthMechanism.DATABASE.equals(user.getAuthMechanism())) {
+				sto = ConfigUtil.getInteger(DemeterConfigKey.STO_Database);
+			} else if (EAuthMechanism.LDAP.equals(user.getAuthMechanism())) {
+				sto = ConfigUtil.getInteger(DemeterConfigKey.STO_LDAP);
+			} else if (EAuthMechanism.OTHER.equals(user.getAuthMechanism())) {
+				sto = ConfigUtil.getInteger(DemeterConfigKey.STO_Other);
+			}
+
+			if (user.getAdmin()) {
+				sto = ConfigUtil.getInteger(DemeterConfigKey.STO_Admin);
+			}
+		}
 
 		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
 			.setAdmin(user.getAdmin())
@@ -173,7 +206,7 @@ public class UserService implements IUserService {
 			.setLayoutDirection(user.getLayoutDirectionType() != null ? user.getLayoutDirectionType() : defDirection)
 			.setDatePatternType(user.getDatePatternType() != null ? user.getDatePatternType() : EDatePatternType.P01)
 			.setDateTimePatternType(user.getDateTimePatternType() != null ? user.getDateTimePatternType() : EDateTimePatternType.P01)
-			.setSessionTimeout(user.getSessionTimeout() != null ? user.getSessionTimeout() : defSessionTimeout);
+			.setSessionTimeout(sto);
 
 		if (user.getRoles() != null) {
 			for (Role role : user.getRoles()) {

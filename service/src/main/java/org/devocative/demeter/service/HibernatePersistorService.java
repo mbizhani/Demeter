@@ -44,9 +44,7 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public void init() {
 		config = new Configuration();
-		for (Class entity : entities) {
-			config.addAnnotatedClass(entity);
-		}
+		entities.forEach(config::addAnnotatedClass);
 
 		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
 		if ("CreateModify".equals(interceptor)) {
@@ -77,7 +75,7 @@ public class HibernatePersistorService implements IPersistorService {
 		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
 		serviceRegistryBuilder.applySettings(config.getProperties());
 		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
-		logger.info("HibernatePersistorService init()");
+		logger.info("HibernatePersistorService init(db = {})", ConfigUtil.getString(true, getConfig("db.username")));
 
 		String scriptFile = ConfigUtil.getString(getConfig("db.script"), null);
 		if (scriptFile != null) {

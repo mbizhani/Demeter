@@ -5,6 +5,8 @@ import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.EUserStatus;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UserInputVO implements Serializable {
 	private static final long serialVersionUID = -8601295449952419297L;
@@ -13,14 +15,14 @@ public class UserInputVO implements Serializable {
 	private String password;
 	private String firstName;
 	private String lastName;
-	private boolean admin = false;
-	private EUserStatus status = EUserStatus.ENABLED;
+	private Boolean admin;
+	private EUserStatus status;
 	private EAuthMechanism authMechanism;
 	private ERowMod rowMod;
+	private Integer sessionTimeout;
+	private Set<String> roles = new HashSet<>();
 
 	private String otherId;
-
-	private Integer sessionTimeout = 60;
 
 	// ------------------------------
 
@@ -59,11 +61,11 @@ public class UserInputVO implements Serializable {
 
 	// ---------------
 
-	public boolean isAdmin() {
+	public Boolean getAdmin() {
 		return admin;
 	}
 
-	public UserInputVO setAdmin(boolean admin) {
+	public UserInputVO setAdmin(Boolean admin) {
 		this.admin = admin;
 		return this;
 	}
@@ -86,21 +88,30 @@ public class UserInputVO implements Serializable {
 		return this;
 	}
 
-	public String getOtherId() {
-		return otherId;
-	}
-
-	public UserInputVO setOtherId(String otherId) {
-		this.otherId = otherId;
-		return this;
-	}
-
 	public Integer getSessionTimeout() {
 		return sessionTimeout;
 	}
 
 	public UserInputVO setSessionTimeout(Integer sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
+		return this;
+	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public UserInputVO addRole(String role) {
+		roles.add(role);
+		return this;
+	}
+
+	public String getOtherId() {
+		return otherId;
+	}
+
+	public UserInputVO setOtherId(String otherId) {
+		this.otherId = otherId;
 		return this;
 	}
 }

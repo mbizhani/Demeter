@@ -16,7 +16,7 @@ public interface ISecurityService {
 
 	void signOut();
 
-	String getUserDigest(String username);
+	//String getUserDigest(String username);
 
 	UserVO getSystemUser();
 
