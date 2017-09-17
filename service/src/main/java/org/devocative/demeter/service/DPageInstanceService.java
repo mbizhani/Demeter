@@ -1,8 +1,9 @@
 package org.devocative.demeter.service;
 
+import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
-import org.devocative.adroit.cache.IMissedHitHandler;
 import org.devocative.demeter.DSystemException;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XDPage;
 import org.devocative.demeter.core.xml.XModule;
@@ -130,35 +131,27 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		persistorService.commitOrRollback();
 
 		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2);
-		pageInstCache.setMissedHitHandler(new IMissedHitHandler<String, DPageInstance>() {
-			@Override
-			public DPageInstance loadForCache(String key) {
-				return persistorService
-					.createQueryBuilder()
-					.addFrom(DPageInstance.class, "ent")
-					.addWhere("and ent.uri = :uri")
-					.addParam("uri", key)
-					.object();
-			}
-		});
+		pageInstCache.setMissedHitHandler(key -> persistorService
+			.createQueryBuilder()
+			.addFrom(DPageInstance.class, "ent")
+			.addWhere("and ent.uri = :uri")
+			.addParam("uri", key)
+			.object());
 
 		uriCache = cacheService.create("DMT_D_PAGE_URI", totalDPageSize * 2);
-		uriCache.setMissedHitHandler(new IMissedHitHandler<Class, String>() {
-			@Override
-			public String loadForCache(Class key) {
-				DPageInfo pageInfo = persistorService
-					.createQueryBuilder()
-					.addFrom(DPageInfo.class, "ent")
-					.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
-					.addParam("type", key.getName())
-					.object();
+		uriCache.setMissedHitHandler(key -> {
+			DPageInfo pageInfo = persistorService
+				.createQueryBuilder()
+				.addFrom(DPageInfo.class, "ent")
+				.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
+				.addParam("type", key.getName())
+				.object();
 
-				if (pageInfo != null) {
-					return pageInfo.getBaseUri();
-				}
-
-				return "";
+			if (pageInfo != null) {
+				return pageInfo.getBaseUri();
 			}
+
+			return "";
 		});
 	}
 
@@ -308,19 +301,29 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		pageInstance.setInMenu(xdPage.getInMenu());
 		pageInstance.setPageInfo(pageInfo);
 		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
+
 		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
-			List<Role> roles = new ArrayList<>();
+			List<Role> roles;
+			if (ConfigUtil.getBoolean(DemeterConfigKey.DPageInstRolesByXML) || pageInstance.getRoles() == null) {
+				roles = new ArrayList<>();
+			} else {
+				roles = new ArrayList<>(pageInstance.getRoles());
+			}
+
 			String[] roleNames = xdPage.getRoles().split("[,]");
 			for (String roleName : roleNames) {
-				Role role = roleService.loadByName(roleName);
+				Role role = roleService.loadByName(roleName.trim());
 				if (role != null) {
-					roles.add(role);
+					if (!roles.contains(role)) {
+						roles.add(role);
+					}
 				} else {
 					throw new RuntimeException(String.format("Invalid role name [%s] for DPage [%s]", roleName, xdPage.getUri()));
 				}
 			}
 			pageInstance.setRoles(roles);
 		}
+
 		persistorService.saveOrUpdate(pageInstance);
 	}
 }

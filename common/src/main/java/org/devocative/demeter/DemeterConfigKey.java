@@ -43,6 +43,8 @@ public enum DemeterConfigKey implements IConfigKey {
 	CorsHeaderMethods("dmt.security.cors.methods", "GET, POST, HEAD, OPTIONS"),
 	CorsHeaderCredentials("dmt.security.cors.credential", "true"),
 
+	DPageInstRolesByXML("dmt.security.dpage.roles.xml", false, Arrays.asList(true, false)),
+
 	ServiceRemoteHost("dmt.service.remote.host"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
