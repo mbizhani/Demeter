@@ -190,14 +190,14 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 			.list();
 
 		Set<String> accessibleUri = new HashSet<>();
-		Map<String, List<DPageInstance>> menuEntries = new HashMap<>();
+		Map<String, Set<DPageInstance>> menuEntries = new HashMap<>();
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
 
 			String module = pageInfo.getModule();
 			if (!menuEntries.containsKey(module)) {
-				menuEntries.put(module, new ArrayList<DPageInstance>());
+				menuEntries.put(module, new LinkedHashSet<>());
 			}
 			menuEntries.get(module).add(pageInstance);
 
@@ -232,7 +232,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		List<DPageInstance> instances = queryBuilder.list();
 
 		Set<String> accessibleUri = new HashSet<>();
-		Map<String, List<DPageInstance>> menuEntries = new HashMap<>();
+		Map<String, Set<DPageInstance>> menuEntries = new HashMap<>();
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
@@ -240,7 +240,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 			String module = pageInfo.getModule();
 			if (pageInstance.getInMenu()) {
 				if (!menuEntries.containsKey(module)) {
-					menuEntries.put(module, new ArrayList<DPageInstance>());
+					menuEntries.put(module, new LinkedHashSet<>());
 				}
 				menuEntries.get(module).add(pageInstance);
 			}
@@ -303,20 +303,18 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
 
 		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
-			List<Role> roles;
+			Set<Role> roles;
 			if (ConfigUtil.getBoolean(DemeterConfigKey.DPageInstRolesByXML) || pageInstance.getRoles() == null) {
-				roles = new ArrayList<>();
+				roles = new HashSet<>();
 			} else {
-				roles = new ArrayList<>(pageInstance.getRoles());
+				roles = new HashSet<>(pageInstance.getRoles());
 			}
 
 			String[] roleNames = xdPage.getRoles().split("[,]");
 			for (String roleName : roleNames) {
 				Role role = roleService.loadByName(roleName.trim());
 				if (role != null) {
-					if (!roles.contains(role)) {
-						roles.add(role);
-					}
+					roles.add(role);
 				} else {
 					throw new RuntimeException(String.format("Invalid role name [%s] for DPage [%s]", roleName, xdPage.getUri()));
 				}

@@ -74,7 +74,7 @@ public class UserVO implements Serializable {
 		return pageVO.getAccessibleUri().contains(uri);
 	}
 
-	public Map<String, List<DPageInstance>> getMainMenuEntries() {
+	public Map<String, Set<DPageInstance>> getMainMenuEntries() {
 		return pageVO.getMainMenuEntries();
 	}
 
@@ -248,11 +248,11 @@ public class UserVO implements Serializable {
 		private static final long serialVersionUID = 5722909672657821898L;
 
 		private Set<String> accessibleUri;
-		private Map<String, List<DPageInstance>> mainMenuEntries;
+		private Map<String, Set<DPageInstance>> mainMenuEntries;
 
 		// ------------------------------
 
-		public PageVO(Set<String> accessibleUri, Map<String, List<DPageInstance>> mainMenuEntries) {
+		public PageVO(Set<String> accessibleUri, Map<String, Set<DPageInstance>> mainMenuEntries) {
 			this.accessibleUri = accessibleUri;
 			this.mainMenuEntries = mainMenuEntries;
 		}
@@ -263,7 +263,7 @@ public class UserVO implements Serializable {
 			return accessibleUri;
 		}
 
-		public Map<String, List<DPageInstance>> getMainMenuEntries() {
+		public Map<String, Set<DPageInstance>> getMainMenuEntries() {
 			return mainMenuEntries;
 		}
 

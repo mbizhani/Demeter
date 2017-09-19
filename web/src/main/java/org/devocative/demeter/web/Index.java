@@ -51,6 +51,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RequireHttps
 public class Index extends WebPage {
@@ -323,9 +324,9 @@ public class Index extends WebPage {
 		oMenuItems.add(new OMenuItem(UrlUtil.createUri("", true), new ResourceModel("label.home")));
 
 		// TODO replace DPageInstance with a VO
-		Map<String, List<DPageInstance>> defaultPages = currentUser.getMainMenuEntries();
+		Map<String, Set<DPageInstance>> defaultPages = currentUser.getMainMenuEntries();
 		if (defaultPages != null) {
-			for (Map.Entry<String, List<DPageInstance>> entry : defaultPages.entrySet()) {
+			for (Map.Entry<String, Set<DPageInstance>> entry : defaultPages.entrySet()) {
 				OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));
 				List<OMenuItem> subMenus = new ArrayList<>();
 				for (DPageInstance pageInstance : entry.getValue()) {

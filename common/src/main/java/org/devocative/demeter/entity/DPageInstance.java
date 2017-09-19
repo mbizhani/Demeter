@@ -5,7 +5,7 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Audited
 @Entity
@@ -41,7 +41,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	@NotAudited
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_page_info", foreignKey = @ForeignKey(name = "pageinst2pageinfo"))
+	@JoinColumn(name = "f_page_info", nullable = false, foreignKey = @ForeignKey(name = "pageinst2pageinfo"))
 	private DPageInfo pageInfo;
 
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -51,7 +51,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		foreignKey = @ForeignKey(name = "pageInstRole2pageInst"),
 		inverseForeignKey = @ForeignKey(name = "pageInstRole2role")
 	)
-	private List<Role> roles;
+	private Set<Role> roles;
 
 	// ---------------
 
@@ -135,11 +135,11 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		this.pageInfo = pageInfo;
 	}
 
-	public List<Role> getRoles() {
+	public Set<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(List<Role> roles) {
+	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
 
