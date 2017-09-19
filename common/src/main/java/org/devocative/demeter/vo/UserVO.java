@@ -119,6 +119,20 @@ public class UserVO implements Serializable {
 
 	public UserVO addRole(Role role) {
 		roles.add(role);
+
+		if (role.getDenials() != null) {
+			for (Privilege privilege : role.getDenials()) {
+				addDenial(privilege.getName());
+			}
+		}
+
+		// Admin user has permission to every thing by default
+		if (!isAdmin() && role.getPermissions() != null) {
+			for (Privilege privilege : role.getPermissions()) {
+				addPermission(privilege.getName());
+			}
+		}
+
 		return this;
 	}
 

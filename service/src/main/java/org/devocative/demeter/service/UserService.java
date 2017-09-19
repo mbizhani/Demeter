@@ -210,22 +210,7 @@ public class UserService implements IUserService {
 			.setSessionTimeout(sto);
 
 		if (user.getRoles() != null) {
-			for (Role role : user.getRoles()) {
-				userVO.addRole(role);
-
-				if (role.getDenials() != null) {
-					for (Privilege privilege : role.getDenials()) {
-						userVO.addDenial(privilege.getName());
-					}
-				}
-
-				// Admin user has permission to every thing by default
-				if (!user.getAdmin() && role.getPermissions() != null) {
-					for (Privilege privilege : role.getPermissions()) {
-						userVO.addPermission(privilege.getName());
-					}
-				}
-			}
+			user.getRoles().forEach(userVO::addRole);
 		}
 
 		if (user.getAuthorizations() != null) {
