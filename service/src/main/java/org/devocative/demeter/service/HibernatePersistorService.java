@@ -135,39 +135,32 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public void commitOrRollback() {
 		Session session = currentSession.get();
+
 		if (session != null && session.isOpen()) {
 			Transaction trx = session.getTransaction();
 			try {
 				if (trx.isActive()) {
 					trx.commit();
 				}
-			} catch (HibernateException e) {
-				logger.error("Hibernate endSession: ", e);
+			} catch (Exception e) {
+				logger.error("Hibernate commitOrRollback(): ", e);
 				trx.rollback();
-			}
-		}
-	}
-
-	@Override
-	public void rollback() {
-		Session session = currentSession.get();
-		if (session != null && session.isOpen()) {
-			Transaction trx = session.getTransaction();
-			if (trx != null && trx.isActive()) {
-				trx.rollback();
+				throw e;
 			}
 		}
 	}
 
 	@Override
 	public void endSession() {
-		commitOrRollback();
-
-		Session session = currentSession.get();
-		if (session != null && session.isOpen()) {
-			session.close();
+		try {
+			commitOrRollback();
+		} finally {
+			Session session = currentSession.get();
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+			currentSession.remove();
 		}
-		currentSession.remove();
 	}
 
 	@Override
