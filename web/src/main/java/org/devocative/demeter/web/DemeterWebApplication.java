@@ -1,5 +1,7 @@
 package org.devocative.demeter.web;
 
+import org.apache.wicket.ConverterLocator;
+import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.core.request.mapper.CryptoMapper;
 import org.apache.wicket.protocol.http.CsrfPreventionRequestCycleListener;
@@ -11,18 +13,22 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
+import org.apache.wicket.util.convert.ConversionException;
+import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.wickomp.WDefaults;
+import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DemeterWebApplication extends WebApplication {
@@ -94,6 +100,49 @@ public class DemeterWebApplication extends WebApplication {
 	@Override
 	public WebSession newSession(Request request, Response response) {
 		return new DemeterWebSession(request);
+	}
+
+	@Override
+	protected IConverterLocator newConverterLocator() {
+		ConverterLocator converterLocator = new ConverterLocator();
+
+		String jsonConfig = ConfigUtil.getString(DemeterConfigKey.WebReplaceCharForString);
+		if (jsonConfig != null && !jsonConfig.trim().isEmpty()) {
+			Map map = WebUtil.fromJson(jsonConfig, Map.class);
+			logger.info("Demeter Application: Char Replacement {}", map);
+
+			if (!map.isEmpty()) {
+				converterLocator.set(String.class, new IConverter<Object>() {
+					private static final long serialVersionUID = 8964294171953142318L;
+
+					@Override
+					public Object convertToObject(String s, Locale locale) throws ConversionException {
+						try {
+							if (map.containsKey(locale.getLanguage())) {
+								List<Map> replacements = (List<Map>) map.get(locale.getLanguage());
+								for (Map replacement : replacements) {
+									String from = (String) replacement.get("from");
+									String to = (String) replacement.get("to");
+									s = s.replaceAll(from, to);
+								}
+								return s;
+							}
+						} catch (Exception e) {
+							logger.error("DemeterApplication.newConverterLocator", e);
+						}
+
+						return s;
+					}
+
+					@Override
+					public String convertToString(Object o, Locale locale) {
+						return o != null ? o.toString() : null;
+					}
+				});
+			}
+		}
+
+		return converterLocator;
 	}
 
 	@Override

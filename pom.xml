@@ -57,7 +57,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<d.adroit.ver>1.3</d.adroit.ver>
-		<d.wickomp.ver>2.3</d.wickomp.ver>
+		<d.wickomp.ver>2.4</d.wickomp.ver>
 		<d.diadem.ver>1.2</d.diadem.ver>
 
 		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>

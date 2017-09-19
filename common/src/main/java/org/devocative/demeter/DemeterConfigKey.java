@@ -50,6 +50,7 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
+	WebReplaceCharForString("dmt.web.replace.char", "{\"fa\":[{\"from\":\"ي\",\"to\":\"ی\"}, {\"from\":\"ك\",\"to\":\"ک\"}]}"),
 
 	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
