@@ -198,7 +198,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			if (authUserInputVO != null) {
 				UserVO authUserVO = userService.createOrUpdateUser(authUserInputVO, null, ConfigUtil.getBoolean(DemeterConfigKey.OtherAuthUpdate));
 
-				logger.info("Authenticate: user by URL params user=[{}] roles=[{}] permissions={} denials={}",
+				logger.info("Authenticate by URL: user=[{}] roles=[{}] permissions={} denials={}",
 					authUserVO.getUsername(),
 					authUserVO.getRoles(),
 					authUserVO.getPermissions(),

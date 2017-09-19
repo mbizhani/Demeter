@@ -197,7 +197,8 @@ public class UserService implements IUserService {
 			}
 		}
 
-		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getPerson().getFirstName(), user.getPerson().getLastName())
+		Person person = user.getPersonSafely();
+		UserVO userVO = new UserVO(user.getId(), user.getUsername(), person.getFirstName(), person.getLastName())
 			.setAdmin(user.getAdmin())
 			.setAuthMechanism(user.getAuthMechanism())
 

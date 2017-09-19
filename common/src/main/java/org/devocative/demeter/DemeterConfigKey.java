@@ -43,11 +43,14 @@ public enum DemeterConfigKey implements IConfigKey {
 	CorsHeaderMethods("dmt.security.cors.methods", "GET, POST, HEAD, OPTIONS"),
 	CorsHeaderCredentials("dmt.security.cors.credential", "true"),
 
-	DPageInstRolesByXML("dmt.security.dpage.roles.xml", false, Arrays.asList(true, false)),
-
+	DPageInstRolesByXML("dmt.service.dpage.roles.xml", false, Arrays.asList(true, false)),
+	StringTemplateCacheEnabled("dmt.service.string.template.cache.enabled", true, Arrays.asList(true, false)),
+	FileBaseDir(true, "dmt.service.file.base.dir"),
 	ServiceRemoteHost("dmt.service.remote.host"),
+
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
+
 	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
 
@@ -60,10 +63,6 @@ public enum DemeterConfigKey implements IConfigKey {
 	TaskPoolSize("dmt.task.pool.size", 5),
 	TaskPoolMax("dmt.task.pool.max", 10),
 	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),
-
-	StringTemplateCacheEnabled("dmt.string.template.cache.enabled", true, Arrays.asList(true, false)),
-
-	FileBaseDir(true, "dmt.file.base.dir"),
 
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", "Jalali", Arrays.asList("Jalali", "Gregorian")),

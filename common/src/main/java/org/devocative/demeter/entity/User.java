@@ -201,9 +201,6 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	}
 
 	public Person getPerson() {
-		if (person == null) {
-			setPerson(new Person());
-		}
 		return person;
 	}
 
@@ -231,62 +228,62 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	@Override
 	public ERowMod getRowMod() {
-		return getPerson().getRowMod();
+		return getPersonSafely().getRowMod();
 	}
 
 	@Override
 	public void setRowMod(ERowMod rowMod) {
-		getPerson().setRowMod(rowMod);
+		getPersonSafely().setRowMod(rowMod);
 	}
 
 	@Override
 	public Date getCreationDate() {
-		return getPerson().getCreationDate();
+		return getPersonSafely().getCreationDate();
 	}
 
 	@Override
 	public void setCreationDate(Date date) {
-		getPerson().setCreationDate(date);
+		getPersonSafely().setCreationDate(date);
 	}
 
 	@Override
 	public Long getCreatorUserId() {
-		return getPerson().getCreatorUserId();
+		return getPersonSafely().getCreatorUserId();
 	}
 
 	@Override
 	public void setCreatorUserId(Long userId) {
-		getPerson().setCreatorUserId(userId);
+		getPersonSafely().setCreatorUserId(userId);
 	}
 
 	@Override
 	public Date getModificationDate() {
-		return getPerson().getModificationDate();
+		return getPersonSafely().getModificationDate();
 	}
 
 	@Override
 	public void setModificationDate(Date date) {
-		getPerson().setModificationDate(date);
+		getPersonSafely().setModificationDate(date);
 	}
 
 	@Override
 	public Long getModifierUserId() {
-		return getPerson().getModifierUserId();
+		return getPersonSafely().getModifierUserId();
 	}
 
 	@Override
 	public void setModifierUserId(Long userId) {
-		getPerson().setModifierUserId(userId);
+		getPersonSafely().setModifierUserId(userId);
 	}
 
 	@Override
 	public Integer getVersion() {
-		return getPerson().getVersion();
+		return getPersonSafely().getVersion();
 	}
 
 	@Override
 	public void setVersion(Integer version) {
-		getPerson().setVersion(version);
+		getPersonSafely().setVersion(version);
 	}
 
 	// ---------------
@@ -311,5 +308,14 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Override
 	public String toString() {
 		return getUsername() != null ? getUsername() : String.format("[%s]", getId());
+	}
+
+	// ---------------
+
+	public Person getPersonSafely() {
+		if (getPerson() == null) {
+			setPerson(new Person());
+		}
+		return getPerson();
 	}
 }
