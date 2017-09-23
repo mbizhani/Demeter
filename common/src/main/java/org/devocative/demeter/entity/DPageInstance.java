@@ -5,7 +5,7 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Audited
 @Entity
@@ -51,7 +51,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		foreignKey = @ForeignKey(name = "pageInstRole2pageInst"),
 		inverseForeignKey = @ForeignKey(name = "pageInstRole2role")
 	)
-	private Set<Role> roles;
+	private List<Role> roles;
 
 	// ---------------
 
@@ -135,11 +135,11 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		this.pageInfo = pageInfo;
 	}
 
-	public Set<Role> getRoles() {
+	public List<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<Role> roles) {
+	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
 

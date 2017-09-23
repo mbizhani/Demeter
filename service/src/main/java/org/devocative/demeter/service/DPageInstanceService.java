@@ -305,9 +305,9 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
 			Set<Role> roles;
 			if (ConfigUtil.getBoolean(DemeterConfigKey.DPageInstRolesByXML) || pageInstance.getRoles() == null) {
-				roles = new HashSet<>();
+				roles = new LinkedHashSet<>();
 			} else {
-				roles = new HashSet<>(pageInstance.getRoles());
+				roles = new LinkedHashSet<>(pageInstance.getRoles());
 			}
 
 			String[] roleNames = xdPage.getRoles().split("[,]");
@@ -319,7 +319,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 					throw new RuntimeException(String.format("Invalid role name [%s] for DPage [%s]", roleName, xdPage.getUri()));
 				}
 			}
-			pageInstance.setRoles(roles);
+			pageInstance.setRoles(new ArrayList<>(roles));
 		}
 
 		persistorService.saveOrUpdate(pageInstance);
