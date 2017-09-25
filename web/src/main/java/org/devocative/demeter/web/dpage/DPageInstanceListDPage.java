@@ -29,6 +29,7 @@ import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
+import org.devocative.wickomp.opt.OHorizontalAlign;
 import org.devocative.wickomp.opt.OSize;
 
 import javax.inject.Inject;
@@ -124,21 +125,24 @@ public class DPageInstanceListDPage extends DPage implements IGridDataSource<DPa
 		add(form);
 
 		OColumnList<DPageInstance> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.title"), "title"));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.uri"), "uri"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DPageInstance.title"), "title"));
+		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.uri"), "uri")
+			.setAlign(OHorizontalAlign.Left)
+			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.inMenu"), "inMenu")
 			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.refId"), "refId"));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.pageInfo"), "pageInfo"));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.roles"), "roles"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DPageInstance.refId"), "refId"));
+		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.pageInfo"), "pageInfo")
+			.setStyle("direction:ltr;text-align:left"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DPageInstance.roles"), "roles"));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.modificationDate"), "modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.version"), "version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
