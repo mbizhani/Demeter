@@ -25,7 +25,8 @@ public class UserFVO implements Serializable {
 	private RangeVO<Integer> sessionTimeout;
 	private PersonFVO person;
 	private List<Role> roles;
-	private List<Privilege> authorizations;
+	private List<Privilege> permissions;
+	private List<Privilege> denials;
 
 	// ------------------------------
 
@@ -117,14 +118,6 @@ public class UserFVO implements Serializable {
 		this.sessionTimeout = sessionTimeout;
 	}
 
-	public PersonFVO getPerson() {
-		return person;
-	}
-
-	public void setPerson(PersonFVO person) {
-		this.person = person;
-	}
-
 	public List<Role> getRoles() {
 		return roles;
 	}
@@ -133,12 +126,20 @@ public class UserFVO implements Serializable {
 		this.roles = roles;
 	}
 
-	public List<Privilege> getAuthorizations() {
-		return authorizations;
+	public List<Privilege> getPermissions() {
+		return permissions;
 	}
 
-	public void setAuthorizations(List<Privilege> authorizations) {
-		this.authorizations = authorizations;
+	public void setPermissions(List<Privilege> permissions) {
+		this.permissions = permissions;
+	}
+
+	public List<Privilege> getDenials() {
+		return denials;
+	}
+
+	public void setDenials(List<Privilege> denials) {
+		this.denials = denials;
 	}
 
 }

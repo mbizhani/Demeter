@@ -24,7 +24,9 @@ public interface IUserService {
 
 	List<Role> getRolesList();
 
-	List<Privilege> getAuthorizationsList();
+	List<Privilege> getPermissionsList();
+
+	List<Privilege> getDenialsList();
 
 	// ==============================
 

@@ -86,13 +86,23 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "mt_dmt_prvlg_user",
+	@JoinTable(name = "mt_dmt_prvlg_user_perm",
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
-		foreignKey = @ForeignKey(name = "prvlgUser2user"),
-		inverseForeignKey = @ForeignKey(name = "prvlgUser2prvlg")
+		foreignKey = @ForeignKey(name = "prvlgUserPerm2user"),
+		inverseForeignKey = @ForeignKey(name = "prvlgUserPerm2prvlg")
 	)
-	private List<Privilege> authorizations;
+	private List<Privilege> permissions;
+
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "mt_dmt_prvlg_user_deny",
+		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
+		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
+		foreignKey = @ForeignKey(name = "prvlgUserDeny2user"),
+		inverseForeignKey = @ForeignKey(name = "prvlgUserDeny2prvlg")
+	)
+	private List<Privilege> denials;
 
 	// ------------------------------
 
@@ -216,12 +226,20 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 		this.roles = roles;
 	}
 
-	public List<Privilege> getAuthorizations() {
-		return authorizations;
+	public List<Privilege> getPermissions() {
+		return permissions;
 	}
 
-	public void setAuthorizations(List<Privilege> authorizations) {
-		this.authorizations = authorizations;
+	public void setPermissions(List<Privilege> permissions) {
+		this.permissions = permissions;
+	}
+
+	public List<Privilege> getDenials() {
+		return denials;
+	}
+
+	public void setDenials(List<Privilege> denials) {
+		this.denials = denials;
 	}
 
 	// ---------------

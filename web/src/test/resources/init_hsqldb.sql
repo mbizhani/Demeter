@@ -28,7 +28,15 @@ CREATE TABLE a_mt_dmt_prvlg_role_perm (
 	PRIMARY KEY (r_num, f_role, f_prvlg)
 );
 
-CREATE TABLE a_mt_dmt_prvlg_user (
+CREATE TABLE a_mt_dmt_prvlg_user_deny (
+	r_num   INTEGER NOT NULL,
+	f_user  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_user, f_prvlg)
+);
+
+CREATE TABLE a_mt_dmt_prvlg_user_perm (
 	r_num   INTEGER NOT NULL,
 	f_user  BIGINT  NOT NULL,
 	f_prvlg BIGINT  NOT NULL,
@@ -115,7 +123,12 @@ CREATE TABLE mt_dmt_prvlg_role_perm (
 	f_prvlg BIGINT NOT NULL
 );
 
-CREATE TABLE mt_dmt_prvlg_user (
+CREATE TABLE mt_dmt_prvlg_user_deny (
+	f_user  BIGINT NOT NULL,
+	f_prvlg BIGINT NOT NULL
+);
+
+CREATE TABLE mt_dmt_prvlg_user_perm (
 	f_user  BIGINT NOT NULL,
 	f_prvlg BIGINT NOT NULL
 );
@@ -141,7 +154,7 @@ CREATE TABLE t_dmt_d_page (
 CREATE TABLE t_dmt_d_page_inst (
 	id              BIGINT       NOT NULL,
 	d_creation      DATE         NOT NULL,
-	f_creator_user  BIGINT,
+	f_creator_user BIGINT NOT NULL,
 	b_in_menu       BOOLEAN      NOT NULL,
 	d_modification  DATE,
 	f_modifier_user BIGINT,
@@ -149,14 +162,14 @@ CREATE TABLE t_dmt_d_page_inst (
 	c_title         VARCHAR(255) NOT NULL,
 	c_uri           VARCHAR(255) NOT NULL,
 	n_version       INTEGER      NOT NULL,
-	f_page_info     BIGINT,
+	f_page_info    BIGINT NOT NULL,
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE t_dmt_d_task (
 	id              BIGINT       NOT NULL,
 	d_creation      DATE         NOT NULL,
-	f_creator_user  BIGINT,
+	f_creator_user BIGINT NOT NULL,
 	b_enabled       BOOLEAN      NOT NULL,
 	d_modification  DATE,
 	f_modifier_user BIGINT,
@@ -179,7 +192,7 @@ CREATE TABLE t_dmt_d_task_log (
 CREATE TABLE t_dmt_d_task_schd (
 	id              BIGINT       NOT NULL,
 	d_creation      DATE         NOT NULL,
-	f_creator_user  BIGINT,
+	f_creator_user BIGINT NOT NULL,
 	c_cron_expr     VARCHAR(255) NOT NULL,
 	b_enabled       BOOLEAN      NOT NULL,
 	d_modification  DATE,
@@ -193,7 +206,7 @@ CREATE TABLE t_dmt_d_task_schd (
 CREATE TABLE t_dmt_file_store (
 	id              BIGINT       NOT NULL,
 	d_creation      DATE         NOT NULL,
-	f_creator_user  BIGINT,
+	f_creator_user BIGINT NOT NULL,
 	d_expiration    DATE,
 	c_file_id       VARCHAR(255) NOT NULL,
 	e_mime_type     INTEGER      NOT NULL,
@@ -235,7 +248,7 @@ CREATE TABLE t_dmt_privilege (
 CREATE TABLE t_dmt_role (
 	id              BIGINT       NOT NULL,
 	d_creation      DATE         NOT NULL,
-	f_creator_user  BIGINT,
+	f_creator_user BIGINT NOT NULL,
 	d_modification  DATE,
 	f_modifier_user BIGINT,
 	c_name          VARCHAR(255) NOT NULL,
@@ -301,8 +314,13 @@ ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
-ALTER TABLE a_mt_dmt_prvlg_user
-ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
+ALTER TABLE a_mt_dmt_prvlg_user_deny
+ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_user_perm
+ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
@@ -361,13 +379,23 @@ ADD CONSTRAINT prvlgRolePerm2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
-ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2prvlg
+ALTER TABLE mt_dmt_prvlg_user_deny
+ADD CONSTRAINT prvlgUserDeny2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
-ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2user
+ALTER TABLE mt_dmt_prvlg_user_deny
+ADD CONSTRAINT prvlgUserDeny2user
+FOREIGN KEY (f_user)
+REFERENCES t_dmt_user;
+
+ALTER TABLE mt_dmt_prvlg_user_perm
+ADD CONSTRAINT prvlgUserPerm2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_user_perm
+ADD CONSTRAINT prvlgUserPerm2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 

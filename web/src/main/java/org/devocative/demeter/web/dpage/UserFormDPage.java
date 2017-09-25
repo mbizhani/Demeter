@@ -131,12 +131,13 @@ public class UserFormDPage extends DPage {
 			.setRequired(true)
 			.setLabel(new ResourceModel("User.admin")));
 		floatTable.add(new WNumberInput("sessionTimeout", Integer.class)
-			//.setRequired(true)
 			.setLabel(new ResourceModel("User.sessionTimeout")));
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));
-		floatTable.add(new WSelectionInput("authorizations", userService.getAuthorizationsList(), true)
-			.setLabel(new ResourceModel("User.authorizations")));
+		floatTable.add(new WSelectionInput("permissions", userService.getPermissionsList(), true)
+			.setLabel(new ResourceModel("User.permissions")));
+		floatTable.add(new WSelectionInput("denials", userService.getDenialsList(), true)
+			.setLabel(new ResourceModel("User.denials")));
 
 		Form<User> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(new WEqualInputValidator(password, password2));

@@ -86,7 +86,12 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public List<Privilege> getAuthorizationsList() {
+	public List<Privilege> getPermissionsList() {
+		return persistorService.list(Privilege.class);
+	}
+
+	@Override
+	public List<Privilege> getDenialsList() {
 		return persistorService.list(Privilege.class);
 	}
 
@@ -213,13 +218,15 @@ public class UserService implements IUserService {
 			user.getRoles().forEach(userVO::addRole);
 		}
 
-		if (user.getAuthorizations() != null) {
-			for (Privilege privilege : user.getAuthorizations()) {
-				if (user.getAdmin()) {
-					userVO.addDenial(privilege.getName());
-				} else {
-					userVO.addPermission(privilege.getName());
-				}
+		if (user.getPermissions() != null) {
+			for (Privilege privilege : user.getPermissions()) {
+				userVO.addPermission(privilege.getName());
+			}
+		}
+
+		if (user.getDenials() != null) {
+			for (Privilege privilege : user.getDenials()) {
+				userVO.addDenial(privilege.getName());
 			}
 		}
 

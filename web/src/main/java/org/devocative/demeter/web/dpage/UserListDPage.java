@@ -133,8 +133,10 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setLabel(new ResourceModel("User.sessionTimeout")));
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));
-		floatTable.add(new WSelectionInput("authorizations", userService.getAuthorizationsList(), true)
-			.setLabel(new ResourceModel("User.authorizations")));
+		floatTable.add(new WSelectionInput("permissions", userService.getPermissionsList(), true)
+			.setLabel(new ResourceModel("User.permissions")));
+		floatTable.add(new WSelectionInput("denials", userService.getDenialsList(), true)
+			.setLabel(new ResourceModel("User.denials")));
 
 		floatTable.add(new WSelectionInput("person.rowMod", ERowMod.list(), true)
 			.setLabel(new ResourceModel("entity.rowMod"))
@@ -186,7 +188,8 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.roles"), "roles"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.authorizations"), "authorizations"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.permissions"), "permissions"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("User.denials"), "denials"));
 
 		// -- Person
 		if (getCurrentUser().isRoot()) {

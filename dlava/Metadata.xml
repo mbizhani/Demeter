@@ -416,7 +416,10 @@
 				<field name="roles">
 					<finfo/>
 				</field>
-				<field name="authorizations">
+				<field name="permissions">
+					<finfo/>
+				</field>
+				<field name="denials">
 					<finfo/>
 				</field>
 			</fields>
