@@ -498,7 +498,7 @@ CREATE SEQUENCE dmt_privilege START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE dmt_role START WITH 1 INCREMENT BY 1;
 
-CREATE SEQUENCE hibernate_sequence;
+CREATE SEQUENCE hibernate_sequence START WITH 1 INCREMENT BY 1;
 
 ---------------
 -- CREATE MISC
@@ -512,5 +512,3 @@ CREATE TABLE z_dmt_sql_apply (
 
 	PRIMARY KEY (c_version, c_module)
 );
-
-
