@@ -12,13 +12,15 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @WebListener
 public class DemeterWebListener implements ServletContextListener, ServletRequestListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebListener.class);
 
-	private Map<String, IRequestLifecycle> requestLifecycleBeans;
+	private List<IRequestLifecycle> requestLifecycleBeans = new ArrayList<>();
 
 	// ------------------------------
 
@@ -32,10 +34,9 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 		boolean deployment = ConfigUtil.getBoolean(DemeterConfigKey.DeploymentMode);
 		sce.getServletContext().setInitParameter("configuration", deployment ? "deployment" : "development");
 
-		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
-		for (String beanName : requestLifecycleBeans.keySet()) {
-			logger.info("DemeterWebListener: IRequestLifecycle Bean = {}", beanName);
-		}
+		Map<String, IRequestLifecycle> beans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans.addAll(beans.values());
+		logger.info("DemeterWebListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
 	}
 
 	@Override
@@ -51,14 +52,12 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	public void requestInitialized(ServletRequestEvent sre) {
 		logger.debug("DemeterWebListener.requestInitialized");
 
-		if (requestLifecycleBeans != null) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				try {
-					requestLifecycle.beforeRequest();
-				} catch (Exception e) {
-					logger.error("DemeterWebListener.requestLifecycle: bean={}",
-						requestLifecycle.getClass().getName(), e);
-				}
+		for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
+			try {
+				requestLifecycle.beforeRequest();
+			} catch (Exception e) {
+				logger.error("DemeterWebListener.requestLifecycle: bean={}",
+					requestLifecycle.getClass().getName(), e);
 			}
 		}
 	}
@@ -67,14 +66,12 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	public void requestDestroyed(ServletRequestEvent sre) {
 		logger.debug("DemeterWebListener.requestDestroyed");
 
-		if (requestLifecycleBeans != null) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
-				try {
-					requestLifecycle.afterResponse();
-				} catch (Exception e) {
-					logger.error("DemeterWebListener.requestDestroyed: bean={}",
-						requestLifecycle.getClass().getName(), e);
-				}
+		for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
+			try {
+				requestLifecycle.afterResponse();
+			} catch (Exception e) {
+				logger.error("DemeterWebListener.requestDestroyed: bean={}",
+					requestLifecycle.getClass().getName(), e);
 			}
 		}
 	}

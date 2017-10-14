@@ -1,3 +1,7 @@
+-----------------------
+-- CREATE AUDIT TABLES
+-----------------------
+
 CREATE TABLE REVINFO (
 	REV      INTEGER,
 	REVTSTMP BIGINT,
@@ -28,15 +32,7 @@ CREATE TABLE a_mt_dmt_prvlg_role_perm (
 	PRIMARY KEY (r_num, f_role, f_prvlg)
 );
 
-CREATE TABLE a_mt_dmt_prvlg_user_deny (
-	r_num   INTEGER NOT NULL,
-	f_user  BIGINT  NOT NULL,
-	f_prvlg BIGINT  NOT NULL,
-	r_type  TINYINT,
-	PRIMARY KEY (r_num, f_user, f_prvlg)
-);
-
-CREATE TABLE a_mt_dmt_prvlg_user_perm (
+CREATE TABLE a_mt_dmt_prvlg_user (
 	r_num   INTEGER NOT NULL,
 	f_user  BIGINT  NOT NULL,
 	f_prvlg BIGINT  NOT NULL,
@@ -108,6 +104,10 @@ CREATE TABLE a_t_dmt_user (
 	PRIMARY KEY (id, r_num)
 );
 
+------------------------
+-- CREATE MIDDLE TABLES
+------------------------
+
 CREATE TABLE mt_dmt_pageinst_role (
 	f_page_inst BIGINT NOT NULL,
 	f_role      BIGINT NOT NULL
@@ -123,12 +123,7 @@ CREATE TABLE mt_dmt_prvlg_role_perm (
 	f_prvlg BIGINT NOT NULL
 );
 
-CREATE TABLE mt_dmt_prvlg_user_deny (
-	f_user  BIGINT NOT NULL,
-	f_prvlg BIGINT NOT NULL
-);
-
-CREATE TABLE mt_dmt_prvlg_user_perm (
+CREATE TABLE mt_dmt_prvlg_user (
 	f_user  BIGINT NOT NULL,
 	f_prvlg BIGINT NOT NULL
 );
@@ -137,6 +132,10 @@ CREATE TABLE mt_dmt_user_role (
 	f_user BIGINT NOT NULL,
 	f_role BIGINT NOT NULL
 );
+
+----------------------
+-- CREATE MAIN TABLES
+----------------------
 
 CREATE TABLE t_dmt_d_page (
 	id             BIGINT       NOT NULL,
@@ -162,7 +161,7 @@ CREATE TABLE t_dmt_d_page_inst (
 	c_title         VARCHAR(255) NOT NULL,
 	c_uri           VARCHAR(255) NOT NULL,
 	n_version       INTEGER      NOT NULL,
-	f_page_info    BIGINT NOT NULL,
+	f_page_info    BIGINT,
 	PRIMARY KEY (id)
 );
 
@@ -275,6 +274,10 @@ CREATE TABLE t_dmt_user (
 	PRIMARY KEY (id)
 );
 
+-----------------------------
+-- CREATE UNIQUE CONSTRAINTS
+-----------------------------
+
 ALTER TABLE t_dmt_d_page
 ADD CONSTRAINT uk_dmt_page_type UNIQUE (c_type);
 
@@ -299,6 +302,10 @@ ADD CONSTRAINT uk_dmt_role_name UNIQUE (c_name);
 ALTER TABLE t_dmt_user
 ADD CONSTRAINT uk_dmt_user_username UNIQUE (c_username);
 
+----------------------------------
+-- CREATE REFERENTIAL CONSTRAINTS
+----------------------------------
+
 ALTER TABLE a_mt_dmt_pageinst_role
 ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
 FOREIGN KEY (r_num)
@@ -314,13 +321,8 @@ ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
-ALTER TABLE a_mt_dmt_prvlg_user_deny
-ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
-FOREIGN KEY (r_num)
-REFERENCES REVINFO;
-
-ALTER TABLE a_mt_dmt_prvlg_user_perm
-ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
+ALTER TABLE a_mt_dmt_prvlg_user
+ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
@@ -349,13 +351,15 @@ ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
+------------------------------
+
 ALTER TABLE mt_dmt_pageinst_role
-ADD CONSTRAINT pageinstrole2role
+ADD CONSTRAINT pageInstRole2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_pageinst_role
-ADD CONSTRAINT pageinstrole2user
+ADD CONSTRAINT pageInstRole2pageInst
 FOREIGN KEY (f_page_inst)
 REFERENCES t_dmt_d_page_inst;
 
@@ -379,33 +383,23 @@ ADD CONSTRAINT prvlgRolePerm2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
-ALTER TABLE mt_dmt_prvlg_user_deny
-ADD CONSTRAINT prvlgUserDeny2prvlg
+ALTER TABLE mt_dmt_prvlg_user
+ADD CONSTRAINT prvlgUser2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
-ALTER TABLE mt_dmt_prvlg_user_deny
-ADD CONSTRAINT prvlgUserDeny2user
-FOREIGN KEY (f_user)
-REFERENCES t_dmt_user;
-
-ALTER TABLE mt_dmt_prvlg_user_perm
-ADD CONSTRAINT prvlgUserPerm2prvlg
-FOREIGN KEY (f_prvlg)
-REFERENCES t_dmt_privilege;
-
-ALTER TABLE mt_dmt_prvlg_user_perm
-ADD CONSTRAINT prvlgUserPerm2user
+ALTER TABLE mt_dmt_prvlg_user
+ADD CONSTRAINT prvlgUser2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE mt_dmt_user_role
-ADD CONSTRAINT userrole2role
+ADD CONSTRAINT userRole2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_user_role
-ADD CONSTRAINT userrole2user
+ADD CONSTRAINT userRole2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
@@ -484,6 +478,10 @@ ADD CONSTRAINT role_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
+--------------------
+-- CREATE SEQUENCES
+--------------------
+
 CREATE SEQUENCE dmt_d_page
 		START WITH 1
 		INCREMENT BY 1;
@@ -519,3 +517,16 @@ CREATE SEQUENCE dmt_role
 CREATE SEQUENCE hibernate_sequence
 		START WITH 1
 		INCREMENT BY 1;
+
+---------------
+-- CREATE MISC
+---------------
+
+CREATE TABLE z_dmt_sql_apply (
+	c_module  VARCHAR(10)  NOT NULL,
+	c_version VARCHAR(10)  NOT NULL,
+	c_file    VARCHAR(255) NOT NULL,
+	d_apply   DATE         NOT NULL,
+
+	PRIMARY KEY (c_version, c_module)
+);

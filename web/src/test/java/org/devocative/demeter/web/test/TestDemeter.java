@@ -5,10 +5,12 @@ import org.apache.wicket.util.tester.WicketTester;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
+import org.devocative.demeter.core.EStartupStep;
 import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterWebApplication;
@@ -41,14 +43,45 @@ public class TestDemeter {
 		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");
 	}
 
+	// --------------- C
+
 	@Test
-	public void a00CheckAccessDenied() {
+	public void c00IncompleteStartup() {
+		Assert.assertEquals(EStartupStep.Database, DemeterCore.getLatestStat().getStep());
+		Assert.assertEquals(2, DemeterCore.getDbDiffs().size());
+
+		DemeterCore.applyAllDbDiffs();
+		DemeterCore.resume();
+		Assert.assertEquals(EStartupStep.End, DemeterCore.getLatestStat().getStep());
+	}
+
+	@Test
+	public void c01CheckAllEntities() throws ClassNotFoundException {
+		IPersistorService persistorService = DemeterCore.getApplicationContext().getBean(IPersistorService.class);
+		Assert.assertNotNull(persistorService);
+
+		List<String> entities = DemeterCore.getEntities();
+		Assert.assertNotNull(entities);
+		Assert.assertTrue(entities.size() > 0);
+
+		for (String entity : entities) {
+			List<?> list = persistorService.list(Class.forName(entity));
+			Assert.assertNotNull(list);
+		}
+	}
+
+	// --------------- D
+
+	@Test
+	public void d00CheckAccessDenied() {
 		tester.executeUrl("./dvc/dmt/users");
 		Assert.assertTrue(tester.getLastResponseAsString().contains("<title>ورود به سامانه</title>"));
 	}
 
 	@Test
-	public void a01Login() {
+	public void d01Login() {
+		Assert.assertFalse(ConfigUtil.getBoolean(DemeterConfigKey.LoginCaptchaEnabled));
+
 		LoginDPage loginDPage = new LoginDPage("dPage", Collections.<String>emptyList());
 		tester.startComponentInPage(loginDPage);
 
@@ -59,7 +92,7 @@ public class TestDemeter {
 	}
 
 	@Test
-	public void a02CurrentUser() {
+	public void d02CurrentUser() {
 		Assert.assertEquals("root", securityService.getCurrentUser().getUsername());
 
 		String roles = securityService.getCurrentUser().getRoles().toString();
@@ -70,7 +103,7 @@ public class TestDemeter {
 	}
 
 	@Test
-	public void a02CheckAllPages() throws Exception {
+	public void d03CheckAllPages() throws Exception {
 		IDPageInstanceService pageInstanceService = DemeterCore.getApplicationContext().getBean(IDPageInstanceService.class);
 		UserVO.PageVO defaultPages = pageInstanceService.getDefaultPages();
 		Set<DPageInfo> pageInfoSet = new HashSet<>();
@@ -100,6 +133,8 @@ public class TestDemeter {
 			tester.startComponentInPage(dPage);
 		}
 	}
+
+	// --------------- S
 
 	@Test
 	public void s01AddRole() {

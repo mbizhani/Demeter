@@ -13,19 +13,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
 
-	private Map<String, IRequestLifecycle> requestLifecycleBeans;
+	private List<IRequestLifecycle> requestLifecycleBeans = new ArrayList<>();
 	private ISecurityService securityService;
 
 	public DemeterRequestCycleListener() {
-		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
-		for (String beanName : requestLifecycleBeans.keySet()) {
-			logger.info("DemeterRequestCycleListener: IRequestLifecycle Bean = {}", beanName);
-		}
+		Map<String, IRequestLifecycle> beans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans.addAll(beans.values());
+		logger.info("DemeterRequestCycleListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
 
 		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
 	}
@@ -47,8 +48,8 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		}
 
 		// Other request cycles are handled in DemeterWebListener, only WebSocket is handled here!
-		if (requestLifecycleBeans != null && isWSRq) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+		if (isWSRq) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 				try {
 					requestLifecycle.beforeRequest();
 				} catch (Exception e) {
@@ -73,8 +74,8 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		}
 
 		// Other request cycles are handled in DemeterWebListener, only WebSocket is handled here!
-		if (requestLifecycleBeans != null && isWSRs) {
-			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
+		if (isWSRs) {
+			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 				try {
 					requestLifecycle.afterResponse();
 				} catch (Exception e) {

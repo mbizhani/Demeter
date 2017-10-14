@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+	<title>Startup</title>
+</head>
+
+<body>
+
+<h1>Startup Failure Handler</h1>
+
+<table border="1" cellpadding="0" cellspacing="0">
+	<tr>
+		<th>Step</th>
+		<td wicket:id="step"></td>
+	</tr>
+	<tr>
+		<th>Exception/Error</th>
+		<td wicket:id="error"></td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+<form wicket:id="form">
+	<wicket:container wicket:id="diffs">
+		<table border="1" cellspacing="0" cellpadding="0">
+			<tr>
+				<th>Module</th>
+				<td wicket:id="module"></td>
+			</tr>
+			<tr>
+				<th>Version</th>
+				<td wicket:id="version"></td>
+			</tr>
+			<tr>
+				<th>File</th>
+				<td wicket:id="file"></td>
+			</tr>
+			<tr>
+				<th>SQL</th>
+				<td><textarea wicket:id="sql" cols="100" rows="10"></textarea></td>
+			</tr>
+		</table>
+		<br/>
+	</wicket:container>
+	<button type="submit" wicket:id="apply">Apply</button>
+</form>
+
+</body>
+
+</html>

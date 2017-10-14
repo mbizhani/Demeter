@@ -9,6 +9,8 @@ public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
 	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
+	DatabaseDiffAuto("dmt.db.diff.auto", false, Arrays.asList(true, false)),
+
 	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
 	//SecurityRealm(true, "dmt.security.realm"),
 	SecurityKeyStoreEnabled("dmt.security.ks.enabled", true, Arrays.asList(true, false)),
@@ -35,7 +37,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	STO_Database("dmt.security.sto.database", 60),
 	STO_LDAP("dmt.security.sto.ldap", 40),
 	STO_Other("dmt.security.sto.other", 5),
-	STO_Admin("dmt.security.sto.other", 10),
+	STO_Admin("dmt.security.sto.admin", 10),
 
 	CorsEnabled("dmt.security.cors.enabled", false, Arrays.asList(true, false)),
 	CorsHeaderOrigins("dmt.security.cors.origins", "*"),

@@ -18,6 +18,7 @@ import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.util.time.Duration;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
+import org.devocative.demeter.IDemeterCoreEventListener;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.wickomp.WDefaults;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class DemeterWebApplication extends WebApplication {
+public class DemeterWebApplication extends WebApplication implements IDemeterCoreEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebApplication.class);
 
 	private static final String APP_INNER_CTX = "/dvc";
@@ -52,23 +53,8 @@ public class DemeterWebApplication extends WebApplication {
 	}
 
 	@Override
-	protected void init() {
-		logger.info("*************************");
-		logger.info("** Demeter Application **");
-		logger.info("** Context Path: {}", getServletContext().getContextPath());
-
-		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.getApplicationContext()));
-
-		getMarkupSettings().setStripWicketTags(true);
-		getMarkupSettings().setStripComments(true);
-		getMarkupSettings().setCompressWhitespace(true);
-		getMarkupSettings().setDefaultMarkupEncoding("UTF-8");
-
+	public void afterUpSuccessfully() {
 		getRequestCycleListeners().add(new DemeterRequestCycleListener());
-		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger(DemeterConfigKey.WebRequestTimeout)));
-		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean(DemeterConfigKey.WebIgnoreMissedResource));
-
-		WDefaults.setExceptionToMessageHandler(new DemeterExceptionToMessageHandler());
 
 		mountPage(APP_INNER_CTX, Index.class);
 
@@ -100,6 +86,34 @@ public class DemeterWebApplication extends WebApplication {
 	@Override
 	public WebSession newSession(Request request, Response response) {
 		return new DemeterWebSession(request);
+	}
+
+	// ------------------------------
+
+	@Override
+	protected void init() {
+		logger.info("*************************");
+		logger.info("** Demeter Application **");
+		logger.info("** Context Path: {}", getServletContext().getContextPath());
+
+		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.getApplicationContext()));
+
+		getMarkupSettings().setStripWicketTags(true);
+		getMarkupSettings().setStripComments(true);
+		getMarkupSettings().setCompressWhitespace(true);
+		getMarkupSettings().setDefaultMarkupEncoding("UTF-8");
+
+		getRequestCycleSettings().setTimeout(Duration.minutes(ConfigUtil.getInteger(DemeterConfigKey.WebRequestTimeout)));
+		getResourceSettings().setThrowExceptionOnMissingResource(!ConfigUtil.getBoolean(DemeterConfigKey.WebIgnoreMissedResource));
+
+		WDefaults.setExceptionToMessageHandler(new DemeterExceptionToMessageHandler());
+
+		if (DemeterCore.isStartedSuccessfully()) {
+			afterUpSuccessfully();
+		} else {
+			mountPage(APP_INNER_CTX, StartupHandlerPage.class);
+			DemeterCore.addCoreEvent(this);
+		}
 	}
 
 	@Override
