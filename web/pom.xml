@@ -104,11 +104,10 @@
 
 		<testResources>
 			<testResource>
-				<filtering>false</filtering>
 				<directory>src/test/resources</directory>
 			</testResource>
+
 			<testResource>
-				<filtering>false</filtering>
 				<directory>src/test/java</directory>
 				<includes>
 					<include>**</include>
@@ -116,6 +115,10 @@
 				<excludes>
 					<exclude>**/*.java</exclude>
 				</excludes>
+			</testResource>
+
+			<testResource>
+				<directory>../common/src/main/resources</directory>
 			</testResource>
 		</testResources>
 
