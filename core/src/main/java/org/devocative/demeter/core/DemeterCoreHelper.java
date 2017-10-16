@@ -68,12 +68,21 @@ public class DemeterCoreHelper {
 				}
 			}
 
-			PreparedStatement ps = connection.prepareStatement("insert into z_dmt_sql_apply(c_module,c_version,c_file,d_apply) VALUES(?,?,?,?)");
-			ps.setString(1, diff.getModule());
-			ps.setString(2, diff.getVersion());
-			ps.setString(3, diff.getFile());
-			ps.setDate(4, new Date(new java.util.Date().getTime()));
-			ps.executeUpdate();
+			PreparedStatement select = connection.prepareStatement("select count(1) from z_dmt_sql_apply where c_module=? and c_version=?");
+			select.setString(1, diff.getModule());
+			select.setString(2, diff.getVersion());
+			ResultSet rs = select.executeQuery();
+			rs.next();
+			long cnt = rs.getLong(1);
+			if (cnt == 0) {
+				logger.warn("Insert SQL Apply: module=[{}] version=[{}]", diff.getModule(), diff.getVersion());
+				PreparedStatement insert = connection.prepareStatement("insert into z_dmt_sql_apply(c_module,c_version,c_file,d_apply) VALUES(?,?,?,?)");
+				insert.setString(1, diff.getModule());
+				insert.setString(2, diff.getVersion());
+				insert.setString(3, diff.getFile());
+				insert.setDate(4, new Date(new java.util.Date().getTime()));
+				insert.executeUpdate();
+			}
 		}
 	}
 
@@ -82,6 +91,8 @@ public class DemeterCoreHelper {
 		Map<String, List<String>> applied = findApplied(connection);
 
 		for (String module : modules) {
+			module = module.toLowerCase();
+
 			URL verUrl = DemeterCoreHelper.class.getResource(String.format("/sql/%s_versions.txt", module));
 			if (verUrl != null) {
 				LineIterator iterator = IOUtils.lineIterator(verUrl.openStream(), "UTF-8");
@@ -92,6 +103,10 @@ public class DemeterCoreHelper {
 						URL sqlUrl = DemeterCore.class.getResource(sqlFile);
 						if (sqlUrl != null) {
 							String sql = IOUtils.toString(sqlUrl, "UTF-8");
+
+							sql += "\n\n-- Add SQL_Apply\n";
+							sql += String.format("insert into z_dmt_sql_apply(c_module,c_version,c_file,d_apply) VALUES('%s','%s','%s',sysdate);",
+								module, version, sqlFile);
 							result.add(new DbDiffVO(module, version, sqlFile, sql));
 						} else {
 							throw new RuntimeException("SQL file not found: " + sqlFile);
