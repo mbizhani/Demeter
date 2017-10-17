@@ -58,7 +58,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 		mountPage(APP_INNER_CTX, Index.class);
 
-		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(DemeterCore.getApplicationContext()));
+		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(DemeterCore.get().getApplicationContext()));
 
 		initModulesForWeb();
 
@@ -96,7 +96,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		logger.info("** Demeter Application **");
 		logger.info("** Context Path: {}", getServletContext().getContextPath());
 
-		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.getApplicationContext()));
+		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.get().getApplicationContext()));
 
 		getMarkupSettings().setStripWicketTags(true);
 		getMarkupSettings().setStripComments(true);
@@ -108,11 +108,11 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 		WDefaults.setExceptionToMessageHandler(new DemeterExceptionToMessageHandler());
 
-		if (DemeterCore.isStartedSuccessfully()) {
+		if (DemeterCore.get().isStartedSuccessfully()) {
 			afterUpSuccessfully();
 		} else {
 			mountPage(APP_INNER_CTX, StartupHandlerPage.class);
-			DemeterCore.addCoreEvent(this);
+			DemeterCore.get().addCoreEvent(this);
 		}
 	}
 
@@ -183,7 +183,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 	private void initModulesForWeb() {
 		String appBaseDir = getServletContext().getRealPath(".");
 
-		Map<String, XModule> modules = DemeterCore.getModules();
+		Map<String, XModule> modules = DemeterCore.get().getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
 			getResourceSettings().getStringResourceLoaders().add(0, new BundleStringResourceLoader(xModule.getMainResource()));
@@ -211,7 +211,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		}
 
 		if (webDModule != null) {
-			DemeterCore.registerSpringBean(module + "WebDModule", webDModule);
+			DemeterCore.get().registerSpringBean(module + "WebDModule", webDModule);
 			webDModule.init();
 			logger.info("WebDModule created and inited successfully: {}", module);
 		}

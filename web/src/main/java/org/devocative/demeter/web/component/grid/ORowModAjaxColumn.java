@@ -18,7 +18,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 	public ORowModAjaxColumn(IModel<String> text, HTMLBase linkContent) {
 		super(text, linkContent);
 
-		currentUser = DemeterCore.getApplicationContext().getBean(ISecurityService.class).getCurrentUser();
+		currentUser = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class).getCurrentUser();
 	}
 
 	@Override

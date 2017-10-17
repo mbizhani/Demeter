@@ -28,13 +28,13 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	public void contextInitialized(ServletContextEvent sce) {
 		logger.info("##========================");
 		logger.info("##== Context Initialized!");
-		DemeterCore.init();
+		DemeterCore.get().init();
 		logger.info("##========================");
 
 		boolean deployment = ConfigUtil.getBoolean(DemeterConfigKey.DeploymentMode);
 		sce.getServletContext().setInitParameter("configuration", deployment ? "deployment" : "development");
 
-		Map<String, IRequestLifecycle> beans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		Map<String, IRequestLifecycle> beans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		requestLifecycleBeans.addAll(beans.values());
 		logger.info("DemeterWebListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
 	}
@@ -42,7 +42,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		logger.info("##== Context Destroyed!");
-		DemeterCore.shutdown();
+		DemeterCore.get().shutdown();
 		logger.info("##========================");
 	}
 

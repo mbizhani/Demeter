@@ -24,11 +24,11 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private ISecurityService securityService;
 
 	public DemeterRequestCycleListener() {
-		Map<String, IRequestLifecycle> beans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		Map<String, IRequestLifecycle> beans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		requestLifecycleBeans.addAll(beans.values());
 		logger.info("DemeterRequestCycleListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
 
-		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
+		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
 	}
 
 	@Override

@@ -19,8 +19,8 @@ public class StartupHandlerPage extends WebPage {
 	private static final long serialVersionUID = -283332983407600664L;
 
 	public StartupHandlerPage(PageParameters pageParameters) {
-		StepResultVO latestStat = DemeterCore.getLatestStat();
-		List<DbDiffVO> dbDiffs = DemeterCore.getDbDiffs();
+		StepResultVO latestStat = DemeterCore.get().getLatestStat();
+		List<DbDiffVO> dbDiffs = DemeterCore.get().getDbDiffs();
 
 		add(new Label("step", latestStat.getStep()));
 		add(new Label("error", latestStat.getError().getMessage()));
@@ -44,8 +44,8 @@ public class StartupHandlerPage extends WebPage {
 
 			@Override
 			public void onSubmit() {
-				DemeterCore.applyDbDiffs(dbDiffs);
-				DemeterCore.resume();
+				DemeterCore.get().applyDbDiffs(dbDiffs);
+				DemeterCore.get().resume();
 				setResponsePage(Index.class, pageParameters);
 			}
 		});

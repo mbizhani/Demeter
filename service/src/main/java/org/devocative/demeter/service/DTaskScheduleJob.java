@@ -20,9 +20,9 @@ public class DTaskScheduleJob implements Job {
 		String scheduleId = context.getJobDetail().getKey().getName();
 		logger.info("DemeterSimpleTaskJob: scheduleId={}", scheduleId);
 
-		IPersistorService persistorService = (IPersistorService) DemeterCore.getApplicationContext().getBean("dmtPersistorService");
-		ITaskService taskService = DemeterCore.getApplicationContext().getBean(ITaskService.class);
-		ISecurityService securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
+		IPersistorService persistorService = (IPersistorService) DemeterCore.get().getApplicationContext().getBean("dmtPersistorService");
+		ITaskService taskService = DemeterCore.get().getApplicationContext().getBean(ITaskService.class);
+		ISecurityService securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
 		UserVO currentUser = securityService.getCurrentUser();
 		if (currentUser == null) {
 			securityService.authenticate(securityService.getSystemUser());

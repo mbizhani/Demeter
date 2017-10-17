@@ -149,9 +149,9 @@ commit;
 	// ------------------------------
 
 	public void s01CheckExport() throws SQLException, FileNotFoundException {
-		DemeterCore.init(TestImportExport.class.getResourceAsStream("/config_OraDbExp.properties"));
+		DemeterCore.get().init(TestImportExport.class.getResourceAsStream("/config_OraDbExp.properties"));
 
-		IPersistorService persistorService = DemeterCore.getApplicationContext().getBean(IPersistorService.class);
+		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Connection sqlConnection = persistorService.createSqlConnection();
 
 		ExportImportHelper helper = new ExportImportHelper(sqlConnection);
@@ -238,17 +238,17 @@ commit;
 
 		sqlConnection.close();
 
-		DemeterCore.shutdown();
+		DemeterCore.get().shutdown();
 	}
 
 	public void s02CheckImport() throws SQLException, FileNotFoundException {
-		DemeterCore.init(TestImportExport.class.getResourceAsStream("/config_OraDbImp.properties"));
+		DemeterCore.get().init(TestImportExport.class.getResourceAsStream("/config_OraDbImp.properties"));
 
-		IPersistorService persistorService = DemeterCore.getApplicationContext().getBean(IPersistorService.class);
+		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Connection sqlConnection = persistorService.createSqlConnection();
 		sqlConnection.setAutoCommit(false);
 
-		Object userId = DemeterCore.getApplicationContext().getBean(ISecurityService.class).getCurrentUser().getUserId();
+		Object userId = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class).getCurrentUser().getUserId();
 		logger.info("Current User: id=[{}]", userId);
 
 		ExportImportHelper helper = new ExportImportHelper(sqlConnection);
@@ -276,7 +276,7 @@ commit;
 
 		sqlConnection.commit();
 
-		DemeterCore.shutdown();
+		DemeterCore.get().shutdown();
 	}
 
 	// ---------------

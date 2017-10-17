@@ -74,8 +74,8 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 			nonceRefreshExecutor.scheduleAtFixedRate(() -> nonce = UUID.randomUUID().toString(), 1, 1, TimeUnit.MINUTES);
 		}*/
 
-		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
-		userService = DemeterCore.getApplicationContext().getBean(IUserService.class);
+		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
+		userService = DemeterCore.get().getApplicationContext().getBean(IUserService.class);
 
 		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 

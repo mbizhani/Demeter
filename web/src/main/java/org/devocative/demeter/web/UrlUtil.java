@@ -102,7 +102,7 @@ public class UrlUtil {
 
 	private static IDPageInstanceService getPageInstanceService() {
 		if (pageInstanceService == null) {
-			pageInstanceService = DemeterCore.getApplicationContext().getBean(IDPageInstanceService.class);
+			pageInstanceService = DemeterCore.get().getApplicationContext().getBean(IDPageInstanceService.class);
 		}
 		return pageInstanceService;
 	}

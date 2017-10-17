@@ -116,7 +116,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
 
 		int totalDPageSize = 0;
-		Map<String, XModule> modules = DemeterCore.getModules();
+		Map<String, XModule> modules = DemeterCore.get().getModules();
 		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
 

@@ -1,6 +1,8 @@
 package org.devocative.demeter.core;
 
 import com.thoughtworks.xstream.XStream;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.IConfigKey;
 import org.devocative.adroit.StringEncryptorUtil;
@@ -17,33 +19,45 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
 public class DemeterCore {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterCore.class);
 
-	private static final Map<String, XModule> MODULES = new LinkedHashMap<>();
-	private static final Set<String> MODULE_SHORT_NAMES = new LinkedHashSet<>();
+	private final Map<String, XModule> MODULES = new LinkedHashMap<>();
+	private final Set<String> MODULE_SHORT_NAMES = new LinkedHashSet<>();
 
-	private static ApplicationContext appCtx;
-	private static final Map<ApplicationLifecyclePriority, Map<String, IApplicationLifecycle>> APP_LIFECYCLE_BEANS = new HashMap<>();
+	private ClassPathXmlApplicationContext appCtx;
+	private final Map<ApplicationLifecyclePriority, Map<String, IApplicationLifecycle>> APP_LIFECYCLE_BEANS = new HashMap<>();
 
-	private static boolean shuted = false;
+	private boolean shuted = false;
 
-	private static StepResultVO MAIN_STARTUP = new StepResultVO(EStartupStep.Begin);
-	private static final List<IDemeterCoreEventListener> DEMETER_CORE_EVENTS = new ArrayList<>();
+	private StepResultVO MAIN_STARTUP = new StepResultVO(EStartupStep.Begin);
+	private final List<IDemeterCoreEventListener> DEMETER_CORE_EVENTS = new ArrayList<>();
 
 	// ------------------------------
 
-	public static void init() {
+	private static DemeterCore INSTANCE;
+
+	public static DemeterCore get() {
+		if (INSTANCE == null || INSTANCE.shuted) {
+			INSTANCE = new DemeterCore();
+		}
+
+		return INSTANCE;
+	}
+
+	// ------------------------------
+
+	public void init() {
 		init(getDefaultConfig());
 	}
 
-	public synchronized static void init(InputStream configInputStream) {
+	public synchronized void init(InputStream configInputStream) {
 		if (MAIN_STARTUP.getStep() == EStartupStep.Begin) {
 			ConfigUtil.load(configInputStream);
 
@@ -53,7 +67,7 @@ public class DemeterCore {
 		}
 	}
 
-	public static void resume() {
+	public void resume() {
 		logger.info("## RESUMING");
 
 		if (!isStartedSuccessfully()) {
@@ -63,26 +77,27 @@ public class DemeterCore {
 		}
 	}
 
-	public synchronized static void shutdown() {
+	public synchronized void shutdown() {
 		if (!shuted) {
 			shutdownApplicationLifecycle();
+			appCtx.close();
 			logger.info("### MODULE LOADER SHUTDOWNED");
 		}
 
 		shuted = true;
 	}
 
-	public static void registerSpringBean(String beanName, Object bean) {
-		ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) appCtx).getBeanFactory();
+	public void registerSpringBean(String beanName, Object bean) {
+		ConfigurableListableBeanFactory beanFactory = appCtx.getBeanFactory();
 		beanFactory.registerSingleton(beanName, bean);
 		beanFactory.autowireBean(bean);
 	}
 
-	public static void generatePersistorSchemaDiff() {
+	public void generatePersistorSchemaDiff() {
 		generatePersistorSchemaDiff(getDefaultConfig());
 	}
 
-	public static void generatePersistorSchemaDiff(InputStream configInputStream) {
+	public void generatePersistorSchemaDiff(InputStream configInputStream) {
 		ConfigUtil.load(configInputStream);
 
 		startUntil(EStartupStep.Begin, EStartupStep.LazyBeans);
@@ -99,41 +114,41 @@ public class DemeterCore {
 		}
 	}
 
-	public static void applyAllDbDiffs() {
+	public void applyAllDbDiffs() {
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), true);
 	}
 
-	public static void applyDbDiffs(List<DbDiffVO> diffs) {
+	public void applyDbDiffs(List<DbDiffVO> diffs) {
 		DemeterCoreHelper.applyDbDiffs(diffs);
 	}
 
-	public static void addCoreEvent(IDemeterCoreEventListener listener) {
+	public void addCoreEvent(IDemeterCoreEventListener listener) {
 		DEMETER_CORE_EVENTS.add(listener);
 	}
 
 	// ---------------
 
-	public static ApplicationContext getApplicationContext() {
+	public ApplicationContext getApplicationContext() {
 		return appCtx;
 	}
 
-	public static Map<String, XModule> getModules() {
+	public Map<String, XModule> getModules() {
 		return new LinkedHashMap<>(MODULES);
 	}
 
-	public static boolean isStartedSuccessfully() {
+	public boolean isStartedSuccessfully() {
 		return MAIN_STARTUP.getStep() == EStartupStep.End;
 	}
 
-	public static StepResultVO getLatestStat() {
+	public StepResultVO getLatestStat() {
 		return new StepResultVO(MAIN_STARTUP.getStep(), MAIN_STARTUP.getError());
 	}
 
-	public static List<DbDiffVO> getDbDiffs() {
+	public List<DbDiffVO> getDbDiffs() {
 		return DemeterCoreHelper.getDbDiffs(new ArrayList<>(MODULE_SHORT_NAMES));
 	}
 
-	public static List<String> getEntities() {
+	public List<String> getEntities() {
 		List<String> list = new ArrayList<>();
 		for (Map.Entry<String, XModule> moduleEntry : MODULES.entrySet()) {
 			XModule xModule = moduleEntry.getValue();
@@ -148,7 +163,7 @@ public class DemeterCore {
 
 	// ------------------------------
 
-	private static StepResultVO startUntil(EStartupStep step, EStartupStep last) {
+	private StepResultVO startUntil(EStartupStep step, EStartupStep last) {
 		StepResultVO result = null;
 		while (step.ordinal() < last.ordinal()) {
 			logger.info("## Executing Step: [{}]", EStartupStep.next(step));
@@ -163,7 +178,7 @@ public class DemeterCore {
 		return result != null ? result : new StepResultVO(step);
 	}
 
-	private static StepResultVO doNext(EStartupStep current) {
+	private StepResultVO doNext(EStartupStep current) {
 		Exception error = null;
 		EStartupStep next = EStartupStep.next(current);
 
@@ -201,6 +216,7 @@ public class DemeterCore {
 					break;
 
 				case End:
+					initEnd();
 					break;
 
 				default:
@@ -214,7 +230,7 @@ public class DemeterCore {
 		return new StepResultVO(next, error);
 	}
 
-	private static void checkAndExecuteAfterSuccess() {
+	private void checkAndExecuteAfterSuccess() {
 		if (isStartedSuccessfully()) {
 			for (IDemeterCoreEventListener demeterUp : DEMETER_CORE_EVENTS) {
 				demeterUp.afterUpSuccessfully();
@@ -225,7 +241,7 @@ public class DemeterCore {
 
 	// --------------- STEPS
 
-	private static void initEncDec() {
+	private void initEncDec() {
 		boolean enableSecurity = true;
 		try {
 			enableSecurity = ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity);
@@ -260,7 +276,7 @@ public class DemeterCore {
 		}
 	}
 
-	private static void initModules() {
+	private void initModules() {
 		XStream xStream = new XStream();
 		xStream.processAnnotations(XModule.class);
 		xStream.alias("dependency", String.class);
@@ -286,7 +302,7 @@ public class DemeterCore {
 		}
 	}
 
-	private static void initSpringContext() {
+	private void initSpringContext() {
 		boolean clientMode = ConfigUtil.getString(DemeterConfigKey.ServiceRemoteHost) != null;
 		logger.info("Client Mode: {}", clientMode);
 
@@ -307,7 +323,7 @@ public class DemeterCore {
 		}
 	}
 
-	private static void initPersistorServices() {
+	private void initPersistorServices() {
 		Map<String, IPersistorService> persistors = appCtx.getBeansOfType(IPersistorService.class);
 
 		List<Class> dmtPersistorServiceEntities = new ArrayList<>();
@@ -341,11 +357,11 @@ public class DemeterCore {
 		logger.info("Demeter persistor initialized with [{}] entities.", dmtPersistorServiceEntities.size());
 	}
 
-	private static void initDatabase() {
+	private void initDatabase() {
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), false);
 	}
 
-	private static void initLazyBeans() {
+	private void initLazyBeans() {
 		for (XModule module : MODULES.values()) {
 			try {
 				String beanName = String.format("%sDModule", module.getShortName().toLowerCase());
@@ -359,7 +375,7 @@ public class DemeterCore {
 		}
 	}
 
-	private static void initBeansStartup() {
+	private void initBeansStartup() {
 		Map<String, IApplicationLifecycle> beansOfType = appCtx.getBeansOfType(IApplicationLifecycle.class);
 		for (Map.Entry<String, IApplicationLifecycle> entry : beansOfType.entrySet()) {
 			if (entry.getValue().getLifecyclePriority() == null) {
@@ -387,9 +403,30 @@ public class DemeterCore {
 		iPersistorServiceMap.values().forEach(org.devocative.demeter.iservice.persistor.IPersistorService::endSession);
 	}
 
+	private void initEnd() {
+		if (ConfigUtil.hasKey(DemeterConfigKey.StartupGroovyScript)) {
+			File file = new File(ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
+			if (file.exists()) {
+				try {
+					GroovyShell shell = new GroovyShell();
+					Script parse = shell.parse(file);
+					parse.run();
+
+					logger.info("Script executed successfully: [{}]",
+						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
+				} catch (Exception e) {
+					logger.error("initEnd: script file = [{}]",
+						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript), e);
+				}
+			} else {
+				logger.error("Script file not found: " + ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
+			}
+		}
+	}
+
 	// ---------------
 
-	private static void shutdownApplicationLifecycle() {
+	private void shutdownApplicationLifecycle() {
 		List<ApplicationLifecyclePriority> priorities = Arrays.asList(ApplicationLifecyclePriority.values());
 		Collections.reverse(priorities);
 
@@ -404,7 +441,7 @@ public class DemeterCore {
 
 	// ---------------
 
-	private static List<Class> loadEntities(List<XEntity> entities) {
+	private List<Class> loadEntities(List<XEntity> entities) {
 		List<Class> classes = new ArrayList<>();
 		for (XEntity entity : entities) {
 			try {
@@ -416,7 +453,7 @@ public class DemeterCore {
 		return classes;
 	}
 
-	private static void loadConfigKeys(XModule xModule) {
+	private void loadConfigKeys(XModule xModule) {
 		try {
 			if (xModule.getConfigKeyClass() != null) {
 				Class<?> enumClass = Class.forName(xModule.getConfigKeyClass());
@@ -436,7 +473,7 @@ public class DemeterCore {
 		}
 	}
 
-	private static InputStream getDefaultConfig() {
+	private InputStream getDefaultConfig() {
 		return DemeterCore.class.getResourceAsStream("/config.properties");
 	}
 }

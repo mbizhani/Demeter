@@ -415,7 +415,7 @@ public class HibernatePersistorService implements IPersistorService {
 					if (securityService != null && securityService.getCurrentUser() != null) {
 						state[i] = securityService.getCurrentUser().getUserId();
 					} else {
-						logger.error("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
+						logger.warn("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
 						if (entity instanceof Person) {
 							Person p = (Person) entity;
 							if (!"system".equals(p.getLastName())) {

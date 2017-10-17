@@ -16,12 +16,10 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterWebApplication;
 import org.devocative.demeter.web.dpage.LoginDPage;
 import org.devocative.demeter.web.dpage.RoleFormDPage;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
 
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,37 +28,54 @@ import java.util.Set;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDemeter {
+	private static InputStream CONFIG = TestDemeter.class.getResourceAsStream("/config.properties");
+
 	private static WicketTester tester;
 
 	private static ISecurityService securityService;
 
+	// ------------------------------
+
+	public static void setCONFIG(InputStream CONFIG) {
+		TestDemeter.CONFIG = CONFIG;
+	}
+
 	@BeforeClass
 	public static void setUp() {
-		DemeterCore.init();
-		securityService = DemeterCore.getApplicationContext().getBean(ISecurityService.class);
+		DemeterCore.get().init(CONFIG);
+
+		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
 		tester = new WicketTester(new DemeterWebApplication());
 
 		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");
+		System.out.println("TestDemeter.setUp");
+	}
+
+	@AfterClass
+	public static void shutdown() {
+		DemeterCore.get().shutdown();
 	}
 
 	// --------------- C
 
 	@Test
 	public void c00IncompleteStartup() {
-		Assert.assertEquals(EStartupStep.Database, DemeterCore.getLatestStat().getStep());
-		Assert.assertEquals(2, DemeterCore.getDbDiffs().size());
+		Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
+		Assert.assertEquals(2, DemeterCore.get().getDbDiffs().size());
 
-		DemeterCore.applyAllDbDiffs();
-		DemeterCore.resume();
-		Assert.assertEquals(EStartupStep.End, DemeterCore.getLatestStat().getStep());
+		DemeterCore.get().applyAllDbDiffs();
+		DemeterCore.get().resume();
+		Assert.assertEquals(EStartupStep.End, DemeterCore.get().getLatestStat().getStep());
+
+		Assert.assertEquals("UP", System.getProperty("THE_LDAP"));
 	}
 
 	@Test
 	public void c01CheckAllEntities() throws ClassNotFoundException {
-		IPersistorService persistorService = DemeterCore.getApplicationContext().getBean(IPersistorService.class);
+		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Assert.assertNotNull(persistorService);
 
-		List<String> entities = DemeterCore.getEntities();
+		List<String> entities = DemeterCore.get().getEntities();
 		Assert.assertNotNull(entities);
 		Assert.assertTrue(entities.size() > 0);
 
@@ -104,7 +119,7 @@ public class TestDemeter {
 
 	@Test
 	public void d03CheckAllPages() throws Exception {
-		IDPageInstanceService pageInstanceService = DemeterCore.getApplicationContext().getBean(IDPageInstanceService.class);
+		IDPageInstanceService pageInstanceService = DemeterCore.get().getApplicationContext().getBean(IDPageInstanceService.class);
 		UserVO.PageVO defaultPages = pageInstanceService.getDefaultPages();
 		Set<DPageInfo> pageInfoSet = new HashSet<>();
 

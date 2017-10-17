@@ -257,7 +257,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	// ------------------------------
 
 	private void storePrivilegeKeys() {
-		Collection<XModule> xModules = DemeterCore.getModules().values();
+		Collection<XModule> xModules = DemeterCore.get().getModules().values();
 		for (XModule xModule : xModules) {
 			try {
 				String privilegeKeyClass = xModule.getPrivilegeKeyClass();

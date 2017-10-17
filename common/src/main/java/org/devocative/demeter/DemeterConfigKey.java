@@ -56,6 +56,7 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
+	StartupGroovyScript("dmt.server.startup.script"),
 
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),
 	LdapUrl(true, "dmt.ldap.url"),

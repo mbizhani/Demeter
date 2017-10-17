@@ -63,13 +63,13 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolMax),
 			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolAliveTime),
 			TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<Runnable>());
+			new LinkedBlockingQueue<>());
 
 		threadPoolExecutor.setRejectedExecutionHandler(this);
 
 		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
 
-		requestLifecycleBeans = DemeterCore.getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -88,13 +88,13 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			.update();
 		persistorService.commitOrRollback();
 
-		Map<String, XModule> modules = DemeterCore.getModules();
+		Map<String, XModule> modules = DemeterCore.get().getModules();
 		for (XModule xModule : modules.values()) {
 			if (xModule.getTasks() != null) {
 				for (XDTask xdTask : xModule.getTasks()) {
 					try {
 						Class<?> beanType = Class.forName(xdTask.getType());
-						DemeterCore.getApplicationContext().getBean(beanType);
+						DemeterCore.get().getApplicationContext().getBean(beanType);
 					} catch (ClassNotFoundException e) {
 						throw new DSystemException("Unknown task type as bean: " + xdTask.getType());
 					}
@@ -220,7 +220,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 				logger.info("Starting Task: class=[{}] - taskInfo=[{}]", taskClass, taskInfo.getId());
 
-				DTask dTask = (DTask) DemeterCore.getApplicationContext().getBean(taskClass);
+				DTask dTask = (DTask) DemeterCore.get().getApplicationContext().getBean(taskClass);
 				return startDTask(dTask, id, inputData, resultCallback);
 			} catch (ClassNotFoundException e) {
 				logger.error("Can't find task class: class=[{}] taskInfo=[{}]", taskInfo.getType(), taskInfo.getId());

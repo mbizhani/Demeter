@@ -66,6 +66,7 @@
 		<d.slf4j.ver>1.7.25</d.slf4j.ver>
 		<d.servlet.ver>3.1.0</d.servlet.ver>
 		<d.wicket.ver>7.8.0</d.wicket.ver>
+		<d.groovy.ver>2.4.7</d.groovy.ver>
 
 		<p.jetty.ver>9.4.6.v20170531</p.jetty.ver>
 		<p.compiler.ver>3.5.1</p.compiler.ver>
