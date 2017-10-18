@@ -49,7 +49,7 @@ public abstract class DPage extends Panel {
 		return getCurrentUser().hasPermission(privilegeKey);
 	}
 
-	protected boolean hasPermission(String uri) {
-		return getCurrentUser().hasPermission(uri);
+	protected boolean hasPermission(Class<? extends DPage> dPageClass) {
+		return getCurrentUser().hasPermission(pageInstanceService.getUriByPage(dPageClass));
 	}
 }
