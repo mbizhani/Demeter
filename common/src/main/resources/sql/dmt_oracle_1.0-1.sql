@@ -1,6 +1,7 @@
-------------------
--- ALTER PREVIOUS
-------------------
+----------------
+-- ALTER TABLES
+----------------
+
 DROP TABLE a_mt_dmt_prvlg_user;
 DROP TABLE mt_dmt_prvlg_user;
 
@@ -54,7 +55,7 @@ ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
------------------------------
+-----------------
 
 ALTER TABLE mt_dmt_prvlg_user_deny
 ADD CONSTRAINT prvlgUserDeny2prvlg
