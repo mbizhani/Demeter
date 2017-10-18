@@ -70,12 +70,12 @@ public class UserVO implements Serializable {
 		return root;
 	}
 
-	public boolean hasAccessToURI(String uri) {
-		return pageVO.getAccessibleUri().contains(uri);
-	}
-
 	public Map<String, Set<DPageInstance>> getMainMenuEntries() {
 		return pageVO.getMainMenuEntries();
+	}
+
+	public boolean hasPermission(String uri) {
+		return pageVO.getAccessibleUri().contains(uri);
 	}
 
 	public boolean hasPermission(IPrivilegeKey privilegeKey) {

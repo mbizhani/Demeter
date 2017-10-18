@@ -48,4 +48,8 @@ public abstract class DPage extends Panel {
 	protected boolean hasPermission(IPrivilegeKey privilegeKey) {
 		return getCurrentUser().hasPermission(privilegeKey);
 	}
+
+	protected boolean hasPermission(String uri) {
+		return getCurrentUser().hasPermission(uri);
+	}
 }

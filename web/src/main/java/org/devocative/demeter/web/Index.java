@@ -280,7 +280,7 @@ public class Index extends WebPage {
 		try {
 			Class<? extends DPage> dPageClass = findDPageClass(pageInfo);
 			if (DPage.class.isAssignableFrom(dPageClass)) {
-				if (currentUser.hasAccessToURI(uri)) {
+				if (currentUser.hasPermission(uri)) {
 					Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
 					result = (DPage) constructor.newInstance("content", params);
 				} else if (currentUser.isAuthenticated()) {
