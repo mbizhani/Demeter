@@ -24,10 +24,12 @@ public class DemeterCoreHelper {
 			List<DbDiffVO> diffs = findDiffs(connection, modules, PaginationPlugin.findDatabaseType(connection).toString().toLowerCase());
 			logger.info("Database Found Diff(s): no = [{}]", diffs.size());
 
-			if (force || ConfigUtil.getBoolean(DemeterConfigKey.DatabaseDiffAuto)) {
-				applyDiffs(connection, diffs);
-			} else {
-				throw new RuntimeException("Database Diff Found");
+			if (!diffs.isEmpty()) {
+				if (force || ConfigUtil.getBoolean(DemeterConfigKey.DatabaseDiffAuto)) {
+					applyDiffs(connection, diffs);
+				} else {
+					throw new RuntimeException("Database Diff Found");
+				}
 			}
 		} catch (IOException | SQLException e) {
 			throw new RuntimeException(e);
