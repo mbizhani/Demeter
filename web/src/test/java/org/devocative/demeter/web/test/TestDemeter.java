@@ -28,11 +28,15 @@ import java.util.Set;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDemeter {
-	private static InputStream CONFIG = TestDemeter.class.getResourceAsStream("/config.properties");
+	private static InputStream CONFIG = TestDemeter.class.getResourceAsStream("/configHSQLDB.properties");
 
 	private static WicketTester tester;
 
 	private static ISecurityService securityService;
+
+	// ------------------------------
+
+	protected int NO_OF_DB_DIFF_FILES = 2;
 
 	// ------------------------------
 
@@ -56,22 +60,24 @@ public class TestDemeter {
 		DemeterCore.get().shutdown();
 	}
 
-	// --------------- C
+	// --------------- B
 
 	@Test
-	public void c00IncompleteStartup() {
+	public void b00IncompleteStartup() {
 		Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
-		Assert.assertEquals(2, DemeterCore.get().getDbDiffs().size());
+		Assert.assertEquals(NO_OF_DB_DIFF_FILES, DemeterCore.get().getDbDiffs().size());
 
 		DemeterCore.get().applyAllDbDiffs();
 		DemeterCore.get().resume();
 		Assert.assertEquals(EStartupStep.End, DemeterCore.get().getLatestStat().getStep());
 
-		Assert.assertEquals("UP", System.getProperty("THE_LDAP"));
+		if (ConfigUtil.hasKey(DemeterConfigKey.StartupGroovyScript)) {
+			Assert.assertEquals("UP", System.getProperty("THE_LDAP"));
+		}
 	}
 
 	@Test
-	public void c01CheckAllEntities() throws ClassNotFoundException {
+	public void b01CheckAllEntities() throws ClassNotFoundException {
 		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Assert.assertNotNull(persistorService);
 
@@ -79,7 +85,10 @@ public class TestDemeter {
 		Assert.assertNotNull(entities);
 		Assert.assertTrue(entities.size() > 0);
 
+		System.out.println("--- TOTAL ENTITIES: " + entities.size());
+
 		for (String entity : entities) {
+			System.out.println("\t--- " + entity);
 			List<?> list = persistorService.list(Class.forName(entity));
 			Assert.assertNotNull(list);
 		}
@@ -149,10 +158,10 @@ public class TestDemeter {
 		}
 	}
 
-	// --------------- S
+	// --------------- F
 
 	@Test
-	public void s01AddRole() {
+	public void f01AddRole() {
 		RoleFormDPage roleFormDPage = new RoleFormDPage("dPage");
 		tester.startComponentInPage(roleFormDPage);
 

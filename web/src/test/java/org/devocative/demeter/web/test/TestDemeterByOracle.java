@@ -18,6 +18,12 @@ public class TestDemeterByOracle {
 
 	private List<Failure> failures = new ArrayList<>();
 
+	// ------------------------------
+
+	protected Class<? extends TestDemeter> TEST_DEMETER_CLASS = TestDemeter.class;
+
+	// ------------------------------
+
 	@Test
 	public void c00testDemeterByOracle() {
 		InputStream config = TestDemeterByOracle.class.getResourceAsStream("/configOracle.properties");
@@ -54,7 +60,7 @@ public class TestDemeterByOracle {
 					failures.add(failure);
 				}
 			});
-			core.run(TestDemeter.class);
+			core.run(TEST_DEMETER_CLASS);
 
 			Assert.assertEquals("Failures:\n" + listOfFailures(), 0, failures.size());
 		}
