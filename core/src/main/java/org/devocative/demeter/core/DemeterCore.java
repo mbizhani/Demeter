@@ -101,9 +101,13 @@ public class DemeterCore {
 
 	public void generatePersistorSchemaDiff(InputStream configInputStream) {
 		ConfigUtil.load(configInputStream);
-		ConfigUtil.updateKey("dmt.db.diff.auto", "true");
 
-		startUntil(EStartupStep.Begin, EStartupStep.LazyBeans);
+		StepResultVO resultVO = startUntil(EStartupStep.Begin, EStartupStep.LazyBeans);
+		if (!resultVO.isSuccessful()) {
+			logger.error("=======================================");
+			logger.error("== {}", resultVO.getError());
+			logger.error("=======================================");
+		}
 
 		Map<String, IPersistorService> persistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
 		for (Map.Entry<String, IPersistorService> entry : persistorServiceMap.entrySet()) {
@@ -125,6 +129,8 @@ public class DemeterCore {
 	}
 
 	public void applyAllDbDiffs() {
+		startUntil(EStartupStep.Begin, EStartupStep.Database);
+
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), true);
 	}
 
