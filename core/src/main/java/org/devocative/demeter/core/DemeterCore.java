@@ -39,6 +39,8 @@ public class DemeterCore {
 	private StepResultVO MAIN_STARTUP = new StepResultVO(EStartupStep.Begin);
 	private final List<IDemeterCoreEventListener> DEMETER_CORE_EVENTS = new ArrayList<>();
 
+	private Date startUpDate;
+
 	// ------------------------------
 
 	private static DemeterCore INSTANCE;
@@ -99,6 +101,7 @@ public class DemeterCore {
 
 	public void generatePersistorSchemaDiff(InputStream configInputStream) {
 		ConfigUtil.load(configInputStream);
+		ConfigUtil.updateKey("dmt.db.diff.auto", "true");
 
 		startUntil(EStartupStep.Begin, EStartupStep.LazyBeans);
 
@@ -112,6 +115,13 @@ public class DemeterCore {
 			logger.info("Persistor schema diff: {}", entry.getKey());
 			entry.getValue().generateSchemaDiff();
 		}
+
+		for (Map.Entry<String, IPersistorService> entry : persistorServiceMap.entrySet()) {
+			logger.info("Persistor shutdown: {}", entry.getKey());
+			entry.getValue().shutdown();
+		}
+
+		appCtx.close();
 	}
 
 	public void applyAllDbDiffs() {
@@ -159,6 +169,10 @@ public class DemeterCore {
 			}
 		}
 		return list;
+	}
+
+	public Date getStartUpDate() {
+		return startUpDate;
 	}
 
 	// ------------------------------
@@ -422,6 +436,8 @@ public class DemeterCore {
 				logger.error("Script file not found: " + ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
 			}
 		}
+
+		startUpDate = new Date();
 	}
 
 	// ---------------

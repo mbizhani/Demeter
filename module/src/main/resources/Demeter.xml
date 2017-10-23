@@ -25,6 +25,8 @@
 		<entity type="org.devocative.demeter.entity.Privilege"/>
 		<entity type="org.devocative.demeter.entity.Role"/>
 		<entity type="org.devocative.demeter.entity.User"/>
+
+		<entity type="org.devocative.demeter.entity.ZSqlApply"/>
 	</entities>
 
 	<tasks>

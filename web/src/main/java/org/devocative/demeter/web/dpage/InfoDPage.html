@@ -2,20 +2,30 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-	Info: <span wicket:id="params"></span>
-	<!--<button wicket:id="link" type="button">Call DTask</button>-->
 
-	<!--<table>
+	<table cellspacing="0" cellpadding="5" border="1" style="direction: ltr" align="center">
 		<tr>
-			<td><div wicket:id="text"></div></td>
-			<td><div wicket:id="date"></div></td>
-			<td><div wicket:id="dateRange"></div></td>
-			<td><div wicket:id="selection"></div></td>
-			<td><input type="submit" value="Search"/></td>
+			<th>Server Startup</th>
+			<td wicket:id="startUp"></td>
 		</tr>
-	</table>-->
+	</table>
 
-	<!--<a wicket:id="alink">Redir</a><br/>
-	<a wicket:id="link">Redir</a><br/>-->
+	<br/>
+
+	<table cellspacing="0" cellpadding="5" border="1" style="direction: ltr" align="center">
+		<tr>
+			<th>Module</th>
+			<th>Version</th>
+			<th>File</th>
+			<th>Apply Date</th>
+		</tr>
+		<tr wicket:id="rows">
+			<td wicket:id="module"></td>
+			<td wicket:id="version"></td>
+			<td wicket:id="file"></td>
+			<td wicket:id="apply"></td>
+		</tr>
+	</table>
+
 </wicket:panel>
 </html>

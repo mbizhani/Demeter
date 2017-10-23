@@ -1,21 +1,22 @@
 package org.devocative.demeter.entity;
 
+import org.devocative.adroit.CalendarUtil;
+
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ECalendar implements Serializable {
 	private static final long serialVersionUID = -8563152792867832546L;
 
 	private static final Map<Integer, ECalendar> ID_TO_LIT = new LinkedHashMap<>();
+	private static final int PERSIAN_ID = 1;
+	private static final int GREGORIAN_ID = 2;
 
 	// ------------------------------
 
-	public static final ECalendar JALALI = new ECalendar(1, "Jalali");
-	public static final ECalendar GREGORIAN = new ECalendar(2, "Gregorian");
+	public static final ECalendar PERSIAN = new ECalendar(PERSIAN_ID, "Persian");
+	public static final ECalendar GREGORIAN = new ECalendar(GREGORIAN_ID, "Gregorian");
 
 	// ------------------------------
 
@@ -46,7 +47,21 @@ public class ECalendar implements Serializable {
 		return ID_TO_LIT.get(getId()).name;
 	}
 
-	// ------------------------------
+	// ---------------
+
+	public String convertToString(Date dt, String pattern) {
+		switch (getId()) {
+			case PERSIAN_ID:
+				return CalendarUtil.toPersian(dt, pattern);
+
+			case GREGORIAN_ID:
+				return CalendarUtil.formatDate(dt, pattern);
+		}
+
+		return null;
+	}
+
+	// ---------------
 
 	@Override
 	public boolean equals(Object o) {

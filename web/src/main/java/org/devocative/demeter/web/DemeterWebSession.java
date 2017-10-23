@@ -80,7 +80,7 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	@Override
 	public OCalendar getCalendar() {
 		OCalendar result = OCalendar.Gregorian;
-		if (ECalendar.JALALI.equals(userVO.getCalendar())) {
+		if (ECalendar.PERSIAN.equals(userVO.getCalendar())) {
 			result = OCalendar.Persian;
 		}
 		return result;
