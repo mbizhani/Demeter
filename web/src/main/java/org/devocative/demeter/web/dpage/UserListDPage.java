@@ -118,8 +118,6 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setLabel(new ResourceModel("User.locale")));
 		floatTable.add(new WSelectionInput("calendarType", ECalendar.list(), true)
 			.setLabel(new ResourceModel("User.calendarType")));
-		floatTable.add(new WSelectionInput("layoutDirectionType", ELayoutDirection.list(), true)
-			.setLabel(new ResourceModel("User.layoutDirectionType")));
 		floatTable.add(new WSelectionInput("datePatternType", EDatePatternType.list(), true)
 			.setLabel(new ResourceModel("User.datePatternType")));
 		floatTable.add(new WSelectionInput("dateTimePatternType", EDateTimePatternType.list(), true)
@@ -176,7 +174,6 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.status"), "status"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.locale"), "locale"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.calendarType"), "calendarType"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.layoutDirectionType"), "layoutDirectionType"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.datePatternType"), "datePatternType"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.dateTimePatternType"), "dateTimePatternType"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.lastLoginDate"), "lastLoginDate")

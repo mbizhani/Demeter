@@ -121,8 +121,6 @@ public class UserFormDPage extends DPage {
 			.setLabel(new ResourceModel("User.locale")));
 		floatTable.add(new WSelectionInput("calendarType", ECalendar.list(), false)
 			.setLabel(new ResourceModel("User.calendarType")));
-		floatTable.add(new WSelectionInput("layoutDirectionType", ELayoutDirection.list(), false)
-			.setLabel(new ResourceModel("User.layoutDirectionType")));
 		floatTable.add(new WSelectionInput("datePatternType", EDatePatternType.list(), false)
 			.setLabel(new ResourceModel("User.datePatternType")));
 		floatTable.add(new WSelectionInput("dateTimePatternType", EDateTimePatternType.list(), false)

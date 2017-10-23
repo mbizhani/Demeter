@@ -14,8 +14,8 @@ public class ELocale implements Serializable {
 
 	// ------------------------------
 
-	public static final ELocale FA = new ELocale(1, "Farsi", "fa");
-	public static final ELocale EN = new ELocale(2, "English", "en");
+	public static final ELocale FA = new ELocale(1, "Farsi", "fa", ELayoutDirection.RTL, ECalendar.PERSIAN);
+	public static final ELocale EN = new ELocale(2, "English", "en", ELayoutDirection.LTR, ECalendar.GREGORIAN);
 
 	// ------------------------------
 
@@ -27,12 +27,20 @@ public class ELocale implements Serializable {
 	@Transient
 	private String code;
 
+	@Transient
+	private ELayoutDirection layoutDirection;
+
+	@Transient
+	private ECalendar defaultCalendar;
+
 	// ------------------------------
 
-	private ELocale(Integer id, String name, String code) {
+	private ELocale(Integer id, String name, String code, ELayoutDirection layoutDirection, ECalendar defaultCalendar) {
 		this.id = id;
 		this.name = name;
 		this.code = code;
+		this.layoutDirection = layoutDirection;
+		this.defaultCalendar = defaultCalendar;
 
 		ID_TO_LIT.put(id, this);
 	}
@@ -52,6 +60,14 @@ public class ELocale implements Serializable {
 
 	public String getCode() {
 		return ID_TO_LIT.get(getId()).code;
+	}
+
+	public ELayoutDirection getLayoutDirection() {
+		return ID_TO_LIT.get(getId()).layoutDirection;
+	}
+
+	public ECalendar getDefaultCalendar() {
+		return ID_TO_LIT.get(getId()).defaultCalendar;
 	}
 
 	// ------------------------------

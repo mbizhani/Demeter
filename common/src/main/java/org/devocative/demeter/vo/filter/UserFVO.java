@@ -17,16 +17,18 @@ public class UserFVO implements Serializable {
 	private List<EUserStatus> status;
 	private List<ELocale> locale;
 	private List<ECalendar> calendarType;
-	private List<ELayoutDirection> layoutDirectionType;
 	private List<EDatePatternType> datePatternType;
 	private List<EDateTimePatternType> dateTimePatternType;
 	private RangeVO<Date> lastLoginDate;
 	private Boolean admin;
 	private RangeVO<Integer> sessionTimeout;
-	private PersonFVO person;
 	private List<Role> roles;
 	private List<Privilege> permissions;
 	private List<Privilege> denials;
+
+	// ---------------
+
+	private PersonFVO person;
 
 	// ------------------------------
 
@@ -68,14 +70,6 @@ public class UserFVO implements Serializable {
 
 	public void setCalendarType(List<ECalendar> calendarType) {
 		this.calendarType = calendarType;
-	}
-
-	public List<ELayoutDirection> getLayoutDirectionType() {
-		return layoutDirectionType;
-	}
-
-	public void setLayoutDirectionType(List<ELayoutDirection> layoutDirectionType) {
-		this.layoutDirectionType = layoutDirectionType;
 	}
 
 	public List<EDatePatternType> getDatePatternType() {
@@ -142,4 +136,13 @@ public class UserFVO implements Serializable {
 		this.denials = denials;
 	}
 
+	// ---------------
+
+	public PersonFVO getPerson() {
+		return person;
+	}
+
+	public void setPerson(PersonFVO person) {
+		this.person = person;
+	}
 }

@@ -50,10 +50,6 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	private ECalendar calendarType;
 
 	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_laydir_type"))
-	private ELayoutDirection layoutDirectionType;
-
-	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_date_pattern"))
 	private EDatePatternType datePatternType;
 
@@ -160,14 +156,6 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	public void setCalendarType(ECalendar calendarType) {
 		this.calendarType = calendarType;
-	}
-
-	public ELayoutDirection getLayoutDirectionType() {
-		return layoutDirectionType;
-	}
-
-	public void setLayoutDirectionType(ELayoutDirection layoutDirectionType) {
-		this.layoutDirectionType = layoutDirectionType;
 	}
 
 	public EDatePatternType getDatePatternType() {
