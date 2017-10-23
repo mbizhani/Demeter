@@ -184,6 +184,7 @@ public class UserService implements IUserService {
 	@Override
 	public UserVO getUserVO(User user) {
 		ELocale defLocale = ELocale.findByCode(ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
+		ECalendar defCalendar = ECalendar.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultCalendar));
 
 		Integer sto = user.getSessionTimeout();
 		if (sto == null) {
@@ -208,7 +209,11 @@ public class UserService implements IUserService {
 
 			.setLocale(userLocale)
 			.setLayoutDirection(userLocale.getLayoutDirection())
-			.setCalendar(user.getCalendarType() != null ? user.getCalendarType() : userLocale.getDefaultCalendar())
+			.setCalendar(
+				user.getCalendarType() != null ?
+					user.getCalendarType() :
+					defCalendar != null ? defCalendar :
+						userLocale.getDefaultCalendar())
 			.setDatePatternType(user.getDatePatternType() != null ? user.getDatePatternType() : EDatePatternType.P01)
 			.setDateTimePatternType(user.getDateTimePatternType() != null ? user.getDateTimePatternType() : EDateTimePatternType.P01)
 			.setSessionTimeout(sto);

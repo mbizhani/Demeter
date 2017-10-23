@@ -69,6 +69,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),
 
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
+	UserDefaultCalendar("dmt.user.def.calendar", Arrays.asList("Persian", "Gregorian")),
 
 	LogMDCEnabled("dmt.log.mdc.enabled", true, Arrays.asList(true, false));
 
