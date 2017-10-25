@@ -139,7 +139,12 @@ public abstract class DTask implements Runnable {
 
 	protected void sendResult(Object result) {
 		if (resultCallback != null) {
-			resultCallback.onTaskResult(id, result);
+			try {
+				resultCallback.onTaskResult(id, result);
+			} catch (Exception e) {
+				logger.error("DTask.sendResult", e);
+				sendError(e);
+			}
 		} else {
 			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
 		}
@@ -147,7 +152,11 @@ public abstract class DTask implements Runnable {
 
 	protected void sendError(Exception exception) {
 		if (resultCallback != null) {
-			resultCallback.onTaskError(id, exception);
+			try {
+				resultCallback.onTaskError(id, exception);
+			} catch (Exception e) {
+				logger.error("DTask.sendError: ", e);
+			}
 		} else {
 			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
 		}
