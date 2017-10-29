@@ -1,5 +1,6 @@
 package org.devocative.demeter.web;
 
+import org.devocative.demeter.entity.IPrivilegeKey;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.WPanel;
@@ -22,5 +23,9 @@ public class DPanel extends WPanel {
 
 	protected UserVO getCurrentUser() {
 		return securityService.getCurrentUser();
+	}
+
+	protected boolean hasPermission(IPrivilegeKey privilegeKey) {
+		return getCurrentUser().hasPermission(privilegeKey);
 	}
 }
