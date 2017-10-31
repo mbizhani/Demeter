@@ -93,6 +93,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		roleService.createOrUpdateRole("AuthByDB", ERowMod.ROOT, true);
 		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.ROOT, true);
 		roleService.createOrUpdateRole("AuthByOther", ERowMod.ROOT, true);
+
+		persistorService.commitOrRollback();
 	}
 
 	@Override

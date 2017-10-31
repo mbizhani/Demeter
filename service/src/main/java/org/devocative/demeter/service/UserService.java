@@ -107,7 +107,7 @@ public class UserService implements IUserService {
 
 		personService.saveOrUpdate(user.getPerson());
 		saveOrUpdate(user);
-		persistorService.commitOrRollback();
+		//persistorService.commitOrRollback();
 	}
 
 	@Override

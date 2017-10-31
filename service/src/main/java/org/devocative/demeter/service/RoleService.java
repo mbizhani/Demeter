@@ -100,6 +100,6 @@ public class RoleService implements IRoleService {
 		role.setDynamic(dynamic);
 		role.setRowMod(rowMod);
 		saveOrUpdate(role);
-		persistorService.commitOrRollback();
+		//persistorService.commitOrRollback();
 	}
 }
