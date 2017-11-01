@@ -138,6 +138,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public void authenticate(String username, String password) {
+		resetToGuest();
+
 		UserVO authenticatedUserVO = null;
 		User user = userService.loadByUsername(username);
 
@@ -195,6 +197,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	@Override
 	public UserVO authenticateByUrlParams(Map<String, List<String>> params) {
 		if (otherAuthenticationService != null) {
+			resetToGuest();
+
 			UserInputVO authUserInputVO = otherAuthenticationService.authenticate(params);
 
 			if (authUserInputVO != null) {
@@ -421,5 +425,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			logger.error("LDAP getValue for attr = " + attribute, e);
 		}
 		return null;
+	}
+
+	private void resetToGuest() {
+		CURRENT_USER.set(guest);
 	}
 }
