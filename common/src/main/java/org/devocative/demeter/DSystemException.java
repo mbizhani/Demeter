@@ -10,4 +10,8 @@ public class DSystemException extends RuntimeException {
 	public DSystemException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public DSystemException(Throwable cause) {
+		super(cause);
+	}
 }

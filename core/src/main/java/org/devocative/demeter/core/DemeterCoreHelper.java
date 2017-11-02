@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.sql.plugin.PaginationPlugin;
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +29,11 @@ public class DemeterCoreHelper {
 				if (force || ConfigUtil.getBoolean(DemeterConfigKey.DatabaseDiffAuto)) {
 					applyDiffs(connection, diffs);
 				} else {
-					throw new RuntimeException("Database Diff Found");
+					throw new DSystemException("Database Diff Found: Numbers=" + diffs.size());
 				}
 			}
 		} catch (IOException | SQLException e) {
-			throw new RuntimeException(e);
+			throw new DSystemException(e);
 		}
 	}
 
@@ -40,7 +41,7 @@ public class DemeterCoreHelper {
 		try (Connection connection = createConnection()) {
 			return findDiffs(connection, modules, PaginationPlugin.findDatabaseType(connection).toString().toLowerCase());
 		} catch (IOException | SQLException e) {
-			throw new RuntimeException(e);
+			throw new DSystemException(e);
 		}
 	}
 
@@ -48,7 +49,7 @@ public class DemeterCoreHelper {
 		try (Connection connection = createConnection()) {
 			applyDiffs(connection, dbDiffVOs);
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new DSystemException(e);
 		}
 	}
 
@@ -111,13 +112,13 @@ public class DemeterCoreHelper {
 								module, version, sqlFile);
 							result.add(new DbDiffVO(module, version, sqlFile, sql));
 						} else {
-							throw new RuntimeException("SQL file not found: " + sqlFile);
+							throw new DSystemException("SQL file not found: " + sqlFile);
 						}
 					}
 				}
 				iterator.close();
 			} else {
-				throw new RuntimeException("'versions.txt' File Not Found: " + module);
+				throw new DSystemException("'versions.txt' File Not Found: " + module);
 			}
 		}
 		return result;
@@ -139,7 +140,7 @@ public class DemeterCoreHelper {
 				applied.get(module).add(version);
 			}
 		} catch (SQLException e) {
-			logger.error("DemeterCoreHelper.findApplied: {}", e.getMessage());
+			logger.warn("DemeterCoreHelper.findApplied: {}", e.getMessage());
 		}
 
 		return applied;
@@ -154,7 +155,7 @@ public class DemeterCoreHelper {
 				ConfigUtil.getString(true, "dmt.db.username"),
 				ConfigUtil.getString("dmt.db.password", ""));
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new DSystemException(e);
 		}
 	}
 }

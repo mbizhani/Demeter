@@ -240,10 +240,12 @@ public class DemeterCore {
 					break;
 
 				default:
-					throw new RuntimeException("Unhandled Step: " + current);
+					throw new DSystemException("Unhandled Step: " + current);
 			}
 		} catch (Exception e) {
-			logger.error("Step=[{}]", next, e);
+			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
+			logger.warn("!! Step = [{}] , Msg = [{}]", next, e.getMessage());
+			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
 			error = e;
 		}
 
