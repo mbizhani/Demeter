@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -136,22 +135,24 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		add(form);
 
 		OColumnList<Role> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.name"), "name"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Role.name"), "name"));
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.dynamic"), "dynamic")
 			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions"), "permissions"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials"), "denials"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions"), "permissions")
+			.setWidth(OSize.fixed(250)));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials"), "denials")
+			.setWidth(OSize.fixed(250)));
 		if (getCurrentUser().isRoot()) {
-			columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.rowMod"), "rowMod"));
+			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMod"), "rowMod"));
 		}
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.modificationDate"), "modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
 		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.version"), "version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));

@@ -19,7 +19,6 @@ import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.form.range.WDateRangeInput;
-import org.devocative.wickomp.form.range.WNumberRangeInput;
 import org.devocative.wickomp.formatter.OBooleanFormatter;
 import org.devocative.wickomp.formatter.ODateFormatter;
 import org.devocative.wickomp.formatter.ONumberFormatter;
@@ -118,17 +117,17 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 			.setLabel(new ResourceModel("User.locale")));
 		floatTable.add(new WSelectionInput("calendarType", ECalendar.list(), true)
 			.setLabel(new ResourceModel("User.calendarType")));
-		floatTable.add(new WSelectionInput("datePatternType", EDatePatternType.list(), true)
+		/*floatTable.add(new WSelectionInput("datePatternType", EDatePatternType.list(), true)
 			.setLabel(new ResourceModel("User.datePatternType")));
 		floatTable.add(new WSelectionInput("dateTimePatternType", EDateTimePatternType.list(), true)
-			.setLabel(new ResourceModel("User.dateTimePatternType")));
+			.setLabel(new ResourceModel("User.dateTimePatternType")));*/
 		floatTable.add(new WDateRangeInput("lastLoginDate")
 			.setTimePartVisible(true)
 			.setLabel(new ResourceModel("User.lastLoginDate")));
 		floatTable.add(new WBooleanInput("admin")
 			.setLabel(new ResourceModel("User.admin")));
-		floatTable.add(new WNumberRangeInput("sessionTimeout", Integer.class)
-			.setLabel(new ResourceModel("User.sessionTimeout")));
+		/*floatTable.add(new WNumberRangeInput("sessionTimeout", Integer.class)
+			.setLabel(new ResourceModel("User.sessionTimeout")));*/
 		floatTable.add(new WSelectionInput("roles", userService.getRolesList(), true)
 			.setLabel(new ResourceModel("User.roles")));
 		floatTable.add(new WSelectionInput("permissions", userService.getPermissionsList(), true)
@@ -174,19 +173,22 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.status"), "status"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.locale"), "locale"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("User.calendarType"), "calendarType"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.datePatternType"), "datePatternType"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.dateTimePatternType"), "dateTimePatternType"));
+		//columnList.add(new OPropertyColumn<>(new ResourceModel("User.datePatternType"), "datePatternType"));
+		//columnList.add(new OPropertyColumn<>(new ResourceModel("User.dateTimePatternType"), "dateTimePatternType"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.lastLoginDate"), "lastLoginDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.admin"), "admin")
 			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.sessionTimeout"), "sessionTimeout")
+		/*columnList.add(new OPropertyColumn<User>(new ResourceModel("User.sessionTimeout"), "sessionTimeout")
 			.setFormatter(ONumberFormatter.integer())
-			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.roles"), "roles"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.permissions"), "permissions"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("User.denials"), "denials"));
+			.setStyle("direction:ltr"));*/
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.roles"), "roles")
+			.setWidth(OSize.fixed(100)));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.permissions"), "permissions")
+			.setWidth(OSize.fixed(150)));
+		columnList.add(new OPropertyColumn<User>(new ResourceModel("User.denials"), "denials")
+			.setWidth(OSize.fixed(150)));
 
 		// -- Person
 		if (getCurrentUser().isRoot()) {
