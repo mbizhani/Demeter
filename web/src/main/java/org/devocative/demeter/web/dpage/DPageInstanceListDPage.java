@@ -134,7 +134,8 @@ public class DPageInstanceListDPage extends DPage implements IGridDataSource<DPa
 		columnList.add(new OPropertyColumn<>(new ResourceModel("DPageInstance.refId"), "refId"));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.pageInfo"), "pageInfo")
 			.setStyle("direction:ltr;text-align:left"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("DPageInstance.roles"), "roles"));
+		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("DPageInstance.roles"), "roles")
+			.setWidth(OSize.fixed(150)));
 		columnList.add(new OPropertyColumn<DPageInstance>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));

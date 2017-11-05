@@ -1,5 +1,6 @@
 package org.devocative.demeter.web.dpage;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -48,7 +49,8 @@ public class ConfigKeysDPage extends DPage {
 				String remapped = remappedKeys.get(configKey.getKey());
 				RepeatingView key = new RepeatingView("key");
 				if (configKey.getPossibleValues() == null) {
-					key.add(new WTextInput(remapped));
+					key.add(new WTextInput(remapped)
+						.add(new AttributeModifier("style", "width:300px")));
 				} else {
 					List<String> pValues = new ArrayList<>();
 					for (Object pv : configKey.getPossibleValues()) {
