@@ -5,14 +5,18 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.adroit.ConfigUtil;
+import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.DPasswordStrengthValidator;
 import org.devocative.wickomp.form.*;
 import org.devocative.wickomp.form.validator.WEqualInputValidator;
+import org.devocative.wickomp.form.validator.WPatternValidator;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
 
@@ -77,16 +81,20 @@ public class UserFormDPage extends DPage {
 
 		floatTable.add(new WTextInput("username")
 			.setRequired(true)
-			.setLabel(new ResourceModel("User.username")));
+			.setLabel(new ResourceModel("User.username"))
+			.add(new WPatternValidator("^[A-Za-z]+?[A-Za-z0-9.]*?$", "User.username.invalid.format")));
 
-		password = new WTextInput("password", new Model<String>(), true);
+		password = new WTextInput("password", new Model<>(), true);
 		password
 			.setRequired(entity.getId() == null)
 			.setLabel(new ResourceModel("User.password"))
 			.setOutputMarkupId(true)
 			.setEnabled(EAuthMechanism.DATABASE.equals(entity.getAuthMechanism()));
 		floatTable.add(password);
-		password2 = new WTextInput("password2", new Model<String>(), true);
+		if (ConfigUtil.getBoolean(DemeterConfigKey.WebPasswordStrength)) {
+			password.add(new DPasswordStrengthValidator());
+		}
+		password2 = new WTextInput("password2", new Model<>(), true);
 		password2
 			.setRequired(entity.getId() == null)
 			.setLabel(new ResourceModel("User.password2"))

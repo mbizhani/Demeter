@@ -171,6 +171,7 @@ public class Index extends WebPage {
 
 			@Override
 			public void onClick() {
+				DemeterWebSession.get().invalidate();
 				securityService.signOut();
 				setResponsePage(Index.class);
 			}

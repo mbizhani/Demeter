@@ -54,6 +54,15 @@ public enum DemeterConfigKey implements IConfigKey {
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
 	WebReplaceCharForString("dmt.web.replace.char", "{\"fa\":[{\"from\":\"ي\",\"to\":\"ی\"}, {\"from\":\"ك\",\"to\":\"ک\"}]}"),
 
+	WebPasswordStrength("dmt.web.password.strength", true, Arrays.asList(true, false)),
+	WebPasswordStrengthDigit("dmt.web.password.strength.digit", true, Arrays.asList(true, false)),
+	WebPasswordStrengthLowerCase("dmt.web.password.strength.lower", true, Arrays.asList(true, false)),
+	WebPasswordStrengthUpperCase("dmt.web.password.strength.upper", true, Arrays.asList(true, false)),
+	WebPasswordStrengthSpecialChar("dmt.web.password.strength.special", true, Arrays.asList(true, false)),
+	WebPasswordStrengthNoWhiteSpace("dmt.web.password.strength.nospace", true, Arrays.asList(true, false)),
+	WebPasswordStrengthMinLength("dmt.web.password.strength.minlength", 7),
+	WebPasswordStrengthMaxLength("dmt.web.password.strength.maxlength"),
+
 	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
 	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
 	StartupGroovyScript("dmt.server.startup.script"),
