@@ -196,7 +196,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Override
 	public UserVO authenticateByUrlParams(Map<String, List<String>> params) {
-		if (otherAuthenticationService != null) {
+		if (otherAuthenticationService != null && otherAuthenticationService.canProceedAuthentication(params)) {
 			resetToGuest();
 
 			UserInputVO authUserInputVO = otherAuthenticationService.authenticate(params);

@@ -7,5 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IOtherAuthenticationService {
+	boolean canProceedAuthentication(Map<String, List<String>> params);
+
 	UserInputVO authenticate(Map<String, List<String>> params) throws DemeterException;
 }
