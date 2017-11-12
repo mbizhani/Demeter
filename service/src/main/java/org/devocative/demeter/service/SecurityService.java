@@ -66,8 +66,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		userService.createOrUpdateUser(
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
-				.setRowMod(ERowMod.SYSTEM)
-				.setSessionTimeout(10),
+				.setRowMod(ERowMod.SYSTEM),
 			null,
 			true
 		);

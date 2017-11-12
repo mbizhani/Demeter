@@ -62,9 +62,9 @@ public enum DemeterConfigKey implements IConfigKey {
 	WebPasswordStrengthNoWhiteSpace("dmt.web.password.strength.nospace", true, Arrays.asList(true, false)),
 	WebPasswordStrengthMinLength("dmt.web.password.strength.minlength", 7),
 	WebPasswordStrengthMaxLength("dmt.web.password.strength.maxlength"),
+	PingWebSocketEnabled("dmt.web.ws.ping.enabled", true, Arrays.asList(true, false)),
+	PingWebSocketPeriod("dmt.web.ws.ping.period", 270), //4.5 * 60
 
-	PingWebSocketEnabled("dmt.server.ping.enabled", true, Arrays.asList(true, false)),
-	PingWebSocketPeriod("dmt.server.ping.period", 150000), //4.5 * 60 * 1000
 	StartupGroovyScript("dmt.server.startup.script"),
 
 	LdapDnTemplate(true, "dmt.ldap.dn.template"),

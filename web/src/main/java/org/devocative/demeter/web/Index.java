@@ -204,21 +204,16 @@ public class Index extends WebPage {
 		Resource.addJQueryReference(response);
 		response.render(INDEX_CSS);
 
-		String ajaxUrl = "";
-		int alertPeriodBeforeSessionTimeout = currentUser.getSessionTimeout();
-
-		if (alertPeriodBeforeSessionTimeout > 0) {
-			alertPeriodBeforeSessionTimeout = (int) ((alertPeriodBeforeSessionTimeout - 0.1 * alertPeriodBeforeSessionTimeout) * 60000);
-			ajaxUrl = ajaxBehavior.getCallbackUrl().toString();
-		}
+		int sessionTimeoutInSec = currentUser.getSessionTimeout() * 60;
+		String ajaxUrl = sessionTimeoutInSec > 0 ? ajaxBehavior.getCallbackUrl().toString() : "";
 
 		response.render(JavaScriptHeaderItem.forScript(
-			String.format("var sessionTO=%d;var ajaxUrl='%s';", alertPeriodBeforeSessionTimeout, ajaxUrl),
+			String.format("var sessionTO=%d;var ajaxUrl='%s';", sessionTimeoutInSec, ajaxUrl),
 			"initJSVariables"));
 
 		if (ConfigUtil.getBoolean(DemeterConfigKey.PingWebSocketEnabled)) {
-			int webSocketPingInterval = ConfigUtil.getInteger(DemeterConfigKey.PingWebSocketPeriod);
-			response.render(JavaScriptHeaderItem.forScript(String.format("var WebSocketPingInterval=%d;", webSocketPingInterval), "WebSocketPingInterval"));
+			int webSocketPingIntervalInSec = ConfigUtil.getInteger(DemeterConfigKey.PingWebSocketPeriod);
+			response.render(JavaScriptHeaderItem.forScript(String.format("var WebSocketPingInterval=%d;", webSocketPingIntervalInSec), "WebSocketPingInterval"));
 		}
 
 		response.render(INDEX_JS);
