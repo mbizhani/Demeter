@@ -10,7 +10,9 @@ public class DemeterIcon {
 	public static final IconFont SEARCH = new FontAwesome("search", new ResourceModel("label.search", "Search"));
 	public static final IconFont SAVE = new FontAwesome("floppy-o", new ResourceModel("label.save", "Save"));
 	public static final IconFont REMOVE = new FontAwesome("times", new ResourceModel("label.remove", "Remove")).setStyleClass("ic-false");
+
 	public static final IconFont ADD = new FontAwesome("plus", new ResourceModel("label.add", "Add"));
+	public static final IconFont ADD_USER = new FontAwesome("user-plus", new ResourceModel("label.add.user", "Add User"));
 
 	public static final IconFont EXPORT_EXCEL = new FontAwesome("file-excel-o", new ResourceModel("label.export.excel", "Export Excel")).setStyleClass("ic-imp");
 	public static final IconFont EXPAND = new FontAwesome("expand", new ResourceModel("label.nodes.expand", "Expand"));
