@@ -22,7 +22,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	HttpPort("dmt.security.http.port", 8080),
 	HttpsEnabled("dmt.security.https.enabled", false, Arrays.asList(true, false)),
 	HttpsPort("dmt.security.https.port", 8443),
-	UserAutoRegister("dmt.security.register.auto", true, Arrays.asList(true, false)),
+	UserAutoRegister("dmt.security.register.auto", false, Arrays.asList(true, false)),
 	LoginCaptchaEnabled("dmt.security.login.captcha.enabled", true, Arrays.asList(true, false)),
 	UrlCrypticEnabled("dmt.security.url.cryptic.enabled", false, Arrays.asList(true, false)),
 	CsrfPreventionEnabled("dmt.security.csrf.prevention.enabled", false, Arrays.asList(true, false)),
