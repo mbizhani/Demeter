@@ -1,5 +1,6 @@
 package org.devocative.demeter.web;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -7,11 +8,12 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.devocative.demeter.core.DbDiffVO;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.StepResultVO;
+import org.devocative.wickomp.html.WAjaxLink;
 
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class StartupHandlerPage extends WebPage {
 				item.add(new Label("module", diffVO.getModule()));
 				item.add(new Label("version", diffVO.getVersion()));
 				item.add(new Label("file", diffVO.getFile()));
-				item.add(new TextArea<>("sql", new PropertyModel<>(diffVO, "sql")));
+				item.add(new TextArea<>("sql", new Model<>(diffVO.getSql())));
 			}
 		});
 		form.add(new Button("apply") {
@@ -45,6 +47,15 @@ public class StartupHandlerPage extends WebPage {
 			@Override
 			public void onSubmit() {
 				DemeterCore.get().applyDbDiffs(dbDiffs);
+				DemeterCore.get().resume();
+				setResponsePage(Index.class, pageParameters);
+			}
+		});
+		form.add(new WAjaxLink("resume") {
+			private static final long serialVersionUID = 7843257940731113723L;
+
+			@Override
+			public void onClick(AjaxRequestTarget ajaxRequestTarget) {
 				DemeterCore.get().resume();
 				setResponsePage(Index.class, pageParameters);
 			}
