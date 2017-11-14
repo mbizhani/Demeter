@@ -244,7 +244,7 @@ public class DemeterCore {
 			}
 		} catch (Exception e) {
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
-			logger.warn("!! Step = [{}] , Msg = [{}]", next, e.getMessage());
+			logger.warn("!! Step = [{}]", next, e);
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
 			error = e;
 		}

@@ -49,7 +49,11 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 	@Override
 	public Class<? extends Page> getHomePage() {
-		return Index.class;
+		if (DemeterCore.get().isStartedSuccessfully()) {
+			return Index.class;
+		} else {
+			return StartupHandlerPage.class;
+		}
 	}
 
 	@Override
@@ -108,6 +112,8 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 		WDefaults.setExceptionToMessageHandler(new DemeterExceptionToMessageHandler());
 
+		logger.info("** Latest Step = [{}], Successful = [{}]",
+			DemeterCore.get().getLatestStat().getStep(), DemeterCore.get().isStartedSuccessfully());
 		if (DemeterCore.get().isStartedSuccessfully()) {
 			afterUpSuccessfully();
 		} else {
