@@ -7,7 +7,6 @@ import org.devocative.demeter.iservice.template.BaseStringTemplate;
 import java.util.Map;
 
 public class GroovyDelegatingScript extends BaseStringTemplate<DelegatingScript> {
-	private static final String DELEGATE = "DELEGATE";
 	private DelegatingScript delegatingScript;
 
 	public GroovyDelegatingScript(DelegatingScript delegatingScript) {
@@ -16,10 +15,12 @@ public class GroovyDelegatingScript extends BaseStringTemplate<DelegatingScript>
 
 	@Override
 	public Object process(Map<String, Object> params) {
-		if (params.containsKey(DELEGATE)) {
-			Object delegate = params.get(DELEGATE);
-			params.remove(DELEGATE);
+		if (params.containsKey(GROOVY_DELEGATE_KEY)) {
+			Object delegate = params.get(GROOVY_DELEGATE_KEY);
+			params.remove(GROOVY_DELEGATE_KEY);
 			delegatingScript.setDelegate(delegate);
+		} else {
+			throw new RuntimeException("No delegate object in params map, key=" + GROOVY_DELEGATE_KEY);
 		}
 
 		Binding binding = new Binding();
