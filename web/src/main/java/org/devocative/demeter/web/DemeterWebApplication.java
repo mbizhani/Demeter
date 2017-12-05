@@ -8,7 +8,6 @@ import org.apache.wicket.protocol.http.CsrfPreventionRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.https.HttpsConfig;
-import org.apache.wicket.protocol.https.HttpsMapper;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
@@ -57,6 +56,13 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 	}
 
 	@Override
+	public WebSession newSession(Request request, Response response) {
+		return new DemeterWebSession(request);
+	}
+
+	// --------------- IDemeterCoreEventListener
+
+	@Override
 	public void afterUpSuccessfully() {
 		getRequestCycleListeners().add(new DemeterRequestCycleListener());
 
@@ -74,7 +80,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		if (ConfigUtil.getBoolean(DemeterConfigKey.HttpsEnabled)) {
 			int httpPort = ConfigUtil.getInteger(DemeterConfigKey.HttpPort);
 			int httpsPort = ConfigUtil.getInteger(DemeterConfigKey.HttpsPort);
-			setRootRequestMapper(new HttpsMapper(getRootRequestMapper(), new HttpsConfig(httpPort, httpsPort)));
+			setRootRequestMapper(new DemeterHttpsMapper(getRootRequestMapper(), new HttpsConfig(httpPort, httpsPort)));
 			logger.info("HTTPS Enabled: HTTP Port=[{}], HTTPS Port=[{}]", httpPort, httpsPort);
 		}
 
@@ -85,11 +91,6 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 		logger.info("** Demeter Application Up! **");
 		logger.info("*****************************");
-	}
-
-	@Override
-	public WebSession newSession(Request request, Response response) {
-		return new DemeterWebSession(request);
 	}
 
 	// ------------------------------
