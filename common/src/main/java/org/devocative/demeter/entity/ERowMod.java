@@ -50,7 +50,13 @@ public class ERowMod implements Serializable {
 		return ID_TO_LIT.get(getId()).name;
 	}
 
-	// ------------------------------
+	// ---------------
+
+	public boolean isAllowedFor(ERowMod rowMod) {
+		return this.id >= rowMod.id;
+	}
+
+	// ---------------
 
 	@Override
 	public boolean equals(Object o) {

@@ -33,8 +33,8 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 
 			return
 				ERowMod.NORMAL.equals(rowMod.getRowMod()) ||
-					(ERowMod.ROOT.equals(rowMod.getRowMod()) && currentUser.isRoot()) ||
-					(ERowMod.ADMIN.equals(rowMod.getRowMod()) && currentUser.isAdmin()) ||
+					(currentUser.isRoot() && rowMod.getRowMod().isAllowedFor(ERowMod.ROOT)) ||
+					(currentUser.isAdmin() && rowMod.getRowMod().isAllowedFor(ERowMod.ADMIN)) ||
 					(creatorUser != null &&
 						ERowMod.CREATOR.equals(rowMod.getRowMod()) &&
 						currentUser.getUserId().equals(creatorUser.getCreatorUserId()));
