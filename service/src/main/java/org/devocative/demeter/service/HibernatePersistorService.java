@@ -1,6 +1,7 @@
 package org.devocative.demeter.service;
 
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.ObjectUtil;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -10,6 +11,8 @@ import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
@@ -185,6 +188,41 @@ public class HibernatePersistorService implements IPersistorService {
 		checkTransaction(session);
 		session.update(obj);
 		session.flush();
+	}
+
+	@Override
+	public void updateFields(Object obj, String... fields) {
+		if (fields != null && fields.length > 0) {
+			Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
+			ClassMetadata classMetadata = sessionFactory.getClassMetadata(cls);
+			String idPropName = classMetadata.getIdentifierPropertyName();
+
+			StringBuilder builder = new StringBuilder();
+			builder
+				.append("update ")
+				.append(cls.getName())
+				.append(" ent set ent.").append(fields[0]).append(" = :f0");
+
+			for (int i = 1; i < fields.length; i++) {
+				builder.append(", ent.").append(fields[i]).append(" = :f").append(i);
+			}
+
+			builder.append(" where ent.").append(idPropName).append(" = :id");
+
+			logger.debug("updateFields query: {}", builder.toString());
+
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			Query query = session.createQuery(builder.toString());
+			for (int i = 0; i < fields.length; i++) {
+				query.setParameter("f" + i, ObjectUtil.getPropertyValue(obj, fields[i], false));
+			}
+			query.setParameter("id", ObjectUtil.getPropertyValue(obj, idPropName, false));
+			query.executeUpdate();
+			session.flush();
+		} else {
+			throw new RuntimeException("No filed!");
+		}
 	}
 
 	@Override

@@ -21,6 +21,8 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 
 	void update(Object obj);
 
+	void updateFields(Object obj, String... fields);
+
 	void merge(Object obj);
 
 	<T> T get(Class<T> entity, Serializable id);
