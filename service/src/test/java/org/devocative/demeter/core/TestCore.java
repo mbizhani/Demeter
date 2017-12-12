@@ -1,6 +1,7 @@
 package org.devocative.demeter.core;
 
 import org.devocative.adroit.vo.RangeVO;
+import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.template.IStringTemplate;
@@ -45,6 +46,7 @@ public class TestCore {
 			person.setFirstName("John" + i);
 			person.setLastName("Blue" + i);
 			person.setBirthRegDate(new Date());
+			person.setRowMod(ERowMod.NORMAL);
 
 			try {
 				Thread.sleep(1000);
