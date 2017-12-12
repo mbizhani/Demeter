@@ -39,6 +39,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 						ERowMod.CREATOR.equals(rowMod.getRowMod()) &&
 						currentUser.getUserId().equals(creatorUser.getCreatorUserId()));
 		}
-		return super.onCellRender(bean, id);
+
+		return true;
 	}
 }

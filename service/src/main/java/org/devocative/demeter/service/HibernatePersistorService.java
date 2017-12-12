@@ -191,11 +191,12 @@ public class HibernatePersistorService implements IPersistorService {
 	}
 
 	@Override
-	public void updateFields(Object obj, String... fields) {
+	public Object updateFields(Object obj, String... fields) {
 		if (fields != null && fields.length > 0) {
 			Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
 			ClassMetadata classMetadata = sessionFactory.getClassMetadata(cls);
 			String idPropName = classMetadata.getIdentifierPropertyName();
+			Object idPropValue = ObjectUtil.getPropertyValue(obj, idPropName, false);
 
 			StringBuilder builder = new StringBuilder();
 			builder
@@ -217,9 +218,11 @@ public class HibernatePersistorService implements IPersistorService {
 			for (int i = 0; i < fields.length; i++) {
 				query.setParameter("f" + i, ObjectUtil.getPropertyValue(obj, fields[i], false));
 			}
-			query.setParameter("id", ObjectUtil.getPropertyValue(obj, idPropName, false));
+			query.setParameter("id", idPropValue);
 			query.executeUpdate();
 			session.flush();
+
+			return idPropValue;
 		} else {
 			throw new RuntimeException("No filed!");
 		}

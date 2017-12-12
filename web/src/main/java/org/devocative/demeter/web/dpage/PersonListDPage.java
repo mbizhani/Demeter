@@ -15,6 +15,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
+import org.devocative.demeter.web.component.grid.ORowModChangeAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -143,28 +144,28 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 		add(form);
 
 		OColumnList<Person> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.firstName"), "firstName"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.lastName"), "lastName"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.firstName"), "firstName"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.lastName"), "lastName"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.birthRegDate"), "birthRegDate")
 			.setFormatter(ODateFormatter.getDateByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.email"), "email"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.mobile"), "mobile"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.systemNumber"), "systemNumber"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.email"), "email"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.mobile"), "mobile"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.systemNumber"), "systemNumber"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.hasUser"), "hasUser")
 			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.user"), "user"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.user"), "user"));
 		if (getCurrentUser().isRoot()) {
-			columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.rowMod"), "rowMod"));
+			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMod"), "rowMod"));
 		}
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.modificationDate"), "modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("entity.version"), "version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
@@ -179,6 +180,8 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 					window.show(target);
 				}
 			});
+
+			columnList.add(new ORowModChangeAjaxColumn<>(window));
 		}
 
 		OGrid<Person> oGrid = new OGrid<>();

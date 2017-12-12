@@ -2,10 +2,7 @@ package org.devocative.demeter.entity;
 
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ERowMod implements Serializable {
 	private static final long serialVersionUID = -3933153565923626628L;
@@ -88,5 +85,9 @@ public class ERowMod implements Serializable {
 		List<ERowMod> list = list();
 		list.remove(DELETED);
 		return list;
+	}
+
+	public static List<ERowMod> accessList() {
+		return Arrays.asList(ROOT, ADMIN, CREATOR, NORMAL);
 	}
 }

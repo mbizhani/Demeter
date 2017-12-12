@@ -14,6 +14,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
+import org.devocative.demeter.web.component.grid.ORowModChangeAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -167,6 +168,8 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 					window.show(target);
 				}
 			});
+
+			columnList.add(new ORowModChangeAjaxColumn<>(window));
 		}
 
 		OGrid<Role> oGrid = new OGrid<>();
