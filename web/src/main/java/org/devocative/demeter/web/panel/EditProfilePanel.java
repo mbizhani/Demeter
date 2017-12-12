@@ -52,21 +52,23 @@ public class EditProfilePanel extends DPanel {
 		userInfo.add(new Label("roles"));
 		userInfo.add(new Label("permissions"));
 		userInfo.add(new Label("denials"));
+		userInfo.add(new Label("calendar"));
+		userInfo.add(new Label("sessionTimeout"));
 
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 
-		oldPassword = new WTextInput("oldPassword", new Model<String>(), true);
+		oldPassword = new WTextInput("oldPassword", new Model<>(), true);
 		oldPassword.setLabel(new ResourceModel("User.oldPassword"));
 		oldPassword.setEnabled(EAuthMechanism.DATABASE.equals(currentUser.getAuthMechanism()));
 		floatTable.add(oldPassword);
 
-		password = new WTextInput("password", new Model<String>(), true);
+		password = new WTextInput("password", new Model<>(), true);
 		password.setLabel(new ResourceModel("User.password"));
 		password.setEnabled(EAuthMechanism.DATABASE.equals(currentUser.getAuthMechanism()));
 		floatTable.add(password);
 
-		WTextInput password2 = new WTextInput("password2", new Model<String>(), true);
+		WTextInput password2 = new WTextInput("password2", new Model<>(), true);
 		password2.setLabel(new ResourceModel("User.password2"));
 		password2.setEnabled(EAuthMechanism.DATABASE.equals(currentUser.getAuthMechanism()));
 		floatTable.add(password2);
