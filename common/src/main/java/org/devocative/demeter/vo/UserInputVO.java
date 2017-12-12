@@ -29,6 +29,13 @@ public class UserInputVO implements Serializable {
 	public UserInputVO() {
 	}
 
+	public UserInputVO(String username, String firstName, String lastName, EAuthMechanism authMechanism) {
+		this.username = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.authMechanism = authMechanism;
+	}
+
 	public UserInputVO(String username, String password, String firstName, String lastName, EAuthMechanism authMechanism) {
 		this.username = username;
 		this.password = password;

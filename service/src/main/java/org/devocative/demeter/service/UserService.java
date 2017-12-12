@@ -135,36 +135,34 @@ public class UserService implements IUserService {
 			password = null;
 		}
 
-		user.setUsername(userInputVO.getUsername());
-
-		if (userInputVO.getStatus() != null) {
-			user.setStatus(userInputVO.getStatus());
-		}
-
-		if (userInputVO.getAdmin() != null) {
-			user.setAdmin(userInputVO.getAdmin());
-		}
-
-		user.setAuthMechanism(userInputVO.getAuthMechanism());
-		user.setSessionTimeout(userInputVO.getSessionTimeout());
-
-		Person person = user.getPerson();
-		if (person == null) {
-			person = new Person();
-			user.setPerson(person);
-		}
-		person.setFirstName(userInputVO.getFirstName());
-		person.setLastName(userInputVO.getLastName());
-
-		if (userInputVO.getRowMod() != null) {
-			person.setRowMod(userInputVO.getRowMod());
-		} else if (person.getRowMod() == null) {
-			person.setRowMod(ERowMod.NORMAL);
-		}
-
-		//TODO userInputVO.getRoles()
-
 		if (user.getId() == null || forceUpdate) {
+			user.setUsername(userInputVO.getUsername());
+
+			if (userInputVO.getStatus() != null) {
+				user.setStatus(userInputVO.getStatus());
+			}
+
+			if (userInputVO.getAdmin() != null) {
+				user.setAdmin(userInputVO.getAdmin());
+			}
+
+			user.setAuthMechanism(userInputVO.getAuthMechanism());
+			if (userInputVO.getSessionTimeout() != null) {
+				user.setSessionTimeout(userInputVO.getSessionTimeout());
+			}
+
+			Person person = user.getPerson();
+			if (person == null) {
+				person = new Person();
+				user.setPerson(person);
+			}
+			person.setFirstName(userInputVO.getFirstName());
+			person.setLastName(userInputVO.getLastName());
+
+			if (userInputVO.getRowMod() != null) {
+				person.setRowMod(userInputVO.getRowMod());
+			}
+
 			saveOrUpdate(user, password);
 		}
 

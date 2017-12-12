@@ -357,7 +357,11 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 			logger.info("Authenticated by LDAP: username=[{}]", username);
 
-			return userService.createOrUpdateUser(new UserInputVO(username, null, firstName, lastName, EAuthMechanism.LDAP), eqUserInDB, true);
+			boolean forceUpdate = eqUserInDB != null && (
+				(firstName != null && !firstName.equals(eqUserInDB.getPerson().getFirstName())) ||
+					(lastName != null && !lastName.equals(eqUserInDB.getPerson().getLastName()))
+			);
+			return userService.createOrUpdateUser(new UserInputVO(username, firstName, lastName, EAuthMechanism.LDAP), eqUserInDB, forceUpdate);
 		} catch (AuthenticationException e) {
 			logger.warn("Authentication By LDAP failed for user: {}", username);
 			throw new DemeterException(DemeterErrorCode.InvalidUser);
