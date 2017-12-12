@@ -25,6 +25,9 @@ public class RoleService implements IRoleService {
 
 	@Override
 	public void saveOrUpdate(Role entity) {
+		if (entity.getRowMod() == null) {
+			entity.setRowMod(ERowMod.NORMAL);
+		}
 		persistorService.saveOrUpdate(entity);
 	}
 

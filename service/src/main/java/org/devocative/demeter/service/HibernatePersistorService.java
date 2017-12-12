@@ -468,11 +468,11 @@ public class HibernatePersistorService implements IPersistorService {
 					}
 				} else if ("creationDate".equals(propertyNames[i])) {
 					state[i] = new Date();
-				} else if ("rowMod".equals(propertyNames[i])) {
+				} /*else if ("rowMod".equals(propertyNames[i])) {
 					if (state[i] == null) {
 						state[i] = ERowMod.NORMAL;
 					}
-				}
+				}*/
 			}
 		}
 

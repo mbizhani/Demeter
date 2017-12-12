@@ -9,6 +9,7 @@ import org.devocative.demeter.core.EStartupStep;
 import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
+import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserVO;
@@ -166,7 +167,10 @@ public class TestDemeter {
 		tester.startComponentInPage(roleFormDPage);
 
 		FormTester form = tester.newFormTester("dPage:form");
-		form.setValue("floatTable:name", "role1");
-		form.submit("save");
+		form.setValue("floatTable:name:textField", "role1");
+		tester.executeAjaxEvent("dPage:form:save", "click");
+
+		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
+		Assert.assertEquals(7, roleService.list().size());
 	}
 }
