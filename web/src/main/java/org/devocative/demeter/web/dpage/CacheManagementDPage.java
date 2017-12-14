@@ -44,7 +44,7 @@ public class CacheManagementDPage extends DPage {
 					public void onClick() {
 						cacheService.clear(vo.getId());
 					}
-				}.add(new AttributeModifier("onclick", "return confirm('Are you sure?');")));
+				}.add(new AttributeModifier("onclick", String.format("return confirm('%s');", getString("label.confirm")))));
 			}
 		});
 

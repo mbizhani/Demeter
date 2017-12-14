@@ -32,5 +32,6 @@ public class DemeterIcon {
 	public static final IconFont EXPAND = new FontAwesome("expand", new ResourceModel("label.nodes.expand", "Expand"));
 	public static final IconFont SEARCH = new FontAwesome("search", new ResourceModel("label.search", "Search"));
 	public static final IconFont SHIELD = new FontAwesome("shield", new ResourceModel("label.shield", "Shield"));
+	public static final IconFont STOP_CIRCLE = new FontAwesome("stop-circle", new ResourceModel("label.stop", "Stop"));
 	public static final IconFont UPLOAD = new FontAwesome("upload", new ResourceModel("label.upload", "Upload"));
 }
