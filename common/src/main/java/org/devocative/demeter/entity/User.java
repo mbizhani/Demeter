@@ -1,6 +1,5 @@
 package org.devocative.demeter.entity;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
@@ -18,10 +17,6 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	private static final long serialVersionUID = 1580426811623477680L;
 
 	@Id
-	@GeneratedValue(generator = "SharedPrimaryKeyGenerator")
-	@GenericGenerator(name = "SharedPrimaryKeyGenerator",
-		strategy = "foreign",
-		parameters = {@org.hibernate.annotations.Parameter(name = "property", value = "person")})
 	private Long id;
 
 	//@NotNull
@@ -67,8 +62,8 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Column(name = "n_session_timeout")
 	private Integer sessionTimeout;
 
-	@OneToOne(fetch = FetchType.EAGER)
-	@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "user2person"))
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "user2person"))
 	private Person person;
 
 	@ManyToMany(fetch = FetchType.LAZY)

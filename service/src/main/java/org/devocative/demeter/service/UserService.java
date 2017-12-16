@@ -34,6 +34,8 @@ public class UserService implements IUserService {
 
 	@Override
 	public void saveOrUpdate(User entity) {
+		personService.saveOrUpdate(entity.getPerson());
+		entity.setId(entity.getPerson().getId());
 		persistorService.saveOrUpdate(entity);
 	}
 
@@ -105,7 +107,6 @@ public class UserService implements IUserService {
 			user.setPassword(StringEncryptorUtil.hash(password));
 		}
 
-		personService.saveOrUpdate(user.getPerson());
 		saveOrUpdate(user);
 		//persistorService.commitOrRollback();
 	}
