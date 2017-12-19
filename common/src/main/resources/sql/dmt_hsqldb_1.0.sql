@@ -32,14 +32,6 @@ CREATE TABLE a_mt_dmt_prvlg_role_perm (
 	PRIMARY KEY (r_num, f_role, f_prvlg)
 );
 
-CREATE TABLE a_mt_dmt_prvlg_user (
-	r_num   INTEGER NOT NULL,
-	f_user  BIGINT  NOT NULL,
-	f_prvlg BIGINT  NOT NULL,
-	r_type  TINYINT,
-	PRIMARY KEY (r_num, f_user, f_prvlg)
-);
-
 CREATE TABLE a_mt_dmt_user_role (
 	r_num  INTEGER NOT NULL,
 	f_user BIGINT  NOT NULL,
@@ -103,6 +95,22 @@ CREATE TABLE a_t_dmt_user (
 	PRIMARY KEY (id, r_num)
 );
 
+CREATE TABLE a_mt_dmt_prvlg_user_deny (
+	r_num   INTEGER NOT NULL,
+	f_user  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_user, f_prvlg)
+);
+
+CREATE TABLE a_mt_dmt_prvlg_user_perm (
+	r_num   INTEGER NOT NULL,
+	f_user  BIGINT  NOT NULL,
+	f_prvlg BIGINT  NOT NULL,
+	r_type  TINYINT,
+	PRIMARY KEY (r_num, f_user, f_prvlg)
+);
+
 ------------------------
 -- CREATE MIDDLE TABLES
 ------------------------
@@ -122,14 +130,19 @@ CREATE TABLE mt_dmt_prvlg_role_perm (
 	f_prvlg BIGINT NOT NULL
 );
 
-CREATE TABLE mt_dmt_prvlg_user (
+CREATE TABLE mt_dmt_user_role (
+	f_user BIGINT NOT NULL,
+	f_role BIGINT NOT NULL
+);
+
+CREATE TABLE mt_dmt_prvlg_user_deny (
 	f_user  BIGINT NOT NULL,
 	f_prvlg BIGINT NOT NULL
 );
 
-CREATE TABLE mt_dmt_user_role (
-	f_user BIGINT NOT NULL,
-	f_role BIGINT NOT NULL
+CREATE TABLE mt_dmt_prvlg_user_perm (
+	f_user  BIGINT NOT NULL,
+	f_prvlg BIGINT NOT NULL
 );
 
 ----------------------
@@ -160,7 +173,7 @@ CREATE TABLE t_dmt_d_page_inst (
 	c_title         VARCHAR(255) NOT NULL,
 	c_uri           VARCHAR(255) NOT NULL,
 	n_version       INTEGER      NOT NULL,
-	f_page_info    BIGINT,
+	f_page_info    BIGINT NOT NULL,
 	PRIMARY KEY (id)
 );
 
@@ -319,11 +332,6 @@ ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
-ALTER TABLE a_mt_dmt_prvlg_user
-ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
-FOREIGN KEY (r_num)
-REFERENCES REVINFO;
-
 ALTER TABLE a_mt_dmt_user_role
 ADD CONSTRAINT FK_mqjoupr478iv6jchf7be9w2kf
 FOREIGN KEY (r_num)
@@ -346,6 +354,16 @@ REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_user
 ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_user_deny
+ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
+FOREIGN KEY (r_num)
+REFERENCES REVINFO;
+
+ALTER TABLE a_mt_dmt_prvlg_user_perm
+ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
@@ -380,16 +398,6 @@ ALTER TABLE mt_dmt_prvlg_role_perm
 ADD CONSTRAINT prvlgRolePerm2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
-
-ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2prvlg
-FOREIGN KEY (f_prvlg)
-REFERENCES t_dmt_privilege;
-
-ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2user
-FOREIGN KEY (f_user)
-REFERENCES t_dmt_user;
 
 ALTER TABLE mt_dmt_user_role
 ADD CONSTRAINT userRole2role
@@ -474,6 +482,26 @@ REFERENCES t_dmt_user;
 ALTER TABLE t_dmt_role
 ADD CONSTRAINT role_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
+REFERENCES t_dmt_user;
+
+ALTER TABLE mt_dmt_prvlg_user_deny
+ADD CONSTRAINT prvlgUserDeny2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_user_deny
+ADD CONSTRAINT prvlgUserDeny2user
+FOREIGN KEY (f_user)
+REFERENCES t_dmt_user;
+
+ALTER TABLE mt_dmt_prvlg_user_perm
+ADD CONSTRAINT prvlgUserPerm2prvlg
+FOREIGN KEY (f_prvlg)
+REFERENCES t_dmt_privilege;
+
+ALTER TABLE mt_dmt_prvlg_user_perm
+ADD CONSTRAINT prvlgUserPerm2user
+FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
 --------------------

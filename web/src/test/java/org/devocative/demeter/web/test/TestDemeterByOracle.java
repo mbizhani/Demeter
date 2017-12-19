@@ -47,6 +47,8 @@ public class TestDemeterByOracle {
 		}
 
 		if (isOracleOk) {
+			TestDemeter.NO_OF_DB_DIFF_FILES = 2; //Oracle DB
+
 			TestDemeter.setCONFIG(TestDemeterByOracle.class.getResourceAsStream("/configOracle.properties"));
 			JUnitCore core = new JUnitCore();
 			core.addListener(new RunListener() {

@@ -37,7 +37,7 @@ public class TestDemeter {
 
 	// ------------------------------
 
-	protected int NO_OF_DB_DIFF_FILES = 2;
+	static int NO_OF_DB_DIFF_FILES = 1; //HyperSQL
 
 	// ------------------------------
 

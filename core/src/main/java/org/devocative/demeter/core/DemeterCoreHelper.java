@@ -96,7 +96,7 @@ public class DemeterCoreHelper {
 		for (String module : modules) {
 			module = module.toLowerCase();
 
-			URL verUrl = DemeterCoreHelper.class.getResource(String.format("/sql/%s_versions.txt", module));
+			URL verUrl = DemeterCoreHelper.class.getResource(String.format("/sql/%s_%s.txt", module, dbType));
 			if (verUrl != null) {
 				LineIterator iterator = IOUtils.lineIterator(verUrl.openStream(), "UTF-8");
 				while (iterator.hasNext()) {
@@ -118,7 +118,7 @@ public class DemeterCoreHelper {
 				}
 				iterator.close();
 			} else {
-				throw new DSystemException("'versions.txt' File Not Found: " + module);
+				throw new DSystemException(String.format("'%s_%s.txt' File Not Found: ", module, dbType));
 			}
 		}
 		return result;
