@@ -504,6 +504,11 @@ ADD CONSTRAINT prvlgUserPerm2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
+ALTER TABLE t_dmt_user
+ADD CONSTRAINT user2person
+FOREIGN KEY (id)
+REFERENCES t_dmt_person;
+
 --------------------
 -- CREATE SEQUENCES
 --------------------

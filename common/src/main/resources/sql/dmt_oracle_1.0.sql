@@ -476,6 +476,11 @@ ADD CONSTRAINT role_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
+ALTER TABLE t_dmt_user
+ADD CONSTRAINT user2person
+FOREIGN KEY (id)
+REFERENCES t_dmt_person;
+
 --------------------
 -- CREATE SEQUENCES
 --------------------
@@ -506,7 +511,7 @@ CREATE TABLE z_dmt_sql_apply (
 	c_module  VARCHAR2(10 CHAR) NOT NULL,
 	c_version VARCHAR2(10 CHAR) NOT NULL,
 	c_file    VARCHAR2(255 CHAR) NOT NULL,
-	d_apply   DATE NOT NULL,
+	d_apply   DATE              NOT NULL,
 
 	PRIMARY KEY (c_version, c_module)
 );
