@@ -37,10 +37,6 @@ public class TestDemeter {
 
 	// ------------------------------
 
-	static int NO_OF_DB_DIFF_FILES = 1; //HyperSQL
-
-	// ------------------------------
-
 	public static void setCONFIG(InputStream CONFIG) {
 		TestDemeter.CONFIG = CONFIG;
 	}
@@ -53,7 +49,6 @@ public class TestDemeter {
 		tester = new WicketTester(new DemeterWebApplication());
 
 		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");
-		System.out.println("TestDemeter.setUp");
 	}
 
 	@AfterClass
@@ -66,7 +61,7 @@ public class TestDemeter {
 	@Test
 	public void b00IncompleteStartup() {
 		Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
-		Assert.assertEquals(NO_OF_DB_DIFF_FILES, DemeterCore.get().getDbDiffs().size());
+		Assert.assertTrue(DemeterCore.get().getDbDiffs().size() > 0);
 
 		DemeterCore.get().applyAllDbDiffs();
 		DemeterCore.get().resume();
