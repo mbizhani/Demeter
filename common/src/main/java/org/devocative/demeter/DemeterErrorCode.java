@@ -6,7 +6,11 @@ public enum DemeterErrorCode implements DErrorCode {
 	InvalidUser("Invalid username or password"),
 	InvalidCurrentPassword("Invalid current password"),
 	UserLocked("User is locked"),
-	UserDisabled("User is disabled");
+	UserDisabled("User is disabled"),
+	DBConstraintViolation("DB Constraint Violated"),
+
+	DuplicateUsername("Duplicate Username"),
+	DuplicateRoleName("Duplicate Role Name");
 
 	private String defaultDescription;
 

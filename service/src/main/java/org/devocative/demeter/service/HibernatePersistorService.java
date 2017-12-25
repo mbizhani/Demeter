@@ -2,6 +2,7 @@ package org.devocative.demeter.service;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
+import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -11,6 +12,7 @@ import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -28,10 +30,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HibernatePersistorService implements IPersistorService {
 	private static final Logger logger = LoggerFactory.getLogger(HibernatePersistorService.class);
 	private static final ThreadLocal<Session> currentSession = new ThreadLocal<>();
+	private static final Pattern ORA_CONSTRAINT_NAME = Pattern.compile("unique constraint or index violation; (.+?) table:");
 
 	private List<Class> entities;
 	private String prefix;
@@ -168,26 +173,38 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void saveOrUpdate(Object obj) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.saveOrUpdate(obj);
-		session.flush();
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			session.saveOrUpdate(obj);
+			session.flush();
+		} catch (ConstraintViolationException e) {
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
 	public void save(Object obj) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.save(obj);
-		session.flush();
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			session.save(obj);
+			session.flush();
+		} catch (ConstraintViolationException e) {
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
 	public void update(Object obj) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.update(obj);
-		session.flush();
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			session.update(obj);
+			session.flush();
+		} catch (ConstraintViolationException e) {
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
@@ -230,10 +247,14 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void merge(Object obj) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.merge(obj);
-		session.flush();
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			session.merge(obj);
+			session.flush();
+		} catch (ConstraintViolationException e) {
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
@@ -295,10 +316,14 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void executeUpdate(String simpleQuery) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.createQuery(simpleQuery).executeUpdate();
-		session.flush();
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+			session.createQuery(simpleQuery).executeUpdate();
+			session.flush();
+		} catch (ConstraintViolationException e) {
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
@@ -401,6 +426,19 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
+	}
+
+	private String getConstraintName(ConstraintViolationException e) {
+		if (e.getConstraintName() != null) {
+			return e.getConstraintName();
+		} else {
+			Matcher matcher = ORA_CONSTRAINT_NAME.matcher(e.getSQLException().getMessage());
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
+		}
+
+		return null;
 	}
 
 	//----------------------------- INNER CLASSES

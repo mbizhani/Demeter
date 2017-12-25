@@ -1,5 +1,8 @@
 package org.devocative.demeter.service;
 
+import org.devocative.demeter.DBConstraintViolationException;
+import org.devocative.demeter.DemeterErrorCode;
+import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
@@ -28,7 +31,13 @@ public class RoleService implements IRoleService {
 		if (entity.getRowMod() == null) {
 			entity.setRowMod(ERowMod.NORMAL);
 		}
-		persistorService.saveOrUpdate(entity);
+		try {
+			persistorService.saveOrUpdate(entity);
+		} catch (DBConstraintViolationException e) {
+			if ("uk_dmt_role_name".equalsIgnoreCase(e.getConstraintName())) {
+				throw new DemeterException(DemeterErrorCode.DuplicateRoleName);
+			}
+		}
 	}
 
 	@Override

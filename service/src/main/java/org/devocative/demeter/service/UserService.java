@@ -2,6 +2,7 @@ package org.devocative.demeter.service;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.StringEncryptorUtil;
+import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
@@ -36,7 +37,13 @@ public class UserService implements IUserService {
 	public void saveOrUpdate(User entity) {
 		personService.saveOrUpdate(entity.getPerson());
 		entity.setId(entity.getPerson().getId());
-		persistorService.saveOrUpdate(entity);
+		try {
+			persistorService.saveOrUpdate(entity);
+		} catch (DBConstraintViolationException e) {
+			if ("uk_dmt_user_username".equalsIgnoreCase(e.getConstraintName())) {
+				throw new DemeterException(DemeterErrorCode.DuplicateUsername);
+			}
+		}
 	}
 
 	@Override
