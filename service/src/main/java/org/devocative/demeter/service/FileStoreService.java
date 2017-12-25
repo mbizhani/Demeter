@@ -92,6 +92,24 @@ public class FileStoreService implements IFileStoreService {
 	// ==============================
 
 	@Override
+	public void saveOrUpdate(FileStore entity, byte[] bytes) {
+		String oldFileId = entity.getFileId();
+
+		OutputStream outputStream = createOutputStream(entity);
+		try {
+			outputStream.write(bytes);
+			outputStream.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		saveOrUpdate(entity);
+
+		if (oldFileId != null) {
+			moveFileAsExpired(oldFileId, EFileStorage.DISK); //TODO
+		}
+	}
+
+	@Override
 	public FileStoreHandler create(String name, EFileStorage storage, EMimeType mimeType, Date expiration, String... tags) {
 		FileStore fileStore = new FileStore();
 		fileStore.setName(name);
@@ -107,33 +125,7 @@ public class FileStoreService implements IFileStoreService {
 			fileStore.setTag(tag);
 		}
 
-		OutputStream outputStream;
-
-		if (EFileStorage.DISK.equals(storage)) {
-			String fileId = UUID.randomUUID().toString().replaceAll("-", "");
-			fileStore.setFileId(fileId);
-
-			File baseDir = new File(ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
-
-			if (!baseDir.exists()) {
-				baseDir.mkdirs();
-			} else if (!baseDir.isDirectory()) {
-				throw new DSystemException("Invalid base directory for file: " + ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
-			}
-
-			String fileFQN = baseDir.getAbsolutePath() + File.separator + fileId;
-
-			try {
-				outputStream = new FileOutputStream(fileFQN);
-			} catch (FileNotFoundException e) {
-				throw new DSystemException("Can't create file: " + fileFQN, e);
-			}
-		} else if (EFileStorage.DATA_BASE.equals(storage)) {
-			throw new RuntimeException("Database as storage is not implemented!");
-		} else {
-			throw new RuntimeException("Invalid storage for FileStore: " + storage);
-		}
-
+		OutputStream outputStream = createOutputStream(fileStore);
 		return new FileStoreHandler(this, outputStream, fileStore);
 	}
 
@@ -142,8 +134,8 @@ public class FileStoreService implements IFileStoreService {
 		if (EFileStorage.DISK.equals(fileStore.getStorage())) {
 			String path = fileStore.getPath();
 
-			try {
-				IOUtils.copy(new FileInputStream(path), outputStream);
+			try (FileInputStream inputStream = new FileInputStream(path)) {
+				IOUtils.copy(inputStream, outputStream);
 			} catch (IOException e) {
 				throw new DSystemException("Can't open file: " + path, e);
 			}
@@ -159,31 +151,20 @@ public class FileStoreService implements IFileStoreService {
 		logger.info("Starting FileStoreDTask ...");
 
 		try {
+			File expiredDir = getExpiredDir();
+			logger.info("Deleting Old Expired Files");
+			FileUtils.deleteDirectory(expiredDir);
+
 			Date now = new Date();
-
-			String dir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + "EXPIRED";
-			File expiredDir = new File(dir);
-
-			if (expiredDir.exists()) {
-				logger.info("Deleting old expired files");
-				FileUtils.deleteDirectory(expiredDir);
-			}
-
-			expiredDir.mkdirs();
-
 			List<String> fileIds = listOfExpiredFiles(now);
-			logger.info("Try to expire files: no=[{}]", fileIds.size());
+			logger.info("Start Expiring Files: no=[{}]", fileIds.size());
 
 			if (!fileIds.isEmpty()) {
 				for (String id : fileIds) {
-					String f = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + id;
-					File file = new File(f);
-					if (file.exists()) {
-						FileUtils.moveFileToDirectory(file, expiredDir, false);
-					}
+					moveFileAsExpired(id, EFileStorage.DISK); //TODO
 				}
 
-				logger.info("Files are moved to temp");
+				logger.info("Files Moved to Expired Dir");
 
 				int updated = updateExpiredFilesStatus(now);
 
@@ -208,6 +189,33 @@ public class FileStoreService implements IFileStoreService {
 
 	// ------------------------------
 
+	private OutputStream createOutputStream(FileStore fileStore) {
+		if (EFileStorage.DISK.equals(fileStore.getStorage())) {
+			String fileId = UUID.randomUUID().toString().replaceAll("-", "");
+			fileStore.setFileId(fileId);
+
+			File baseDir = new File(ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
+
+			if (!baseDir.exists()) {
+				baseDir.mkdirs();
+			} else if (!baseDir.isDirectory()) {
+				throw new DSystemException("Invalid base directory for file: " + ConfigUtil.getString(DemeterConfigKey.FileBaseDir));
+			}
+
+			String fileFQN = baseDir.getAbsolutePath() + File.separator + fileId;
+
+			try {
+				return new FileOutputStream(fileFQN);
+			} catch (FileNotFoundException e) {
+				throw new DSystemException("Can't create file: " + fileFQN, e);
+			}
+		} else if (EFileStorage.DATA_BASE.equals(fileStore.getStorage())) {
+			throw new RuntimeException("Database as storage is not implemented!");
+		} else {
+			throw new RuntimeException("Invalid storage for FileStore: " + fileStore.getStorage());
+		}
+	}
+
 	private List<String> listOfExpiredFiles(Date dt) {
 		return persistorService
 			.createQueryBuilder()
@@ -230,5 +238,35 @@ public class FileStoreService implements IFileStoreService {
 			.addWhere("and ent.status = :old_st")
 			.addParam("old_st", EFileStatus.VALID)
 			.update();
+	}
+
+	private void moveFileAsExpired(String id, EFileStorage storage) {
+		if (EFileStorage.DISK.equals(storage)) {
+			File expiredDir = getExpiredDir();
+			String f = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + id;
+			File file = new File(f);
+			if (file.exists()) {
+				try {
+					FileUtils.moveFileToDirectory(file, expiredDir, false);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		} else {
+			throw new RuntimeException("File Storage Not Supported: " + storage);
+		}
+	}
+
+	private File getExpiredDir() {
+		String dir = ConfigUtil.getString(DemeterConfigKey.FileBaseDir) + File.separator + "EXPIRED";
+		File expiredDir = new File(dir);
+
+		if (!expiredDir.exists()) {
+			expiredDir.mkdirs();
+		} else if (!expiredDir.isDirectory()) {
+			throw new RuntimeException("Invalid directory for expired dir: " + expiredDir);
+		}
+
+		return expiredDir;
 	}
 }

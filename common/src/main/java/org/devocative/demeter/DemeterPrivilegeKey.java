@@ -7,7 +7,7 @@ public enum DemeterPrivilegeKey implements IPrivilegeKey {
 	UserAdd, UserEdit,
 	PersonAdd, PersonEdit,
 	DPageInstEdit,
-	FileStoreEdit;
+	FileStoreAdd, FileStoreEdit;
 
 	private String name;
 

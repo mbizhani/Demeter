@@ -13,6 +13,8 @@ import java.util.List;
 public interface IFileStoreService {
 	void saveOrUpdate(FileStore entity);
 
+	void saveOrUpdate(FileStore entity, byte[] bytes);
+
 	FileStore load(Long id);
 
 	FileStore loadByFileId(String fileId);

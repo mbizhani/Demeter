@@ -194,7 +194,7 @@
 			</fields>
 		</class>
 		<class fqn="org.devocative.demeter.entity.FileStore">
-			<cinfo hasAdd="false"/>
+			<cinfo/>
 			<id ref="id"/>
 			<fields>
 				<field name="id">
@@ -421,6 +421,21 @@
 				</field>
 				<field name="denials">
 					<finfo/>
+				</field>
+			</fields>
+		</class>
+		<class fqn="org.devocative.demeter.entity.ZSqlApply">
+			<cinfo ignore="true"/>
+			<id ref=""/>
+			<fields>
+				<field name="id">
+					<finfo/>
+				</field>
+				<field name="file">
+					<finfo/>
+				</field>
+				<field name="apply">
+					<finfo hasTimePart="true"/>
 				</field>
 			</fields>
 		</class>
