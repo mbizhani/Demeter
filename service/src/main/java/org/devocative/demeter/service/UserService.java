@@ -40,7 +40,7 @@ public class UserService implements IUserService {
 		try {
 			persistorService.saveOrUpdate(entity);
 		} catch (DBConstraintViolationException e) {
-			if ("uk_dmt_user_username".equalsIgnoreCase(e.getConstraintName())) {
+			if (e.isConstraint("uk_dmt_user_username")) {
 				throw new DemeterException(DemeterErrorCode.DuplicateUsername);
 			}
 		}

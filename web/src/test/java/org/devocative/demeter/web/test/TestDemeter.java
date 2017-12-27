@@ -4,13 +4,15 @@ import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
+import org.devocative.demeter.DemeterErrorCode;
+import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.EStartupStep;
-import org.devocative.demeter.entity.DPageInfo;
-import org.devocative.demeter.entity.DPageInstance;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IDPageInstanceService;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.DPage;
@@ -26,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDemeter {
@@ -154,10 +157,111 @@ public class TestDemeter {
 		}
 	}
 
+	@Test
+	public void d04UniqueConstraintViolation() {
+		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
+
+
+		User user = new User();
+		user.setUsername("root");
+		user.setAuthMechanism(EAuthMechanism.LDAP);
+
+		user.setPerson(new Person());
+
+		IUserService userService = DemeterCore.get().getApplicationContext().getBean(IUserService.class);
+		try {
+			userService.saveOrUpdate(user); //Exception should be raised!
+			Assert.assertEquals("DemeterException.DuplicateUsername should be thrown!", 1, 2);
+		} catch (DemeterException e) {
+			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateUsername));
+		}
+
+		Assert.assertEquals(3, userService.list().size());
+
+
+		Role role = new Role();
+		role.setName("User");
+
+		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
+		try {
+			roleService.saveOrUpdate(role); //Exception should be raised!
+			Assert.assertEquals("DemeterException.DuplicateRoleName should be thrown!", 1, 2);
+		} catch (DemeterException e) {
+			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+		}
+		persistorService.endSession();
+
+		Assert.assertEquals(6, roleService.list().size());
+
+		// ---------------
+
+		AtomicInteger aint = new AtomicInteger(0);
+		UserVO currentUser = securityService.getCurrentUser();
+
+		Role rMain = new Role();
+		rMain.setName("TestDup");
+
+		Thread th = new Thread(() -> {
+			securityService.authenticate(currentUser);
+
+			Role rTh = new Role();
+			rTh.setName("TestDup");
+
+			try {
+				roleService.saveOrUpdate(rTh);
+				aint.incrementAndGet();
+			} catch (DemeterException e) {
+				Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+			}
+
+			persistorService.endSession();
+		});
+		th.start();
+
+		try {
+			roleService.saveOrUpdate(rMain);
+			aint.incrementAndGet();
+		} catch (DemeterException e) {
+			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+		}
+		persistorService.endSession();
+
+		try {
+			th.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		Assert.assertEquals(1, aint.get());
+		Assert.assertEquals(7, roleService.list().size()); // TOTAL ROLES = 7
+
+
+		/*
+		// Insert New Record
+		Role merge = new Role();
+		merge.setName("Merge");
+		merge.setRowMod(ERowMod.NORMAL);
+		persistorService.merge(merge);
+
+		Role testDup = roleService.loadByName("TestDup");
+		persistorService.endSession();
+
+		// Update Record
+		testDup.setName("123");
+		persistorService.merge(testDup);
+		persistorService.endSession();
+
+
+		testDup.setName("qqq");
+		persistorService.merge(testDup);
+		persistorService.endSession();
+		*/
+	}
+
 	// --------------- F
 
 	@Test
-	public void f01AddRole() {
+	public void f01AddRoleByForm() {
 		RoleFormDPage roleFormDPage = new RoleFormDPage("dPage");
 		tester.startComponentInPage(roleFormDPage);
 
@@ -166,6 +270,6 @@ public class TestDemeter {
 		tester.executeAjaxEvent("dPage:form:save", "click");
 
 		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
-		Assert.assertEquals(7, roleService.list().size());
+		Assert.assertEquals(8, roleService.list().size()); // TOTAL ROLES = 8
 	}
 }
