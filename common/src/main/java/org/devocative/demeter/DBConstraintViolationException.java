@@ -7,7 +7,12 @@ public class DBConstraintViolationException extends DemeterException {
 		super(DemeterErrorCode.DBConstraintViolation, constraintName);
 	}
 
-	public String getConstraintName() {
-		return getErrorParameter();
+	public boolean isConstraint(String name) {
+		name = name.toLowerCase();
+		String constraint = getErrorParameter().toLowerCase();
+
+		return name.equals(constraint) || // HSQLDB
+			constraint.contains(name) || // Oracle DB: <SCHEMA>.<CONSTRAINT_NAME>
+			name.contains(constraint); // For more precaution :D
 	}
 }

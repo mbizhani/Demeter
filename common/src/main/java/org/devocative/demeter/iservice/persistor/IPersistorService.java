@@ -17,13 +17,15 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 
 	void saveOrUpdate(Object obj);
 
-	void save(Object obj);
+	Serializable save(Object obj);
 
 	void update(Object obj);
 
 	Object updateFields(Object obj, String... fields);
 
-	void merge(Object obj);
+	void persist(Object obj);
+
+	<T> T merge(T obj);
 
 	<T> T get(Class<T> entity, Serializable id);
 

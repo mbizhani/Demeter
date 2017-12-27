@@ -84,6 +84,9 @@ public class DemeterCore {
 			shutdownApplicationLifecycle();
 			appCtx.close();
 			logger.info("### MODULE LOADER SHUTDOWNED");
+
+			// Make it null for another test case to create an INSTANCE fresh
+			INSTANCE = null;
 		}
 
 		shuted = true;

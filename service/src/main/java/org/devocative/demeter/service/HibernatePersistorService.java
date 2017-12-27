@@ -174,24 +174,32 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void saveOrUpdate(Object obj) {
+		EntityResetInfo info = new EntityResetInfo(obj);
+
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
 			session.saveOrUpdate(obj);
 			session.flush();
 		} catch (ConstraintViolationException e) {
+			rollback();
+			info.reset();
 			throw new DBConstraintViolationException(getConstraintName(e));
 		}
 	}
 
 	@Override
-	public void save(Object obj) {
+	public Serializable save(Object obj) {
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
-			session.save(obj);
+
+			Serializable result;
+			result = session.save(obj);
 			session.flush();
+			return result;
 		} catch (ConstraintViolationException e) {
+			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
 		}
 	}
@@ -204,6 +212,7 @@ public class HibernatePersistorService implements IPersistorService {
 			session.update(obj);
 			session.flush();
 		} catch (ConstraintViolationException e) {
+			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
 		}
 	}
@@ -247,13 +256,31 @@ public class HibernatePersistorService implements IPersistorService {
 	}
 
 	@Override
-	public void merge(Object obj) {
+	public void persist(Object obj) {
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
-			session.merge(obj);
+			session.persist(obj);
 			session.flush();
 		} catch (ConstraintViolationException e) {
+			rollback();
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
+	}
+
+	@Override
+	public <T> T merge(T obj) {
+		try {
+			Session session = getCurrentSession();
+			checkTransaction(session);
+
+			T result;
+			result = (T) session.merge(obj);
+			session.flush();
+			session.setFlushMode(FlushMode.ALWAYS);
+			return result;
+		} catch (ConstraintViolationException e) {
+			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
 		}
 	}
@@ -429,6 +456,14 @@ public class HibernatePersistorService implements IPersistorService {
 		return String.format("%s.%s", prefix, key);
 	}
 
+	private void rollback() {
+		Session session = getCurrentSession();
+		Transaction trx = session.getTransaction();
+		if (trx != null && trx.isActive()) {
+			trx.rollback();
+		}
+	}
+
 	private String getConstraintName(ConstraintViolationException e) {
 		if (e.getConstraintName() != null) {
 			return e.getConstraintName();
@@ -538,6 +573,39 @@ public class HibernatePersistorService implements IPersistorService {
 						state[i] = ERowMod.NORMAL;
 					}
 				}
+			}
+		}
+	}
+
+	private class EntityResetInfo {
+		private Object object;
+		private String idPropName;
+		private Object idPropValue;
+
+		private Integer ver = null;
+		private IModificationDate modificationDate = null;
+
+		public EntityResetInfo(Object object) {
+			this.object = object;
+
+			Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(object);
+			ClassMetadata classMetadata = sessionFactory.getClassMetadata(cls);
+
+			idPropName = classMetadata.getIdentifierPropertyName();
+			idPropValue = ObjectUtil.getPropertyValue(object, idPropName, false);
+
+			if (object instanceof IModificationDate) {
+				modificationDate = (IModificationDate) object;
+				ver = modificationDate.getVersion();
+			}
+		}
+
+		public void reset() {
+			if (idPropValue == null) {
+				ObjectUtil.setPropertyValue(object, idPropName, null, false);
+			}
+			if (modificationDate != null) {
+				modificationDate.setVersion(ver);
 			}
 		}
 	}
