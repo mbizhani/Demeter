@@ -26,4 +26,9 @@ public class FileStoreDTask extends DTask {
 	public void execute() {
 		fileStoreService.doExpire();
 	}
+
+	@Override
+	public void cancel() throws Exception {
+		throw new RuntimeException("Not Implemented!");
+	}
 }

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 public class SimpleDTask extends DTask {
 	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
 
+	private Thread currentTh;
+
 	@Override
 	public void init() {
 		logger.info("SimpleDTask.init");
@@ -23,6 +25,20 @@ public class SimpleDTask extends DTask {
 
 	@Override
 	public void execute() {
-		logger.info("SimpleDTask.execute: {}", getCurrentUser());
+		currentTh = Thread.currentThread();
+
+		logger.info("SimpleDTask.execute: user={}, curTh={}", getCurrentUser(), currentTh);
+		try {
+			Thread.sleep(60000);
+			logger.info("SimpleDTask.executed: {}", getCurrentUser());
+		} catch (InterruptedException e) {
+			logger.warn("SimpleDTask Sleep Interrupted");
+		}
+	}
+
+	@Override
+	public void cancel() throws Exception {
+		logger.info("SimpleDTask.cancel: {}", getCurrentUser());
+		currentTh.interrupt();
 	}
 }

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class DTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
@@ -22,8 +21,6 @@ public abstract class DTask implements Runnable {
 	private ITaskResultCallback resultCallback;
 	private UserVO currentUser;
 
-	private AtomicBoolean continue_ = new AtomicBoolean(true);
-
 	// ------------------------------ ABSTRACT METHODS
 
 	public abstract void init() throws Exception;
@@ -31,6 +28,8 @@ public abstract class DTask implements Runnable {
 	public abstract boolean canStart() throws Exception;
 
 	public abstract void execute() throws Exception;
+
+	public abstract void cancel() throws Exception;
 
 	// ------------------------------ ACCESSORS
 
@@ -93,7 +92,7 @@ public abstract class DTask implements Runnable {
 	// ------------------------------ PUBLIC
 
 	@Override
-	public void run() {
+	public final void run() {
 		long start = System.currentTimeMillis();
 		String key;
 		if (currentUser != null && currentUser.getUsername() != null) {
@@ -127,15 +126,16 @@ public abstract class DTask implements Runnable {
 	}
 
 	public final void stop() {
-		continue_.set(false);
 		state = DTaskState.Interrupted;
+		try {
+			cancel();
+		} catch (Exception e) {
+			logger.error("DTask: id={}", getId(), e);
+			throw new RuntimeException(e);
+		}
 	}
 
 	// ------------------------------ PROTECTED
-
-	protected boolean canContinue() {
-		return continue_.get();
-	}
 
 	protected void sendResult(Object result) {
 		if (resultCallback != null) {

@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-	<div wicket:id="grid"></div>
+	<div wicket:id="tasks"></div>
+
+	<hr/>
+
+	<form wicket:id="form">
+		<div class="dmt-form">
+			<div wicket:id="floatTable">
+				<div wicket:id="id"></div>
+				<div wicket:id="type"></div>
+				<div wicket:id="startDate"></div>
+				<div wicket:id="state"></div>
+				<div wicket:id="currentUser"></div>
+			</div>
+
+			<button wicket:id="search"></button>
+			<button type="reset">
+				<wicket:message key="label.reset"/>
+				<i class="fa fa-history"></i>
+			</button>
+		</div>
+	</form>
+
+	<div wicket:id="running"></div>
+
 </wicket:panel>
 </html>

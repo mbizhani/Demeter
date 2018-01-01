@@ -8,6 +8,7 @@ import org.devocative.demeter.core.xml.XDTask;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DTaskInfo;
 import org.devocative.demeter.entity.DTaskSchedule;
+import org.devocative.demeter.filter.CollectionUtil;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.IRequestLifecycle;
@@ -17,6 +18,8 @@ import org.devocative.demeter.iservice.task.DTask;
 import org.devocative.demeter.iservice.task.DTaskResult;
 import org.devocative.demeter.iservice.task.ITaskResultCallback;
 import org.devocative.demeter.iservice.task.ITaskService;
+import org.devocative.demeter.vo.DTaskVO;
+import org.devocative.demeter.vo.filter.DTaskFVO;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -24,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -203,11 +207,53 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	}
 
 	@Override
+	public void stop(Class<? extends DTask> taskBeanClass, Object id) {
+		String key = taskBeanClass.getName();
+		if (id != null) {
+			key += "_" + id;
+		}
+		stop(key);
+	}
+
+	@Override
 	public void stop(String key) {
+		if (TASKS.containsKey(key)) {
+			TASKS.get(key).stop();
+		} else {
+			throw new RuntimeException("DTask Not Found: " + key);
+		}
 	}
 
 	@Override
 	public void stopAll() {
+	}
+
+	// ---------------
+
+	@Override
+	public List<DTaskVO> search(DTaskFVO dTaskFVO, long pageIndex, long pageSize) {
+		List<DTaskVO> dTaskVOs = CollectionUtil.filterCollection(getRunningTasks(), dTaskFVO);
+		int toIndex = (int) (pageIndex * pageSize);
+		return dTaskVOs.subList((int) ((pageIndex - 1) * pageIndex), Math.min(toIndex, dTaskVOs.size()));
+	}
+
+	@Override
+	public long count(DTaskFVO dTaskFVO) {
+		return CollectionUtil.filterCollection(getRunningTasks(), dTaskFVO).size();
+	}
+
+	public List<DTaskVO> getRunningTasks() {
+		List<DTaskVO> result = new ArrayList<>(TASKS.size());
+		for (DTask dTask : TASKS.values()) {
+			result.add(new DTaskVO(
+				dTask.getId().toString(),
+				dTask.getClass().getName(),
+				dTask.getStartDate(),
+				dTask.getState(),
+				dTask.getCurrentUser().getUsername()
+			));
+		}
+		return result;
 	}
 
 	// ------------------------------ Private

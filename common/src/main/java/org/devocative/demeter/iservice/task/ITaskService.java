@@ -1,6 +1,8 @@
 package org.devocative.demeter.iservice.task;
 
 import org.devocative.demeter.entity.DTaskInfo;
+import org.devocative.demeter.vo.DTaskVO;
+import org.devocative.demeter.vo.filter.DTaskFVO;
 
 import java.util.List;
 
@@ -21,7 +23,13 @@ public interface ITaskService {
 
 	DTaskResult start(Long taskInfoId, Object id, Object inputData, ITaskResultCallback resultCallback);
 
+	void stop(Class<? extends DTask> taskBeanClass, Object id);
+
 	void stop(String key);
 
 	void stopAll();
+
+	List<DTaskVO> search(DTaskFVO dTaskFVO, long pageIndex, long pageSize);
+
+	long count(DTaskFVO dTaskFVO);
 }
