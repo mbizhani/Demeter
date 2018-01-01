@@ -3,9 +3,9 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.DSystemException;
+import org.devocative.demeter.filter.CollectionUtil;
+import org.devocative.demeter.filter.IFilterEvent;
 import org.devocative.demeter.iservice.persistor.EJoinMode;
-import org.devocative.demeter.iservice.persistor.FilterOption;
-import org.devocative.demeter.iservice.persistor.Filterer;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -15,9 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class HibernateQueryBuilder implements IQueryBuilder {
@@ -41,15 +38,21 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	private HibernatePersistorService persistorService;
 
+	// ------------------------------
+
 	public HibernateQueryBuilder(HibernatePersistorService persistorService) {
 		this.persistorService = persistorService;
 	}
 
+	// ------------------------------
+
+	@Override
 	public IQueryBuilder setSqlMode(boolean sqlMode) {
 		this.sqlMode = sqlMode;
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addFrom(String entity, String alias) {
 		if (!from.containsKey(alias)) {
 			from.put(alias, entity);
@@ -63,33 +66,39 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addParam(String name, Object value) {
 		params.put(name, value);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addParam(String name, Calendar value) {
 		java.sql.Date sqlDate = new java.sql.Date(value.getTimeInMillis());
 		params.put(name, sqlDate);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addParam(String name, Date value) {
 		java.sql.Date sqlDate = new java.sql.Date(value.getTime());
 		params.put(name, sqlDate);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addParams(Map<String, Object> params) {
 		this.params.putAll(params);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addSelect(String selectClause) {
 		selectBuilder.append(" ").append(selectClause);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addWhere(String whereClause) {
 		whereClauseBuilder.append(" ").append(whereClause);
 		return this;
@@ -114,22 +123,26 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder addSubQueries(String name, IQueryBuilder builder) {
 		subQueries.put(name, builder);
 		subQueriesParamIndex.put(name, subQueriesIndex++);
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder setOrderBy(String order) {
 		this.orderBy = order;
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
 		return this;
 	}
 
+	@Override
 	public IQueryBuilder setHaving(String having) {
 		this.having = having;
 		return this;
@@ -141,8 +154,9 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return this;
 	}
 
-	// ---------------------- PUBLIC EXECUTE-QUERY METHODS
+	// ---------------
 
+	@Override
 	public <T> List<T> list() {
 		buildQuery();
 		applyParams();
@@ -152,6 +166,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return query.list();
 	}
 
+	@Override
 	public <T> List<T> list(long firstResult, long maxResults) {
 		buildQuery();
 		applyParams();
@@ -168,6 +183,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return list;
 	}
 
+	@Override
 	public <T> T object() {
 		buildQuery();
 		applyParams();
@@ -177,6 +193,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return (T) query.uniqueResult();
 	}
 
+	@Override
 	public int update() {
 		Session session = persistorService.getCurrentSession();
 		persistorService.checkTransaction(session);
@@ -193,130 +210,84 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		return result;
 	}
 
-	//----------------------------- PRIVATE METHODS - Search Builder
+	// ---------------
 
 	@Override
-	public IQueryBuilder applyFilter(Class entity, String alias, Serializable filter, String... ignoreProperties) {
-		PropertyDescriptor[] descriptors = ObjectUtil.getPropertyDescriptors(filter, false);
-
-		List<String> ignorePropsList = new ArrayList<>();
-		ignorePropsList.add("class");
-		Collections.addAll(ignorePropsList, ignoreProperties);
-
-		for (PropertyDescriptor descriptor : descriptors) {
-			String propName = descriptor.getName();
-			Method readMethod = descriptor.getReadMethod();
-			FilterOption search = findAnnotation(FilterOption.class, filter, descriptor);
-			if (search != null && search.property().length() > 0) {
-				propName = search.property();
+	public IQueryBuilder applyFilter(final Class entity, final String alias, final Serializable filter, String... ignoreProperties) {
+		CollectionUtil.filter(new IFilterEvent() {
+			@Override
+			public void ifString(String propName, String value, boolean useLike) {
+				if (!useLike) {
+					addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
+					addParam(propName + "_", value);
+				} else {
+					addWhere(String.format("and %1$s.%2$s like :%2$s_", alias, propName));
+					addParam(propName + "_", "%" + value + "%");
+				}
 			}
 
-			if (ignorePropsList.contains(propName)) {
-				continue;
+			@Override
+			public void ifRange(String propName, RangeVO rangeVO) {
+				if (rangeVO.getLower() != null) {
+					addWhere(String.format("and %1$s.%2$s >= :%2$s_from", alias, propName));
+					addParam(propName + "_from", rangeVO.getLower());
+				}
+				if (rangeVO.getUpper() != null) {
+					addWhere(String.format("and %1$s.%2$s < :%2$s_to", alias, propName));
+					addParam(propName + "_to", rangeVO.getUpper());
+				}
 			}
 
-			try {
-				Object value = readMethod.invoke(filter);
-
-				if (value == null) {
-					continue;
+			@Override
+			public void ifFilterer(String propName, Object value) {
+				Class entityPropertyType;
+				String newAlias = alias + "_" + propName;
+				addJoin(newAlias, String.format("%s.%s", alias, propName));
+				PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
+				if (propertyDescriptor == null) {
+					throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
+						propName, entity.getName()));
 				}
-
-				// ---------- Property: String
-				if (value instanceof String) {
-					if (search != null && !search.useLike()) {
-						addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
-						addParam(propName + "_", value);
-					} else {
-						addWhere(String.format("and %1$s.%2$s like :%2$s_", alias, propName));
-						addParam(propName + "_", "%" + value + "%");
-					}
+				if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
+					entityPropertyType = (Class) propertyDescriptor.getReadMethod().getGenericParameterTypes()[0];
+				} else {
+					entityPropertyType = propertyDescriptor.getPropertyType();
 				}
+				applyFilter(entityPropertyType, newAlias, (Serializable) value);
+			}
 
-				// ---------- Property: RangeVO
-				else if (value instanceof RangeVO) {
-					RangeVO rangeVO = (RangeVO) value;
-					if (rangeVO.getLower() != null) {
-						addWhere(String.format("and %1$s.%2$s >= :%2$s_from", alias, propName));
-						addParam(propName + "_from", rangeVO.getLower());
-					}
-					if (rangeVO.getUpper() != null) {
-						addWhere(String.format("and %1$s.%2$s < :%2$s_to", alias, propName));
-						addParam(propName + "_to", rangeVO.getUpper());
-					}
-				}
-
-				// ---------- Property: an object of Filterer
-				else if (value.getClass().isAnnotationPresent(Filterer.class)) {
-					Class entityPropertyType;
-					String newAlias = alias + "_" + propName;
-					addJoin(newAlias, String.format("%s.%s", alias, propName));
+			@Override
+			public void ifCollection(String propName, Collection col) {
+				if (col.size() > 0) {
+					// Check the entity side if it is a collection, which implies that the association is
+					// one2many or many2many and it needs a join
 					PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
 					if (propertyDescriptor == null) {
 						throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
 							propName, entity.getName()));
 					}
 					if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
-						entityPropertyType = (Class) propertyDescriptor.getReadMethod().getGenericParameterTypes()[0];
+						String newAlias = alias + "_" + propName;
+						addJoin(newAlias, String.format("%s.%s", alias, propName));
+						addWhere(String.format("and %1$s in :p_%1$s", newAlias));
+						addParam("p_" + newAlias, col);
 					} else {
-						entityPropertyType = propertyDescriptor.getPropertyType();
-					}
-					applyFilter(entityPropertyType, newAlias, (Serializable) value);
-				}
-
-				// ---------- Property: Collection
-				else if (value instanceof Collection) {
-					Collection col = (Collection) value;
-					if (col.size() > 0) {
-						// Check the entity side if it is a collection, which implies that the association is
-						// one2many or many2many and it needs a join
-						PropertyDescriptor propertyDescriptor = ObjectUtil.getPropertyDescriptor(entity, propName, false);
-						if (propertyDescriptor == null) {
-							throw new RuntimeException(String.format("Invalid property [%s] in entity [%s]! The filter and entity should have same property name!",
-								propName, entity.getName()));
-						}
-						if (Collection.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
-							String newAlias = alias + "_" + propName;
-							addJoin(newAlias, String.format("%s.%s", alias, propName));
-							addWhere(String.format("and %1$s in :p_%1$s", newAlias));
-							addParam("p_" + newAlias, value);
-						} else {
-							addWhere(String.format("and %1$s.%2$s in :%2$s_", alias, propName));
-							addParam(propName + "_", value);
-						}
+						addWhere(String.format("and %1$s.%2$s in :%2$s_", alias, propName));
+						addParam(propName + "_", col);
 					}
 				}
-				// ---------- Property: other primitive types
-				else {
-					addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
-					addParam(propName + "_", value);
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
 			}
-		}
 
+			@Override
+			public void ifOther(String propName, Object value) {
+				addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
+				addParam(propName + "_", value);
+			}
+		}, filter, ignoreProperties);
 		return this;
 	}
 
-	private <T extends Annotation> T findAnnotation(Class<? extends Annotation> annot, Object obj,
-													PropertyDescriptor propertyDescriptor) {
-		T result = null;
-		Method readMethod = propertyDescriptor.getReadMethod();
-		if (readMethod != null)
-			result = (T) readMethod.getAnnotation(annot);
-
-		if (result == null) {
-			try {
-				Field field = obj.getClass().getDeclaredField(propertyDescriptor.getName());
-				result = (T) field.getAnnotation(annot);
-			} catch (NoSuchFieldException e) {
-			}
-		}
-		return result;
-	}
-
-	// -------------------------- PRIVATE METHODS
+	// ------------------------------
 
 	private void buildQuery() {
 		if (query == null) {
