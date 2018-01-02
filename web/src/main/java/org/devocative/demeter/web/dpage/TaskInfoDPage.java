@@ -1,6 +1,8 @@
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.core.request.handler.IPartialPageRequestHandler;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
@@ -12,9 +14,11 @@ import org.devocative.demeter.iservice.task.ITaskService;
 import org.devocative.demeter.vo.DTaskVO;
 import org.devocative.demeter.vo.filter.DTaskFVO;
 import org.devocative.demeter.web.DPage;
+import org.devocative.demeter.web.DTaskBehavior;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.wickomp.WModel;
+import org.devocative.wickomp.async.IAsyncResponse;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.form.range.WDateRangeInput;
@@ -34,11 +38,14 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
-public class TaskInfoDPage extends DPage {
+public class TaskInfoDPage extends DPage implements IAsyncResponse {
 	private static final long serialVersionUID = 3209745189144896909L;
 
 	private DTaskFVO filter = new DTaskFVO();
+
 	private WDataGrid<DTaskVO> running;
+	private DTaskBehavior taskBehavior;
+	private WebMarkupContainer log;
 
 	@Inject
 	private ITaskService taskService;
@@ -52,8 +59,37 @@ public class TaskInfoDPage extends DPage {
 	// ------------------------------
 
 	@Override
+	public void onAsyncResult(IPartialPageRequestHandler handler, Object result) {
+		String script = String.format("$('#%s').append(\"<div><span style='color:blue'>%s | </span>%s</div>\");",
+			log.getMarkupId(),
+			Thread.currentThread().getName(),
+			result.toString());
+		handler.appendJavaScript(script);
+		handler.appendJavaScript(String.format("$('#%1$s').scrollTop($('#%1$s')[0].scrollHeight);", log.getMarkupId()));
+	}
+
+	@Override
+	public void onAsyncError(IPartialPageRequestHandler handler, Exception e) {
+		String script = String.format("$('#%s').append(\"<div><span style='color:red'>%s | </span>%s</div>\");",
+			log.getMarkupId(),
+			Thread.currentThread().getName(),
+			e.toString());
+		handler.appendJavaScript(script);
+		handler.appendJavaScript(String.format("$('#%1$s').scrollTop($('#%1$s')[0].scrollHeight);", log.getMarkupId()));
+	}
+
+	// ------------------------------
+
+	@Override
 	protected void onInitialize() {
 		super.onInitialize();
+
+		taskBehavior = new DTaskBehavior(this);
+		add(taskBehavior);
+
+		log = new WebMarkupContainer("log");
+		log.setOutputMarkupId(true);
+		add(log);
 
 		initDTaskInfoList();
 
@@ -102,6 +138,24 @@ public class TaskInfoDPage extends DPage {
 				taskService.stop(key);
 			}
 		}.setConfirmMessage(getString("label.confirm")));
+		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.DOT_CIRCLE_O) {
+			private static final long serialVersionUID = 1830759784L;
+
+			@Override
+			public void onClick(AjaxRequestTarget target, IModel<DTaskVO> rowData) {
+				String key = rowData.getObject().getKey();
+				taskService.attachToCallback(key, taskBehavior);
+			}
+		});
+		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.CIRCLE_O) {
+			private static final long serialVersionUID = 1830759784L;
+
+			@Override
+			public void onClick(AjaxRequestTarget target, IModel<DTaskVO> rowData) {
+				String key = rowData.getObject().getKey();
+				taskService.detachFromCallback(key, taskBehavior);
+			}
+		});
 
 		OGrid<DTaskVO> oGrid = new OGrid<>();
 		oGrid

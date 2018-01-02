@@ -5,25 +5,35 @@
 
 	<hr/>
 
-	<form wicket:id="form">
-		<div class="dmt-form">
-			<div wicket:id="floatTable">
-				<div wicket:id="id"></div>
-				<div wicket:id="type"></div>
-				<div wicket:id="startDate"></div>
-				<div wicket:id="state"></div>
-				<div wicket:id="currentUser"></div>
-			</div>
+	<table style="width: 100%">
+		<tr>
+			<td style="width: 900px">
+				<form wicket:id="form">
+					<div class="dmt-form">
+						<div wicket:id="floatTable">
+							<div wicket:id="id"></div>
+							<div wicket:id="type"></div>
+							<div wicket:id="startDate"></div>
+							<div wicket:id="state"></div>
+							<div wicket:id="currentUser"></div>
+						</div>
 
-			<button wicket:id="search"></button>
-			<button type="reset">
-				<wicket:message key="label.reset"/>
-				<i class="fa fa-history"></i>
-			</button>
-		</div>
-	</form>
+						<button wicket:id="search"></button>
+						<button type="reset">
+							<wicket:message key="label.reset"/>
+							<i class="fa fa-history"></i>
+						</button>
+					</div>
+				</form>
 
-	<div wicket:id="running"></div>
+				<div wicket:id="running"></div>
+			</td>
 
+			<td style="direction: ltr">
+				<div>Console</div>
+				<div wicket:id="log" style="height:500px; overflow-y:auto; border: 1px solid black;"></div>
+			</td>
+		</tr>
+	</table>
 </wicket:panel>
 </html>

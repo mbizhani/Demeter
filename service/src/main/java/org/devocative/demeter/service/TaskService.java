@@ -3,6 +3,8 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
+import org.devocative.demeter.DemeterErrorCode;
+import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XDTask;
 import org.devocative.demeter.core.xml.XModule;
@@ -14,10 +16,7 @@ import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
-import org.devocative.demeter.iservice.task.DTask;
-import org.devocative.demeter.iservice.task.DTaskResult;
-import org.devocative.demeter.iservice.task.ITaskResultCallback;
-import org.devocative.demeter.iservice.task.ITaskService;
+import org.devocative.demeter.iservice.task.*;
 import org.devocative.demeter.vo.DTaskVO;
 import org.devocative.demeter.vo.filter.DTaskFVO;
 import org.quartz.*;
@@ -36,11 +35,12 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Service("dmtTaskService")
-public class TaskService implements ITaskService, IApplicationLifecycle, RejectedExecutionHandler {
+public class TaskService implements ITaskService, IApplicationLifecycle, RejectedExecutionHandler, ITaskResultEvent {
 	private static Logger logger = LoggerFactory.getLogger(TaskService.class);
 
 	private boolean enabled;
-	private Map<String, DTask> TASKS;
+	private final Map<String, DTask> TASKS = new ConcurrentHashMap<>();
+	private final Map<String, List<ITaskResultCallback>> TASKS_CALLBACK = new ConcurrentHashMap<>();
 	private Scheduler scheduler;
 	private ThreadPoolExecutor threadPoolExecutor;
 	private Map<String, IRequestLifecycle> requestLifecycleBeans;
@@ -83,8 +83,6 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			logger.error("TaskService.init(): StdSchedulerFactory: ", e);
 			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
 		}
-
-		TASKS = new ConcurrentHashMap<>();
 
 		persistorService
 			.createQueryBuilder()
@@ -242,7 +240,95 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		return CollectionUtil.filterCollection(getRunningTasks(), dTaskFVO).size();
 	}
 
-	public List<DTaskVO> getRunningTasks() {
+	@Override
+	public void attachToCallback(String key, ITaskResultCallback callback) {
+		if (TASKS_CALLBACK.containsKey(key)) {
+			List<ITaskResultCallback> list = TASKS_CALLBACK.get(key);
+			if (!list.contains(callback)) {
+				list.add(callback);
+				logger.info("Attach to Task Result: {}", key);
+			} else {
+				throw new RuntimeException("Already Attached Callback Handler");
+			}
+		} else {
+			throw new RuntimeException("Invalid key of DTask");
+		}
+	}
+
+	@Override
+	public void detachFromCallback(String key, ITaskResultCallback callback) {
+		if (TASKS_CALLBACK.containsKey(key)) {
+			List<ITaskResultCallback> list = TASKS_CALLBACK.get(key);
+			boolean result = list.remove(callback);
+			if (!result) {
+				throw new RuntimeException("Already Detached Callback Handler");
+			} else {
+				logger.info("Detach from Task Result: {}", key);
+			}
+		} else {
+			throw new RuntimeException("Invalid key of DTask");
+		}
+	}
+
+	// ---------------
+
+	@Override
+	public void onTaskResult(DTask dTask, Object result) {
+		List<ITaskResultCallback> callbacks = TASKS_CALLBACK.get(dTask.getKey());
+		List<ITaskResultCallback> toRemove = new ArrayList<>();
+
+		for (ITaskResultCallback callback : callbacks) {
+			try {
+				callback.onTaskResult(dTask.getId(), result);
+			} catch (DemeterException e) {
+				if (DemeterErrorCode.InvalidPushConnection.equals(e.getErrorCode())) {
+					toRemove.add(callback);
+				} else {
+					callback.onTaskError(dTask.getId(), e);
+				}
+			} catch (Exception e) {
+				callback.onTaskError(dTask.getId(), e);
+			}
+		}
+
+		if (!toRemove.isEmpty()) {
+			synchronized (TASKS_CALLBACK.get(dTask.getKey())) {
+				logger.info("Remove Disconnected Task Result: key={} size={}", dTask.getKey(), toRemove.size());
+				TASKS_CALLBACK.get(dTask.getKey()).removeAll(toRemove);
+			}
+		}
+	}
+
+	@Override
+	public void onTaskError(DTask dTask, Exception e) {
+		List<ITaskResultCallback> callbacks = TASKS_CALLBACK.get(dTask.getKey());
+		List<ITaskResultCallback> toRemove = new ArrayList<>();
+
+		for (ITaskResultCallback callback : callbacks) {
+			try {
+				callback.onTaskError(dTask.getId(), e);
+			} catch (DemeterException e1) {
+				if (DemeterErrorCode.InvalidPushConnection.equals(e1.getErrorCode())) {
+					toRemove.add(callback);
+				} else {
+					logger.error("TaskService.onTaskError: ", e1);
+				}
+			} catch (Exception e1) {
+				logger.error("TaskService.onTaskError: ", e1);
+			}
+		}
+
+		if (!toRemove.isEmpty()) {
+			synchronized (TASKS_CALLBACK.get(dTask.getKey())) {
+				logger.info("Remove Disconnected Task Result: key={} size={}", dTask.getKey(), toRemove.size());
+				TASKS_CALLBACK.get(dTask.getKey()).removeAll(toRemove);
+			}
+		}
+	}
+
+	// ------------------------------ Private
+
+	private List<DTaskVO> getRunningTasks() {
 		List<DTaskVO> result = new ArrayList<>(TASKS.size());
 		for (DTask dTask : TASKS.values()) {
 			result.add(new DTaskVO(
@@ -255,8 +341,6 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		}
 		return result;
 	}
-
-	// ------------------------------ Private
 
 	// Main
 	private DTaskResult start(DTaskInfo taskInfo, Object id, Object inputData, ITaskResultCallback resultCallback) {
@@ -288,7 +372,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		dTask
 			.setId(id)
 			.setInputData(inputData)
-			.setResultCallback(resultCallback)
+			.setTaskResultEvent(this)
 			.setCurrentUser(securityService.getCurrentUser());
 
 		Future<?> result = null;
@@ -296,6 +380,10 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			logger.warn("ReRunning Task: {}", dTask.getKey());
 		} else {
 			TASKS.put(dTask.getKey(), dTask);
+			TASKS_CALLBACK.put(dTask.getKey(), new ArrayList<>());
+			if (resultCallback != null) {
+				TASKS_CALLBACK.get(dTask.getKey()).add(resultCallback);
+			}
 			result = threadPoolExecutor.submit(dTask);
 			logger.info("Started Task: {}", dTask.getKey());
 		}

@@ -1,6 +1,5 @@
 package org.devocative.demeter.iservice.task;
 
-import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.entity.DTaskState;
 import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ public abstract class DTask implements Runnable {
 	private Long duration;
 	private Exception exception;
 	private DTaskState state = DTaskState.InQueue;
-	private ITaskResultCallback resultCallback;
+	private ITaskResultEvent taskResultEvent;
 	private UserVO currentUser;
 
 	// ------------------------------ ABSTRACT METHODS
@@ -51,8 +50,8 @@ public abstract class DTask implements Runnable {
 		return this;
 	}
 
-	public DTask setResultCallback(ITaskResultCallback resultCallback) {
-		this.resultCallback = resultCallback;
+	public DTask setTaskResultEvent(ITaskResultEvent taskResultEvent) {
+		this.taskResultEvent = taskResultEvent;
 		return this;
 	}
 
@@ -138,27 +137,19 @@ public abstract class DTask implements Runnable {
 	// ------------------------------ PROTECTED
 
 	protected void sendResult(Object result) {
-		if (resultCallback != null) {
-			try {
-				resultCallback.onTaskResult(id, result);
-			} catch (Exception e) {
-				logger.error("DTask.sendResult", e);
-				sendError(e);
-			}
-		} else {
-			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
+		try {
+			taskResultEvent.onTaskResult(this, result);
+		} catch (Exception e) {
+			logger.error("DTask.sendResult", e);
+			sendError(e);
 		}
 	}
 
 	protected void sendError(Exception exception) {
-		if (resultCallback != null) {
-			try {
-				resultCallback.onTaskError(id, exception);
-			} catch (Exception e) {
-				logger.error("DTask.sendError: ", e);
-			}
-		} else {
-			throw new DSystemException("No ITaskResultCallback for DTask: " + getClass().getName());
+		try {
+			taskResultEvent.onTaskError(this, exception);
+		} catch (Exception e) {
+			logger.error("DTask.sendError: ", e);
 		}
 	}
 }

@@ -2,6 +2,7 @@ package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.entity.DTaskState;
+import org.devocative.demeter.iservice.persistor.FilterOption;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,10 +11,17 @@ import java.util.List;
 public class DTaskFVO implements Serializable {
 	private static final long serialVersionUID = -2461425552334924991L;
 
+	@FilterOption(useLike = true)
 	private String id;
+
+	@FilterOption(useLike = true)
 	private String type;
+
 	private RangeVO<Date> startDate;
+
 	private List<DTaskState> state;
+
+	@FilterOption(useLike = true)
 	private String currentUser;
 
 	// ------------------------------

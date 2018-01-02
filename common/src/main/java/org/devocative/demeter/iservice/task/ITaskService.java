@@ -32,4 +32,8 @@ public interface ITaskService {
 	List<DTaskVO> search(DTaskFVO dTaskFVO, long pageIndex, long pageSize);
 
 	long count(DTaskFVO dTaskFVO);
+
+	void attachToCallback(String key, ITaskResultCallback callback);
+
+	void detachFromCallback(String key, ITaskResultCallback callback);
 }

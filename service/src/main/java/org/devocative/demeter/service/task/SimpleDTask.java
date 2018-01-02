@@ -6,12 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @Scope("prototype")
 @Component("dmtSimpleDTask")
 public class SimpleDTask extends DTask {
 	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
 
-	private Thread currentTh;
+	private AtomicBoolean cont = new AtomicBoolean(true);
 
 	@Override
 	public void init() {
@@ -25,12 +27,17 @@ public class SimpleDTask extends DTask {
 
 	@Override
 	public void execute() {
-		currentTh = Thread.currentThread();
+		logger.info("SimpleDTask.execute: user={}", getCurrentUser());
 
-		logger.info("SimpleDTask.execute: user={}, curTh={}", getCurrentUser(), currentTh);
 		try {
-			Thread.sleep(60000);
+			int i = (int) (Math.random() * 10000);
+			final int max = i + 60;
+			for (; i <= max && cont.get(); i++) {
+				Thread.sleep(((i % 3) + 1) * 2000);
+				sendResult(String.format("counter = %02d", i));
+			}
 			logger.info("SimpleDTask.executed: {}", getCurrentUser());
+			sendResult("SimpleDTask.executed: " + getCurrentUser());
 		} catch (InterruptedException e) {
 			logger.warn("SimpleDTask Sleep Interrupted");
 		}
@@ -39,6 +46,6 @@ public class SimpleDTask extends DTask {
 	@Override
 	public void cancel() throws Exception {
 		logger.info("SimpleDTask.cancel: {}", getCurrentUser());
-		currentTh.interrupt();
+		cont.set(false);
 	}
 }
