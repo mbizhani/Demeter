@@ -8,6 +8,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.util.string.Strings;
 import org.devocative.demeter.entity.DTaskInfo;
 import org.devocative.demeter.entity.DTaskState;
 import org.devocative.demeter.iservice.task.ITaskService;
@@ -60,10 +61,15 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse {
 
 	@Override
 	public void onAsyncResult(IPartialPageRequestHandler handler, Object result) {
+		String str = Strings.escapeMarkup(result.toString(), false, true).toString();
+		str = str.replaceAll("[\n]", "<br/>");
+		str = str.replaceAll("[\r]", "");
+
 		String script = String.format("$('#%s').append(\"<div><span style='color:blue'>%s | </span>%s</div>\");",
 			log.getMarkupId(),
 			Thread.currentThread().getName(),
-			result.toString());
+			str);
+
 		handler.appendJavaScript(script);
 		handler.appendJavaScript(String.format("$('#%1$s').scrollTop($('#%1$s')[0].scrollHeight);", log.getMarkupId()));
 	}
