@@ -274,6 +274,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public void onTaskResult(DTask dTask, Object result) {
+		securityService.authenticate(dTask.getCurrentUser());
+
 		List<ITaskResultCallback> callbacks = TASKS_CALLBACK.get(dTask.getKey());
 		List<ITaskResultCallback> toRemove = new ArrayList<>();
 
@@ -297,10 +299,14 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 				TASKS_CALLBACK.get(dTask.getKey()).removeAll(toRemove);
 			}
 		}
+
+		securityService.authenticate(dTask.getCurrentUser());
 	}
 
 	@Override
 	public void onTaskError(DTask dTask, Exception e) {
+		securityService.authenticate(dTask.getCurrentUser());
+
 		List<ITaskResultCallback> callbacks = TASKS_CALLBACK.get(dTask.getKey());
 		List<ITaskResultCallback> toRemove = new ArrayList<>();
 
@@ -324,6 +330,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 				TASKS_CALLBACK.get(dTask.getKey()).removeAll(toRemove);
 			}
 		}
+
+		securityService.authenticate(dTask.getCurrentUser());
 	}
 
 	// ------------------------------ Private

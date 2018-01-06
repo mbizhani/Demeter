@@ -1,8 +1,10 @@
 package org.devocative.demeter.service.task;
 
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.task.DTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,9 @@ public class SimpleDTask extends DTask {
 	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
 
 	private AtomicBoolean cont = new AtomicBoolean(true);
+
+	@Autowired
+	private ISecurityService securityService;
 
 	@Override
 	public void init() {
@@ -30,11 +35,12 @@ public class SimpleDTask extends DTask {
 		logger.info("SimpleDTask.execute: user={}", getCurrentUser());
 
 		try {
+			int idx = 1;
 			int i = (int) (Math.random() * 10000);
-			final int max = i + 60;
+			final int max = i + 30;
 			for (; i <= max && cont.get(); i++) {
-				Thread.sleep(((i % 3) + 1) * 2000);
-				sendResult(String.format("counter = %02d", i));
+				Thread.sleep(((i % 3) + 1) * 1000);
+				sendResult(String.format("counter = %02d | idx= %02d | user=%s", i, idx++, securityService.getCurrentUser()));
 			}
 			logger.info("SimpleDTask.executed: {}", getCurrentUser());
 			sendResult("SimpleDTask.executed: " + getCurrentUser());

@@ -96,7 +96,7 @@
 			   title="KEY:dPage.dmt.TaskInfoList"
 			   uri="/tasks"
 			   inMenu="true"
-			   roles="Root"
+			   roles="Admin"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.FileStoreListDPage"
