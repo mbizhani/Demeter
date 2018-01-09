@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Scope("prototype")
 @Component("dmtFileStoreDTask")
-public class FileStoreDTask extends DTask {
+public class FileStoreDTask extends DTask<Void> {
 
 	@Autowired
 	private IFileStoreService fileStoreService;

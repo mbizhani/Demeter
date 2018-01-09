@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Scope("prototype")
 @Component("dmtSimpleDTask")
-public class SimpleDTask extends DTask {
+public class SimpleDTask extends DTask<String> {
 	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
 
 	private AtomicBoolean cont = new AtomicBoolean(true);

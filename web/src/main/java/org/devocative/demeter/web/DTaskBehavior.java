@@ -10,7 +10,7 @@ import org.devocative.wickomp.async.IAsyncResponse;
 import org.devocative.wickomp.async.WebSocketDelayedResponse;
 import org.devocative.wickomp.async.WebSocketToken;
 
-public class DTaskBehavior extends Behavior implements ITaskResultCallback {
+public class DTaskBehavior<T> extends Behavior implements ITaskResultCallback<T> {
 	private static final long serialVersionUID = 3648272313697986956L;
 
 	private WebSocketToken token;
@@ -18,7 +18,7 @@ public class DTaskBehavior extends Behavior implements ITaskResultCallback {
 
 	// ------------------------------
 
-	public DTaskBehavior(IAsyncResponse response) {
+	public DTaskBehavior(IAsyncResponse<T> response) {
 		this.response = response;
 	}
 

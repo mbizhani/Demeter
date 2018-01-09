@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-public abstract class DTask implements Runnable {
+public abstract class DTask<T> implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
 
 	private Object id;
@@ -136,7 +136,7 @@ public abstract class DTask implements Runnable {
 
 	// ------------------------------ PROTECTED
 
-	protected void sendResult(Object result) {
+	protected void sendResult(T result) {
 		try {
 			taskResultEvent.onTaskResult(this, result);
 		} catch (Exception e) {
