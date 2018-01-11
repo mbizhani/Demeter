@@ -10,8 +10,7 @@ public enum DemeterErrorCode implements DErrorCode {
 	DBConstraintViolation("DB Constraint Violated"),
 
 	DuplicateUsername("Duplicate Username"),
-	DuplicateRoleName("Duplicate Role Name"),
-	InvalidPushConnection("Invalid Push Connection");
+	DuplicateRoleName("Duplicate Role Name");
 
 	private String defaultDescription;
 

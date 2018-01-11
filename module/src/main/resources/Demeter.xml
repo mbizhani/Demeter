@@ -30,7 +30,7 @@
 	</entities>
 
 	<tasks>
-		<!--<task type="org.devocative.demeter.service.task.SimpleDTask"/>-->
+		<task type="org.devocative.demeter.service.task.SimpleDTask"/>
 
 		<!-- Fire at 2:00 every day -->
 		<task type="org.devocative.demeter.service.task.FileStoreDTask" cronExpression="0 0 2 * * ?"/>

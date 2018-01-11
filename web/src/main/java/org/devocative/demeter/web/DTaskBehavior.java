@@ -2,8 +2,6 @@ package org.devocative.demeter.web;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.Behavior;
-import org.devocative.demeter.DemeterErrorCode;
-import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.iservice.task.ITaskResultCallback;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.async.IAsyncResponse;
@@ -15,6 +13,7 @@ public class DTaskBehavior<T> extends Behavior implements ITaskResultCallback<T>
 
 	private WebSocketToken token;
 	private IAsyncResponse response;
+	private boolean enabled = true;
 
 	// ------------------------------
 
@@ -35,17 +34,15 @@ public class DTaskBehavior<T> extends Behavior implements ITaskResultCallback<T>
 
 	@Override
 	public void onTaskResult(Object id, Object result) {
-		boolean isSend = WebUtil.wsPush(token, new WebSocketDelayedResponse(response, result));
-		if (!isSend) {
-			throw new DemeterException(DemeterErrorCode.InvalidPushConnection);
+		if (enabled) {
+			enabled = WebUtil.wsPush(token, new WebSocketDelayedResponse(response, result));
 		}
 	}
 
 	@Override
 	public void onTaskError(Object id, Exception e) {
-		boolean isSend = WebUtil.wsPush(token, new WebSocketDelayedResponse(response, e));
-		if (!isSend) {
-			throw new DemeterException(DemeterErrorCode.InvalidPushConnection);
+		if (enabled) {
+			enabled = WebUtil.wsPush(token, new WebSocketDelayedResponse(response, e));
 		}
 	}
 }

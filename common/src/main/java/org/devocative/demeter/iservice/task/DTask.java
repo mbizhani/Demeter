@@ -5,7 +5,9 @@ import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public abstract class DTask<T> implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DTask.class);
@@ -19,6 +21,8 @@ public abstract class DTask<T> implements Runnable {
 	private DTaskState state = DTaskState.InQueue;
 	private ITaskResultEvent taskResultEvent;
 	private UserVO currentUser;
+
+	private List<ITaskResultCallback> resultCallbacks = new ArrayList<>();
 
 	// ------------------------------ ABSTRACT METHODS
 
@@ -53,6 +57,17 @@ public abstract class DTask<T> implements Runnable {
 	public DTask setTaskResultEvent(ITaskResultEvent taskResultEvent) {
 		this.taskResultEvent = taskResultEvent;
 		return this;
+	}
+
+	public DTask addTaskResultCallback(ITaskResultCallback resultCallback) {
+		if (resultCallback != null) {
+			resultCallbacks.add(resultCallback);
+		}
+		return this;
+	}
+
+	public List<ITaskResultCallback> getResultCallbacks() {
+		return resultCallbacks;
 	}
 
 	public Date getStartDate() {
