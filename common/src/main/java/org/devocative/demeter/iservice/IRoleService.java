@@ -31,5 +31,5 @@ public interface IRoleService {
 
 	// ==============================
 
-	void createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic);
+	Role createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic);
 }

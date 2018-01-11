@@ -103,7 +103,7 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public void createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic) {
+	public Role createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();
@@ -113,5 +113,7 @@ public class RoleService implements IRoleService {
 		role.setRowMod(rowMod);
 		saveOrUpdate(role);
 		//persistorService.commitOrRollback();
+
+		return role;
 	}
 }
