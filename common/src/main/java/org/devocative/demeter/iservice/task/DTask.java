@@ -139,14 +139,9 @@ public abstract class DTask<T> implements Runnable {
 		logger.info("Executed DTask: key=[{}] state=[{}] dur=[{}]", key, state, duration);
 	}
 
-	public final void stop() {
+	public final void stop() throws Exception {
 		state = DTaskState.Interrupted;
-		try {
-			cancel();
-		} catch (Exception e) {
-			logger.error("DTask: id={}", getId(), e);
-			throw new RuntimeException(e);
-		}
+		cancel();
 	}
 
 	// ------------------------------ PROTECTED

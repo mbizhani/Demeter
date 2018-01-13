@@ -120,10 +120,12 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			return;
 		}
 
+		stopAll();
+
 		try {
 			scheduler.shutdown();
 		} catch (SchedulerException e) {
-			logger.warn("Scheduler shutdown:", e);
+			logger.warn("Scheduler Shutdown:", e);
 		}
 		threadPoolExecutor.shutdown();
 	}
@@ -213,7 +215,11 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	@Override
 	public void stop(String key) {
 		if (TASKS.containsKey(key)) {
-			TASKS.get(key).stop();
+			try {
+				TASKS.get(key).stop();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			throw new RuntimeException("DTask Not Found: " + key);
 		}
@@ -221,6 +227,15 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public void stopAll() {
+		logger.info("TaskService.Shutdown: Running Tasks Count=[{}]", TASKS.size());
+
+		for (DTask dTask : TASKS.values()) {
+			try {
+				dTask.stop();
+			} catch (Exception e) {
+				logger.error("TaskService.Shutdown: id=[{}] key=[{}]", dTask.getId(), dTask.getKey(), e);
+			}
+		}
 	}
 
 	// ---------------

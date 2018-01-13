@@ -420,7 +420,7 @@ public class DemeterCore {
 			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
 			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
 				entry.getValue().init();
-				logger.info("Application lifecycle bean ({}) init(): {}", priority, entry.getKey());
+				logger.info("Application Lifecycle Priority [{}] init(): bean=[{}]", priority, entry.getKey());
 			}
 		}
 
@@ -457,11 +457,11 @@ public class DemeterCore {
 		List<ApplicationLifecyclePriority> priorities = Arrays.asList(ApplicationLifecyclePriority.values());
 		Collections.reverse(priorities);
 
-		for (ApplicationLifecyclePriority priority : ApplicationLifecyclePriority.values()) {
+		for (ApplicationLifecyclePriority priority : priorities) {
 			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
 			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
 				entry.getValue().shutdown();
-				logger.info("Application lifecycle bean ({}) shutdown(): {}", priority, entry.getKey());
+				logger.info("Application Lifecycle Priority [{}] shutdown(): bean=[{}]", priority, entry.getKey());
 			}
 		}
 	}
