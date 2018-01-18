@@ -11,7 +11,6 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.IDemeterCoreEventListener;
 import org.devocative.demeter.core.xml.XEntity;
 import org.devocative.demeter.core.xml.XModule;
-import org.devocative.demeter.imodule.DModule;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.IApplicationLifecycle;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -26,6 +25,10 @@ import java.io.InputStream;
 import java.util.*;
 
 public class DemeterCore {
+	public static final String CONFIG_PROFILE = "dmtProfile";
+
+	// ------------------------------
+
 	private static final Logger logger = LoggerFactory.getLogger(DemeterCore.class);
 
 	private final Map<String, XModule> MODULES = new LinkedHashMap<>();
@@ -56,14 +59,8 @@ public class DemeterCore {
 	// ------------------------------
 
 	public void init() {
-		init(getDefaultConfig());
-	}
-
-	public synchronized void init(InputStream configInputStream) {
 		if (MAIN_STARTUP.getStep() == EStartupStep.Begin) {
-			ConfigUtil.load(configInputStream);
-
-			MAIN_STARTUP = startUntil(EStartupStep.Begin, EStartupStep.End);
+			startUntil(EStartupStep.End);
 
 			checkAndExecuteAfterSuccess();
 		}
@@ -73,7 +70,7 @@ public class DemeterCore {
 		logger.info("## RESUMING");
 
 		if (!isStartedSuccessfully()) {
-			MAIN_STARTUP = startUntil(MAIN_STARTUP.getStep(), EStartupStep.End);
+			startUntil(EStartupStep.End);
 
 			checkAndExecuteAfterSuccess();
 		}
@@ -99,16 +96,11 @@ public class DemeterCore {
 	}
 
 	public void generatePersistorSchemaDiff() {
-		generatePersistorSchemaDiff(getDefaultConfig());
-	}
+		startUntil(EStartupStep.BeansStartup);
 
-	public void generatePersistorSchemaDiff(InputStream configInputStream) {
-		ConfigUtil.load(configInputStream);
-
-		StepResultVO resultVO = startUntil(EStartupStep.Begin, EStartupStep.LazyBeans);
-		if (!resultVO.isSuccessful()) {
+		if (!MAIN_STARTUP.isSuccessful()) {
 			logger.error("=======================================");
-			logger.error("== {}", resultVO.getError());
+			logger.error("== {}", MAIN_STARTUP.getError());
 			logger.error("=======================================");
 		}
 
@@ -132,7 +124,7 @@ public class DemeterCore {
 	}
 
 	public void applyAllDbDiffs() {
-		startUntil(EStartupStep.Begin, EStartupStep.Database);
+		startUntil(EStartupStep.Database);
 
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), true);
 	}
@@ -186,8 +178,10 @@ public class DemeterCore {
 
 	// ------------------------------
 
-	private StepResultVO startUntil(EStartupStep step, EStartupStep last) {
+	private void startUntil(EStartupStep last) {
 		StepResultVO result = null;
+		EStartupStep step = MAIN_STARTUP.getStep();
+
 		while (step.ordinal() < last.ordinal()) {
 			logger.info("## Executing Step: [{}]", EStartupStep.next(step));
 			result = doNext(step);
@@ -198,7 +192,10 @@ public class DemeterCore {
 				break;
 			}
 		}
-		return result != null ? result : new StepResultVO(step);
+
+		if (result != null) {
+			MAIN_STARTUP = result;
+		}
 	}
 
 	private StepResultVO doNext(EStartupStep current) {
@@ -208,6 +205,10 @@ public class DemeterCore {
 		try {
 			switch (next) {
 				case Begin:
+					break;
+
+				case Config:
+					initConfig();
 					break;
 
 				case EncDec:
@@ -228,10 +229,6 @@ public class DemeterCore {
 
 				case Database:
 					initDatabase();
-					break;
-
-				case LazyBeans:
-					initLazyBeans();
 					break;
 
 				case BeansStartup:
@@ -265,6 +262,16 @@ public class DemeterCore {
 	}
 
 	// --------------- STEPS
+
+	private void initConfig() {
+		String configFile = "/config.properties";
+		String property = System.getProperty(CONFIG_PROFILE);
+		if (property != null) {
+			configFile = String.format("/config_%s.properties", property);
+		}
+		logger.info(">>>> C O N F I G   F I L E: {}", configFile);
+		ConfigUtil.load(getClass().getResourceAsStream(configFile));
+	}
 
 	private void initEncDec() {
 		boolean enableSecurity = true;
@@ -386,20 +393,6 @@ public class DemeterCore {
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), false);
 	}
 
-	private void initLazyBeans() {
-		for (XModule module : MODULES.values()) {
-			try {
-				String beanName = String.format("%sDModule", module.getShortName().toLowerCase());
-				Class<?> moduleMainClass = Class.forName(module.getMainClass());
-				DModule dModule = (DModule) moduleMainClass.newInstance();
-				registerSpringBean(beanName, dModule);
-				logger.info("DModule bean created: {}", beanName);
-			} catch (Exception e) {
-				throw new DSystemException("DModule class: " + module.getMainClass(), e);
-			}
-		}
-	}
-
 	private void initBeansStartup() {
 		Map<String, IApplicationLifecycle> beansOfType = appCtx.getBeansOfType(IApplicationLifecycle.class);
 		for (Map.Entry<String, IApplicationLifecycle> entry : beansOfType.entrySet()) {
@@ -417,10 +410,12 @@ public class DemeterCore {
 		}
 
 		for (ApplicationLifecyclePriority priority : ApplicationLifecyclePriority.values()) {
-			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
-			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
-				entry.getValue().init();
-				logger.info("Application Lifecycle Priority [{}] init(): bean=[{}]", priority, entry.getKey());
+			if (APP_LIFECYCLE_BEANS.containsKey(priority)) {
+				Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
+				for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
+					entry.getValue().init();
+					logger.info("Application Lifecycle Priority [{}] init(): bean=[{}]", priority, entry.getKey());
+				}
 			}
 		}
 
@@ -458,10 +453,12 @@ public class DemeterCore {
 		Collections.reverse(priorities);
 
 		for (ApplicationLifecyclePriority priority : priorities) {
-			Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
-			for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
-				entry.getValue().shutdown();
-				logger.info("Application Lifecycle Priority [{}] shutdown(): bean=[{}]", priority, entry.getKey());
+			if (APP_LIFECYCLE_BEANS.containsKey(priority)) {
+				Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
+				for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
+					entry.getValue().shutdown();
+					logger.info("Application Lifecycle Priority [{}] shutdown(): bean=[{}]", priority, entry.getKey());
+				}
 			}
 		}
 	}
@@ -498,9 +495,5 @@ public class DemeterCore {
 		} catch (Exception e) {
 			logger.error(String.format("Loading module [%s] config keys", xModule.getShortName()), e);
 		}
-	}
-
-	private InputStream getDefaultConfig() {
-		return DemeterCore.class.getResourceAsStream("/config.properties");
 	}
 }

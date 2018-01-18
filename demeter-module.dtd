@@ -1,7 +1,6 @@
 <!ELEMENT module (dependencies|entities|dPages|tasks)*>
 		<!ATTLIST module
 				shortName CDATA #REQUIRED
-				mainClass CDATA #REQUIRED
 				mainResource CDATA #REQUIRED
 				privilegeKeyClass CDATA #IMPLIED
 				errorCodesClass CDATA #IMPLIED

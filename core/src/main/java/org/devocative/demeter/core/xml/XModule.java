@@ -12,9 +12,6 @@ public class XModule {
 	private String shortName;
 
 	@XStreamAsAttribute
-	private String mainClass;
-
-	@XStreamAsAttribute
 	private String mainResource;
 
 	@XStreamAsAttribute
@@ -45,14 +42,6 @@ public class XModule {
 
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
-	}
-
-	public String getMainClass() {
-		return mainClass;
-	}
-
-	public void setMainClass(String mainClass) {
-		this.mainClass = mainClass;
 	}
 
 	public String getMainResource() {

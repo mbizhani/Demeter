@@ -1,6 +1,7 @@
-package org.devocative.demeter.core;
+package org.devocative.demeter.test;
 
 import org.devocative.adroit.vo.RangeVO;
+import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.ERowMod;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.persistor.IPersistorService;

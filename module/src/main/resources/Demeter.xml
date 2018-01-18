@@ -6,7 +6,6 @@
 
 <module
 		shortName="DMT"
-		mainClass="org.devocative.demeter.module.DemeterDModule"
 		mainResource="org.devocative.demeter.web.DemeterDModule"
 		privilegeKeyClass="org.devocative.demeter.DemeterPrivilegeKey"
 		configKeyClass="org.devocative.demeter.DemeterConfigKey">

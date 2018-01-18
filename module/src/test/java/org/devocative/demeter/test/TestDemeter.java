@@ -1,4 +1,4 @@
-package org.devocative.demeter.web.test;
+package org.devocative.demeter.test;
 
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
@@ -22,7 +22,6 @@ import org.devocative.demeter.web.dpage.RoleFormDPage;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,21 +31,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDemeter {
-	private static InputStream CONFIG = TestDemeter.class.getResourceAsStream("/configHSQLDB.properties");
-
 	private static WicketTester tester;
-
 	private static ISecurityService securityService;
+
+	private static String PROFILE = "hsqldb";
 
 	// ------------------------------
 
-	public static void setCONFIG(InputStream CONFIG) {
-		TestDemeter.CONFIG = CONFIG;
+	public static void setPROFILE(String PROFILE) {
+		TestDemeter.PROFILE = PROFILE;
 	}
 
 	@BeforeClass
 	public static void setUp() {
-		DemeterCore.get().init(CONFIG);
+		System.setProperty(DemeterCore.CONFIG_PROFILE, PROFILE);
+
+		DemeterCore.get().init();
 
 		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
 		tester = new WicketTester(new DemeterWebApplication());

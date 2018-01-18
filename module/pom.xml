@@ -12,19 +12,125 @@
 	<artifactId>demeter-module</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Demeter Module</name>
+	<name>Demeter DModule</name>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.devocative</groupId>
-			<artifactId>demeter-common</artifactId>
+			<artifactId>demeter-service</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${d.spring.ver}</version>
+			<groupId>org.devocative</groupId>
+			<artifactId>demeter-web</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
+
+		<!--  TEST -->
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.4.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.4.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${d.servlet.ver}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+
+			<testResource>
+				<directory>../common/src/main/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+
+			<!-- Jetty -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${p.jetty.ver}</version>
+				<configuration>
+					<useTestScope>true</useTestScope>
+					<webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
+					<webApp>
+						<contextPath>${jetty.context}</contextPath>
+					</webApp>
+					<httpConnector>
+						<port>${jetty.port}</port>
+					</httpConnector>
+
+					<stopKey>Demeter</stopKey>
+					<stopPort>${jetty.port.stop}</stopPort>
+				</configuration>
+			</plugin>
+
+			<!-- Remote Resource -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<outputDirectory>src/test/webapp</outputDirectory>
+					<resourceBundles>
+						<resourceBundle>org.devocative:diadem:${d.diadem.ver}</resourceBundle>
+					</resourceBundles>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Demeter Helper Plugin -->
+			<plugin>
+				<groupId>org.devocative</groupId>
+				<artifactId>demeter-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<!--<configuration>
+					<filters>dmt</filters>
+				</configuration>-->
+			</plugin>
+
+			<!-- Create JAR for Test Classes -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${p.jar.ver}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>

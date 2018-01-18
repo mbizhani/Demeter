@@ -1,4 +1,4 @@
-package org.devocative.demeter.web.test;
+package org.devocative.demeter.test;
 
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.sql.NamedParameterStatement;
@@ -149,7 +149,7 @@ commit;
 	// ------------------------------
 
 	public void s01CheckExport() throws SQLException, FileNotFoundException {
-		DemeterCore.get().init(TestImportExport.class.getResourceAsStream("/config_OraDbExp.properties"));
+		DemeterCore.get().init(/*TestImportExport.class.getResourceAsStream("/config_OraDbExp.properties")*/);
 
 		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Connection sqlConnection = persistorService.createSqlConnection();
@@ -242,7 +242,7 @@ commit;
 	}
 
 	public void s02CheckImport() throws SQLException, FileNotFoundException {
-		DemeterCore.get().init(TestImportExport.class.getResourceAsStream("/config_OraDbImp.properties"));
+		DemeterCore.get().init(/*TestImportExport.class.getResourceAsStream("/config_OraDbImp.properties")*/);
 
 		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
 		Connection sqlConnection = persistorService.createSqlConnection();

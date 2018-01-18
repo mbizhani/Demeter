@@ -1,4 +1,4 @@
-package org.devocative.demeter.core;
+package org.devocative.demeter.test;
 
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.iservice.persistor.FilterOption;

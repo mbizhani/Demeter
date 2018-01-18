@@ -3,12 +3,12 @@ package org.devocative.demeter.core;
 public enum EStartupStep {
 	//NOTE: the order of following literals determines the startup steps of Demeter
 	Begin,
+	Config,
 	EncDec,
 	Modules,
 	Spring,
 	PersistenceServices,
 	Database,
-	LazyBeans,
 	BeansStartup,
 	End;
 

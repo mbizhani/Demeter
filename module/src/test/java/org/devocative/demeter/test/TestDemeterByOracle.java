@@ -1,4 +1,4 @@
-package org.devocative.demeter.web.test;
+package org.devocative.demeter.test;
 
 import org.apache.commons.io.IOUtils;
 import org.devocative.adroit.ConfigUtil;
@@ -26,7 +26,7 @@ public class TestDemeterByOracle {
 
 	@Test
 	public void c00testDemeterByOracle() {
-		InputStream config = TestDemeterByOracle.class.getResourceAsStream("/configOracle.properties");
+		InputStream config = TestDemeterByOracle.class.getResourceAsStream("/config_oracle.properties");
 		ConfigUtil.load(config);
 
 		boolean isOracleOk = true;
@@ -47,7 +47,7 @@ public class TestDemeterByOracle {
 		}
 
 		if (isOracleOk) {
-			TestDemeter.setCONFIG(TestDemeterByOracle.class.getResourceAsStream("/configOracle.properties"));
+			TestDemeter.setPROFILE("oracle");
 			JUnitCore core = new JUnitCore();
 			core.addListener(new RunListener() {
 				@Override
