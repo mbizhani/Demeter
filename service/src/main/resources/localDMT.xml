@@ -12,5 +12,6 @@
 	<context:component-scan base-package="org.devocative.demeter.service.task"/>
 
 	<bean name="dmtPersistorService" class="org.devocative.demeter.service.HibernatePersistorService"/>
+	<bean name="dmtCoreService" class="org.devocative.demeter.core.DemeterCoreService"/>
 
 </beans>

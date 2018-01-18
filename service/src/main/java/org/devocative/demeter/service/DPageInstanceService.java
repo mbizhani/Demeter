@@ -4,9 +4,6 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.core.DemeterCore;
-import org.devocative.demeter.core.xml.XDPage;
-import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DPageInfo;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.entity.Role;
@@ -16,6 +13,8 @@ import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.vo.core.DModuleInfoVO;
+import org.devocative.demeter.vo.core.DPageInfoVO;
 import org.devocative.demeter.vo.filter.DPageInstanceFVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,9 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	@Autowired
 	private IPersistorService persistorService;
+
+	@Autowired
+	private IDemeterCoreService demeterCoreService;
 
 	// ------------------------------
 
@@ -116,13 +118,11 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
 
 		int totalDPageSize = 0;
-		Map<String, XModule> modules = DemeterCore.get().getModules();
-		for (Map.Entry<String, XModule> moduleEntry : modules.entrySet()) {
-			XModule xModule = moduleEntry.getValue();
-
-			List<XDPage> dPages = xModule.getDPages();
+		List<DModuleInfoVO> modules = demeterCoreService.getModules();
+		for (DModuleInfoVO xModule : modules) {
+			List<DPageInfoVO> dPages = xModule.getDPages();
 			if (dPages != null) {
-				for (XDPage dPage : dPages) {
+				for (DPageInfoVO dPage : dPages) {
 					addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
 				}
 				totalDPageSize += dPages.size();
@@ -253,7 +253,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	// ------------------------------
 
-	private void addOrUpdatePageInfo(String module, XDPage xdPage) {
+	private void addOrUpdatePageInfo(String module, DPageInfoVO xdPage) {
 		String baseUri;
 		if (xdPage.getUri().startsWith("/")) {
 			baseUri = String.format("/%s%s", module, xdPage.getUri());

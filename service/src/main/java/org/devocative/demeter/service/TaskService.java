@@ -3,19 +3,15 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.core.DemeterCore;
-import org.devocative.demeter.core.xml.XDTask;
-import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.DTaskInfo;
 import org.devocative.demeter.entity.DTaskSchedule;
 import org.devocative.demeter.filter.CollectionUtil;
-import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
-import org.devocative.demeter.iservice.IApplicationLifecycle;
-import org.devocative.demeter.iservice.IRequestLifecycle;
-import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.task.*;
 import org.devocative.demeter.vo.DTaskVO;
+import org.devocative.demeter.vo.core.DModuleInfoVO;
+import org.devocative.demeter.vo.core.DTaskInfoVO;
 import org.devocative.demeter.vo.filter.DTaskFVO;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -48,6 +44,9 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	@Autowired
 	private IPersistorService persistorService;
 
+	@Autowired
+	private IDemeterCoreService demeterCoreService;
+
 	// ------------------------------ IApplicationLifecycle
 
 	@Override
@@ -70,7 +69,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
 
-		requestLifecycleBeans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
+		requestLifecycleBeans = demeterCoreService.getBeansOfType(IRequestLifecycle.class);
 
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -87,13 +86,13 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			.update();
 		persistorService.commitOrRollback();
 
-		Map<String, XModule> modules = DemeterCore.get().getModules();
-		for (XModule xModule : modules.values()) {
+		List<DModuleInfoVO> modules = demeterCoreService.getModules();
+		for (DModuleInfoVO xModule : modules) {
 			if (xModule.getTasks() != null) {
-				for (XDTask xdTask : xModule.getTasks()) {
+				for (DTaskInfoVO xdTask : xModule.getTasks()) {
 					try {
 						Class<?> beanType = Class.forName(xdTask.getType());
-						DemeterCore.get().getApplicationContext().getBean(beanType);
+						demeterCoreService.getBean(beanType);
 					} catch (ClassNotFoundException e) {
 						throw new DSystemException("Unknown task type as bean: " + xdTask.getType());
 					}
@@ -333,7 +332,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 				logger.info("Starting Task: class=[{}] - taskInfo=[{}]", taskClass, taskInfo.getId());
 
-				DTask dTask = (DTask) DemeterCore.get().getApplicationContext().getBean(taskClass);
+				DTask dTask = (DTask) demeterCoreService.getBean(taskClass);
 				return startDTask(dTask, id, inputData, resultCallback);
 			} catch (ClassNotFoundException e) {
 				logger.error("Can't find task class: class=[{}] taskInfo=[{}]", taskInfo.getType(), taskInfo.getId());
@@ -370,7 +369,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		return new DTaskResult(result, dTask);
 	}
 
-	private void addOrUpdateTask(String module, XDTask xdTask) {
+	private void addOrUpdateTask(String module, DTaskInfoVO xdTask) {
 		DTaskInfo dTaskInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DTaskInfo.class, "ent")
@@ -417,8 +416,12 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		String jobKey = taskSchedule.getId().toString();
 		logger.info("DTaskSchedule: scheduling: {}", jobKey);
 
+		JobDataMap map = new JobDataMap();
+		map.put(IDemeterCoreService.JOB_KEY, demeterCoreService);
+
 		JobDetail job = newJob(DTaskScheduleJob.class)
 			.withIdentity(JobKey.jobKey(jobKey))
+			.setJobData(map)
 			.build();
 
 		//TODO use DTaskSchedule calendar

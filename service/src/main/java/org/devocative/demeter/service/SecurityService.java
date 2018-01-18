@@ -3,13 +3,12 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.StringEncryptorUtil;
 import org.devocative.demeter.*;
-import org.devocative.demeter.core.DemeterCore;
-import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.vo.core.DModuleInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,9 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	@Autowired
 	private IPersistorService persistorService;
+
+	@Autowired
+	private IDemeterCoreService demeterCoreService;
 
 	@Autowired(required = false)
 	private IOtherAuthenticationService otherAuthenticationService;
@@ -262,8 +264,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	// ------------------------------
 
 	private void storePrivilegeKeys() {
-		Collection<XModule> xModules = DemeterCore.get().getModules().values();
-		for (XModule xModule : xModules) {
+		Collection<DModuleInfoVO> xModules = demeterCoreService.getModules();
+		for (DModuleInfoVO xModule : xModules) {
 			try {
 				String privilegeKeyClass = xModule.getPrivilegeKeyClass();
 				if (privilegeKeyClass != null) {
