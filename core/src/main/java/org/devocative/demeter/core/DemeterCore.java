@@ -3,6 +3,7 @@ package org.devocative.demeter.core;
 import com.thoughtworks.xstream.XStream;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import org.apache.commons.io.FileUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.IConfigKey;
 import org.devocative.adroit.StringEncryptorUtil;
@@ -21,8 +22,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class DemeterCore {
 	public static final String CONFIG_PROFILE = "dmtProfile";
@@ -296,7 +302,7 @@ public class DemeterCore {
 			if (tokenValue != null && paramValue != null) {
 				String entry = ConfigUtil.getString(DemeterConfigKey.SecurityKeyStoreEntry);
 				try {
-					StringEncryptorUtil.init(DemeterCore.class.getResourceAsStream("/demeter.ks"), tokenValue, entry, paramValue);
+					StringEncryptorUtil.init(getClass().getResourceAsStream("/demeter.ks"), tokenValue, entry, paramValue);
 					logger.info("StringEncryptorUtil INITED");
 				} catch (Exception e) {
 					logger.error("StringEncryptorUtil Init Error: " + e);
@@ -313,24 +319,39 @@ public class DemeterCore {
 		xStream.processAnnotations(XModule.class);
 		xStream.alias("dependency", String.class);
 
-		List<String> modulesName = ConfigUtil.getList(DemeterConfigKey.Modules);
-		if (!modulesName.contains("Demeter")) {
+		List<String> modulesName;
+		if (ConfigUtil.hasKey(DemeterConfigKey.Modules)) {
+			modulesName = ConfigUtil.getList(DemeterConfigKey.Modules);
+			logger.info("List of Modules by Config: {}", modulesName);
+			if (!modulesName.contains("Demeter")) {
+				modulesName.add(0, "Demeter");
+			}
+		} else {
+			modulesName = findModulesNameInClasspath();
+			modulesName.remove("Demeter");
 			modulesName.add(0, "Demeter");
+			logger.info("List of Modules Found in Classpath: {}", modulesName);
 		}
 
 		for (String moduleName : modulesName) {
-			InputStream moduleXMLResource = DemeterCore.class.getResourceAsStream(String.format("/%s.xml", moduleName));
-			XModule xModule = (XModule) xStream.fromXML(moduleXMLResource);
-			logger.info("Module Found: {}", moduleName);
+			String modulePath = String.format("/dmodule/%s.xml", moduleName);
+			InputStream moduleXMLResource = getClass().getResourceAsStream(modulePath);
+			if (moduleXMLResource != null) {
+				XModule xModule = (XModule) xStream.fromXML(moduleXMLResource);
+				logger.info("Module's XML Loaded: {}", moduleName);
 
-			if (MODULE_SHORT_NAMES.contains(xModule.getShortName())) {
-				throw new DSystemException("Duplicate module short name: " + xModule.getShortName());
+				if (MODULE_SHORT_NAMES.contains(xModule.getShortName())) {
+					throw new DSystemException("Duplicate module short name: " + xModule.getShortName());
+				}
+				MODULE_SHORT_NAMES.add(xModule.getShortName());
+
+				//TODO handle module dependency order
+				MODULES.put(moduleName, xModule);
+
+				loadConfigKeys(xModule);
+			} else {
+				throw new DSystemException("Invalid Module Path: " + modulePath);
 			}
-			MODULE_SHORT_NAMES.add(xModule.getShortName());
-
-			MODULES.put(moduleName, xModule);
-
-			loadConfigKeys(xModule);
 		}
 	}
 
@@ -495,5 +516,43 @@ public class DemeterCore {
 		} catch (Exception e) {
 			logger.error(String.format("Loading module [%s] config keys", xModule.getShortName()), e);
 		}
+	}
+
+	private List<String> findModulesNameInClasspath() {
+		List<String> result = new ArrayList<>();
+
+		try {
+			Enumeration<URL> resources = getClass().getClassLoader().getResources("dmodule/");
+			while (resources.hasMoreElements()) {
+				URL url = resources.nextElement();
+				logger.info("Searching for Modules: URL = {}", url);
+
+				String protocol = url.getProtocol();
+				if ("file".equals(protocol)) {
+					Collection<File> files = FileUtils.listFiles(new File(url.getPath()), new String[]{"xml"}, false);
+					for (File file : files) {
+						String name = file.getName();
+						result.add(name.substring(0, name.length() - 4));
+					}
+				} else if ("jar".equals(protocol)) {
+					String jarPath = url.getPath().substring(5, url.getPath().indexOf("!"));
+					String dirPath = url.getPath().substring(url.getPath().indexOf("!") + 2); // i.e. dmodule/
+					JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+					Enumeration<JarEntry> entries = jar.entries();
+					while (entries.hasMoreElements()) {
+						String name = entries.nextElement().getName();
+						if (name.startsWith(dirPath) && name.endsWith(".xml")) {
+							result.add(name.substring(8, name.length() - 4));
+						}
+					}
+				} else {
+					throw new DSystemException("Invalid Protocol for Module Search: " + protocol);
+				}
+			}
+		} catch (IOException e) {
+			throw new DSystemException(e);
+		}
+
+		return result;
 	}
 }
