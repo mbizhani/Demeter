@@ -21,13 +21,17 @@ public class DemeterCoreService implements IDemeterCoreService {
 			Collection<XModule> xModules = DemeterCore.get().getModules().values();
 			for (XModule xModule : xModules) {
 				List<DPageInfoVO> pages = new ArrayList<>();
-				for (XDPage xdPage : xModule.getDPages()) {
-					pages.add(new DPageInfoVO(xdPage.getType(), xdPage.getTitle(), xdPage.getUri(), xdPage.getInMenu(), xdPage.getRoles()));
+				if (xModule.getDPages() != null) {
+					for (XDPage xdPage : xModule.getDPages()) {
+						pages.add(new DPageInfoVO(xdPage.getType(), xdPage.getTitle(), xdPage.getUri(), xdPage.getInMenu(), xdPage.getRoles()));
+					}
 				}
 
 				List<DTaskInfoVO> tasks = new ArrayList<>();
-				for (XDTask xdTask : xModule.getTasks()) {
-					tasks.add(new DTaskInfoVO(xdTask.getType(), xdTask.getCronExpression(), xdTask.getCalendar()));
+				if (xModule.getTasks() != null) {
+					for (XDTask xdTask : xModule.getTasks()) {
+						tasks.add(new DTaskInfoVO(xdTask.getType(), xdTask.getCronExpression(), xdTask.getCalendar()));
+					}
 				}
 
 				modules.add(new DModuleInfoVO(xModule.getShortName(), xModule.getPrivilegeKeyClass(), pages, tasks));

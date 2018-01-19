@@ -323,15 +323,20 @@ public class DemeterCore {
 		if (ConfigUtil.hasKey(DemeterConfigKey.Modules)) {
 			modulesName = ConfigUtil.getList(DemeterConfigKey.Modules);
 			logger.info("List of Modules by Config: {}", modulesName);
-			if (!modulesName.contains("Demeter")) {
-				modulesName.add(0, "Demeter");
-			}
 		} else {
 			modulesName = findModulesNameInClasspath();
-			modulesName.remove("Demeter");
-			modulesName.add(0, "Demeter");
 			logger.info("List of Modules Found in Classpath: {}", modulesName);
 		}
+
+		//TODO handle module dependency order
+		modulesName.remove("Demeter");
+		modulesName.add(0, "Demeter"); // Must be First Module
+
+		if (modulesName.remove("Deploy")) {
+			modulesName.add("Deploy");  // Must be Last Module
+		}
+
+		logger.info("Final List of Modules: {}", modulesName);
 
 		for (String moduleName : modulesName) {
 			String modulePath = String.format("/dmodule/%s.xml", moduleName);
