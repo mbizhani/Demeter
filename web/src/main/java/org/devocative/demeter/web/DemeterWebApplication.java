@@ -106,6 +106,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		logger.info("** Context Path: {}", getServletContext().getContextPath());
 
 		getComponentInstantiationListeners().add(new SpringComponentInjector(this, DemeterCore.get().getApplicationContext()));
+		getServletContext().setAttribute(DemeterWebParam.DEMETER_APP_CTX, DemeterCore.get().getApplicationContext());
 
 		getMarkupSettings().setStripWicketTags(true);
 		getMarkupSettings().setStripComments(true);
