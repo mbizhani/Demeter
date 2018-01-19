@@ -3,8 +3,8 @@ package org.devocative.demeter.web.dpage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.ZSqlApply;
+import org.devocative.demeter.iservice.IDemeterCoreService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.web.DPage;
 
@@ -17,11 +17,14 @@ public class InfoDPage extends DPage {
 	@Inject
 	private IPersistorService persistorService;
 
+	@Inject
+	private IDemeterCoreService demeterCoreService;
+
 	public InfoDPage(String id, List<String> params) {
 		super(id, params);
 
 		add(new Label("startUp", getCurrentUser().getCalendar().convertToString(
-			DemeterCore.get().getStartUpDate(),
+			demeterCoreService.getStartUpDate(),
 			getCurrentUser().getDateTimePatternType().toString()
 		)));
 

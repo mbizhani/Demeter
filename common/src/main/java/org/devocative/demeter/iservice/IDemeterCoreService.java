@@ -2,6 +2,7 @@ package org.devocative.demeter.iservice;
 
 import org.devocative.demeter.vo.core.DModuleInfoVO;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,4 +16,6 @@ public interface IDemeterCoreService {
 	<T> T getBean(Class<T> var1);
 
 	Object getBean(String var1);
+
+	Date getStartUpDate();
 }

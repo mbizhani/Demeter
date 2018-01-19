@@ -1,12 +1,13 @@
 package org.devocative.demeter.web;
 
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.util.string.StringValue;
-import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
+import org.springframework.context.ApplicationContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -84,10 +85,10 @@ public class UrlUtil {
 		String result = "";
 
 		if (needAbsolute) {
-			result = DemeterWebApplication.get().getContextPath();
+			result = WebApplication.get().getServletContext().getContextPath();
 		}
 
-		result += DemeterWebApplication.get().getInnerContext() + href;
+		result += DemeterWebParam.APP_INNER_CTX + href;
 
 		return result;
 	}
@@ -102,7 +103,8 @@ public class UrlUtil {
 
 	private static IDPageInstanceService getPageInstanceService() {
 		if (pageInstanceService == null) {
-			pageInstanceService = DemeterCore.get().getApplicationContext().getBean(IDPageInstanceService.class);
+			ApplicationContext appCtx = (ApplicationContext) WebApplication.get().getServletContext().getAttribute(DemeterWebParam.DEMETER_APP_CTX);
+			pageInstanceService = appCtx.getBean(IDPageInstanceService.class);
 		}
 		return pageInstanceService;
 	}

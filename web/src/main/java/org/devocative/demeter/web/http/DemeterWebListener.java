@@ -4,6 +4,7 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.web.DemeterWebParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,8 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 		Map<String, IRequestLifecycle> beans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		requestLifecycleBeans.addAll(beans.values());
 		logger.info("DemeterWebListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
+
+		sce.getServletContext().setAttribute(DemeterWebParam.DEMETER_APP_CTX, DemeterCore.get().getApplicationContext());
 	}
 
 	@Override

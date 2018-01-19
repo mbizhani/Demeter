@@ -20,21 +20,20 @@ import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.IDemeterCoreEventListener;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
+import org.devocative.demeter.iservice.IFileStoreService;
+import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.wickomp.WDefaults;
 import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class DemeterWebApplication extends WebApplication implements IDemeterCoreEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebApplication.class);
-
-	private static final String APP_INNER_CTX = "/dvc";
 
 	private List<String> modulesRelatedCSS = new ArrayList<>();
 
@@ -64,11 +63,16 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 	@Override
 	public void afterUpSuccessfully() {
-		getRequestCycleListeners().add(new DemeterRequestCycleListener());
+		final ApplicationContext applicationContext = DemeterCore.get().getApplicationContext();
 
-		mountPage(APP_INNER_CTX, Index.class);
+		Collection<IRequestLifecycle> requestLifecycleCol = applicationContext.getBeansOfType(IRequestLifecycle.class).values();
+		ISecurityService securityService = applicationContext.getBean(ISecurityService.class);
+		getRequestCycleListeners().add(new DemeterRequestCycleListener(new ArrayList<>(requestLifecycleCol), securityService));
 
-		mountResource(String.format("%s/dmt/getfile/${fileid}", APP_INNER_CTX), new FileStoreResourceReference(DemeterCore.get().getApplicationContext()));
+		mountPage(DemeterWebParam.APP_INNER_CTX, Index.class);
+
+		IFileStoreService fileStoreService = applicationContext.getBean(IFileStoreService.class);
+		mountResource(String.format("%s/dmt/getfile/${fileid}", DemeterWebParam.APP_INNER_CTX), new FileStoreResourceReference(fileStoreService));
 
 		initModulesForWeb();
 
@@ -118,7 +122,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		if (DemeterCore.get().isStartedSuccessfully()) {
 			afterUpSuccessfully();
 		} else {
-			mountPage(APP_INNER_CTX, StartupHandlerPage.class);
+			mountPage(DemeterWebParam.APP_INNER_CTX, StartupHandlerPage.class);
 			DemeterCore.get().addCoreEvent(this);
 		}
 	}
@@ -172,14 +176,6 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 	}
 
 	// ------------------------------
-
-	public String getInnerContext() {
-		return APP_INNER_CTX;
-	}
-
-	public String getContextPath() {
-		return getServletContext().getContextPath();
-	}
 
 	public List<String> getModulesRelatedCSS() {
 		return modulesRelatedCSS;

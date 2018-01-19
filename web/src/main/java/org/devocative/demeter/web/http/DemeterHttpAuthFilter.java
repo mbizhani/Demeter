@@ -3,15 +3,16 @@ package org.devocative.demeter.web.http;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.IUserService;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.web.DemeterWebParam;
 import org.devocative.wickomp.WebUtil;
 import org.devocative.wickomp.http.filter.WBaseHttpAuthFilter;
 import org.devocative.wickomp.http.filter.WHttpAuthBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -74,8 +75,9 @@ public class DemeterHttpAuthFilter extends WBaseHttpAuthFilter {
 			nonceRefreshExecutor.scheduleAtFixedRate(() -> nonce = UUID.randomUUID().toString(), 1, 1, TimeUnit.MINUTES);
 		}*/
 
-		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
-		userService = DemeterCore.get().getApplicationContext().getBean(IUserService.class);
+		ApplicationContext appCtx = (ApplicationContext) filterConfig.getServletContext().getAttribute(DemeterWebParam.DEMETER_APP_CTX);
+		securityService = appCtx.getBean(ISecurityService.class);
+		userService = appCtx.getBean(IUserService.class);
 
 		setProcessAuth(ConfigUtil.getBoolean(DemeterConfigKey.EnabledSecurity));
 

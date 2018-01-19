@@ -3,7 +3,6 @@ package org.devocative.demeter.web;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
@@ -13,23 +12,22 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
 
-	private List<IRequestLifecycle> requestLifecycleBeans = new ArrayList<>();
-	private ISecurityService securityService;
+	private final List<IRequestLifecycle> requestLifecycleBeans;
+	private final ISecurityService securityService;
 
-	public DemeterRequestCycleListener() {
-		Map<String, IRequestLifecycle> beans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
-		requestLifecycleBeans.addAll(beans.values());
-		logger.info("DemeterRequestCycleListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
+	// ------------------------------
 
-		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
+	public DemeterRequestCycleListener(List<IRequestLifecycle> requestLifecycleBeans, ISecurityService securityService) {
+		this.requestLifecycleBeans = requestLifecycleBeans;
+		this.securityService = securityService;
 	}
+
+	// ------------------------------
 
 	@Override
 	public void onBeginRequest(RequestCycle cycle) {
@@ -91,6 +89,8 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 		//TODO an Exception Page
 		return super.onException(cycle, ex);
 	}
+
+	// ------------------------------
 
 	private void setSessionTimeout(RequestCycle cycle, int timeoutInMinutes) {
 		Object containerRequest = cycle.getRequest().getContainerRequest();

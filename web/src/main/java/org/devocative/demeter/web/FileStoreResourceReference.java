@@ -9,7 +9,6 @@ import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,12 +18,12 @@ public class FileStoreResourceReference extends ResourceReference {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileStoreResourceReference.class);
 
-	private IFileStoreService fileStoreService;
+	private final IFileStoreService fileStoreService;
 
-	public FileStoreResourceReference(ApplicationContext applicationContext) {
+	public FileStoreResourceReference(IFileStoreService fileStoreService) {
 		super("FileStoreResourceReference");
 
-		fileStoreService = applicationContext.getBean(IFileStoreService.class);
+		this.fileStoreService = fileStoreService;
 	}
 
 	@Override

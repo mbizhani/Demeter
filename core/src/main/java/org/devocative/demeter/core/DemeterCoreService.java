@@ -8,10 +8,7 @@ import org.devocative.demeter.vo.core.DModuleInfoVO;
 import org.devocative.demeter.vo.core.DPageInfoVO;
 import org.devocative.demeter.vo.core.DTaskInfoVO;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DemeterCoreService implements IDemeterCoreService {
 	private List<DModuleInfoVO> modules;
@@ -53,5 +50,10 @@ public class DemeterCoreService implements IDemeterCoreService {
 	@Override
 	public Object getBean(String var1) {
 		return DemeterCore.get().getApplicationContext().getBean(var1);
+	}
+
+	@Override
+	public Date getStartUpDate() {
+		return DemeterCore.get().getStartUpDate();
 	}
 }
