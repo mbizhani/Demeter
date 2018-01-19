@@ -28,6 +28,13 @@
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${d.servlet.ver}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!--  TEST -->
 
 		<dependency>
@@ -41,13 +48,6 @@
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<version>2.4.0</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${d.servlet.ver}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -117,7 +117,7 @@
 				</configuration>-->
 			</plugin>
 
-			<!-- Create JAR for Test Classes -->
+			<!-- Create JAR of Test Classes -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -129,6 +129,12 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<includes>
+						<include>**/*.class</include>
+						<include>**/Demeter.xml</include>
+					</includes>
+				</configuration>
 			</plugin>
 
 		</plugins>

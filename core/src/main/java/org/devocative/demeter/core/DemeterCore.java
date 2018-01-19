@@ -537,12 +537,13 @@ public class DemeterCore {
 				} else if ("jar".equals(protocol)) {
 					String jarPath = url.getPath().substring(5, url.getPath().indexOf("!"));
 					String dirPath = url.getPath().substring(url.getPath().indexOf("!") + 2); // i.e. dmodule/
-					JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-					Enumeration<JarEntry> entries = jar.entries();
-					while (entries.hasMoreElements()) {
-						String name = entries.nextElement().getName();
-						if (name.startsWith(dirPath) && name.endsWith(".xml")) {
-							result.add(name.substring(8, name.length() - 4));
+					try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"))) {
+						Enumeration<JarEntry> entries = jar.entries();
+						while (entries.hasMoreElements()) {
+							String name = entries.nextElement().getName();
+							if (name.startsWith(dirPath) && name.endsWith(".xml")) {
+								result.add(name.substring(8, name.length() - 4));
+							}
 						}
 					}
 				} else {
