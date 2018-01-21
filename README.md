@@ -91,3 +91,13 @@ A convenient environment for development is very important. To reach the goal, o
 
 And finally, a simple screen from the Demeter
 ![Simple Demeter Screen](/doc/img/A_Simple_Demeter_Screen.png)
+
+Running Demeter project is so simple. You can execute follwing commands:
+```
+git clone https://github.com/mbizhani/Demeter.git
+cd Demeter
+mvn clean install
+cd module
+mvn jetty:run
+```
+Now open your browser and go to this address: http://localhost:8080/ctx. The default `config.properties` uses the HSQLDB as the default database.
