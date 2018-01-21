@@ -5,25 +5,28 @@ The `Demeter` project is founded based on the following requirements:
 - Each module has its own entities, services, and web parts
 - A base container with all **common** and **important** services for all modules
 - For deployment, a combination of modules can be deployed
+- Common test cases can be executed for the container and the modules.
 
 So the Demeter project is:
-- A container that finds its modules, called `DModule`, in deployment and initializes them based on the lifecycle, even the deployment, itself, is a separate module
+- A container that finds its modules, called `DModule`, in deployment and initializes them based on the lifecycle, even the deployment, itself, is a separate module.
 - Provides base services for all modules, which are
 	- `Person` and `User` Management
 	- `Role`, `Privileges`, and`Security` Management, and the integration with web
-	- Background and Scheduled `Tasks`, and pushing data basck to web via `WebSocket`
+	- Background and Scheduled `Tasks`, and pushing data back to web via `WebSocket`
 	- `File Store` Management
 	- Layout, Menu and Page Management for web
-- Define conventions and standards for modules
-- Define a convenient platform and ecosystem for development and deployment
-- For generality, the Demeter, itself, has its own `DModule`
+	- Object `Cache` Management and UI for clearing them
+	- Show the list of defined `config` keys, and modify them at runtime
+- Define conventions and standards for modules.
+- Define a convenient platform and ecosystem for faster `development`, `test`, and `deployment`.
+- For generality, the Demeter, itself, has its own `DModule`.
 
 The architecture of Demeter and a DModule is presented in the following logical component diagram:
 ![Demeter Architecture](/doc/img/Demeter_Logical_Components_Relations.png)
 In the architecture, the Demeter project is composed of four maven jar artifacts:
 - `Common`: It has all the common and necessary classes and files which are shared between modules. They are
-  - **Entities**: List of entites in DModule
-  - **Value Objects**: Based on value objects pattern, they are classes that are used for data transfer.
+  - **Entities**: List of entities in DModule
+  - **Value Objects**: Based on value object pattern, they are classes that are used for data transfer.
   - **Service Interfaces**: The Spring beans' interfaces
   - **Privileges**: A privilege is defined by `IPrivilegeKey`. For the list of privileges, and enum is defined which implements the `IPrivilegeKey` interface. So the enum has all the privilege keys.
   - **Config Keys**: There is only one `config.properties` file for the development or deployment. So each module can have its own config keys in the file. Each config entry is `IConfigKey`, so an enum implements the `IConfigKey` interface, and the enum has all the config keys for DModule.
@@ -83,5 +86,8 @@ Each DModule has two XML config files. The first one is for Spring bean definiti
 </module>
 ```
 
-A conviniet environment for development is very important. To reach the goal, other artifacts are under development. The following picture tries to show all the components that are involved in this project.
+A convenient environment for development is very important. To reach the goal, other artifacts are under development. The following picture tries to show all the components that are involved in this project.
 ![Demeter Environment](/doc/img/Class_Diagram__demeter__DemeterComponent.png)
+
+And finally, a simple screen from the Demeter
+![Simple Demeter Screen](/doc/img/A_Simple_Demeter_Screen.png)
