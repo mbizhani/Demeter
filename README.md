@@ -60,7 +60,7 @@ Each DModule has two XML config files. The first one is for Spring bean definiti
 	<entities>
 		<entity type="org.devocative.demeter.entity.DPageInfo"/>
 		<entity type="org.devocative.demeter.entity.DPageInstance"/>
-    ... 
+		... 
 	</entities>
 
 	<tasks>
@@ -72,16 +72,16 @@ Each DModule has two XML config files. The first one is for Spring bean definiti
 
 	<dPages>
 		<dPage type="org.devocative.demeter.web.dpage.PersonListDPage"
-       title="KEY:dPage.dmt.Person"
-       uri="/persons"
-       inMenu="true"
-       roles="Admin" />
+			title="KEY:dPage.dmt.Person"
+			uri="/persons"
+			inMenu="true"
+			roles="Admin" />
 
 		<dPage type="org.devocative.demeter.web.dpage.LoginDPage"
-       title="KEY:dPage.dmt.Login"
-       uri="/login"
-       inMenu="false" />
-    ...
+			title="KEY:dPage.dmt.Login"
+			uri="/login"
+			inMenu="false" />
+		...
 	</dPages>
 </module>
 ```
