@@ -21,6 +21,7 @@ So the Demeter project is:
 - Define a convenient platform and ecosystem for faster `development`, `test`, and `deployment`.
 - For generality, the Demeter, itself, has its own `DModule`.
 
+## Architecture
 The architecture of Demeter and a DModule is presented in the following logical component diagram:
 ![Demeter Architecture](/doc/img/Demeter_Logical_Components_Relations.png)
 In the architecture, the Demeter project is composed of four maven jar artifacts:
@@ -40,9 +41,11 @@ In the architecture, the Demeter project is composed of four maven jar artifacts
 	- Each DModule has an XML config file with all necessary information. This config file will be described later.
 	- This artifact has direct dependencies to `Service` and `Web` with indirect one to `Common`. So it can represent the DModule.
 
+## Startup Process
 The `DemeterCore` class goes through the following steps for startup:
 ![DemeterCore Steps](/doc/img/Demeter_StartUp_Steps.png)
- 
+
+## XML Config Files
 Each DModule has two XML config files. The first one is for Spring bean definition, which is located in the `main/resoureces` of `Service` maven module, and it is a standard Spring XML config file. Another one is DModule XML definition file, which is located in the `main/resources/dmodule` maven module. For simplicity, some part of Demeter DModule is:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -86,12 +89,14 @@ Each DModule has two XML config files. The first one is for Spring bean definiti
 </module>
 ```
 
+## Environment
 A convenient environment for development is very important. To reach the goal, other artifacts are under development. The following picture tries to show all the components that are involved in this project.
 ![Demeter Environment](/doc/img/Class_Diagram__demeter__DemeterComponent.png)
 
 And finally, a simple screen from the Demeter
 ![Simple Demeter Screen](/doc/img/A_Simple_Demeter_Screen.png)
 
+## How to Run
 Running Demeter project is so simple. You can execute follwing commands:
 ```
 git clone https://github.com/mbizhani/Demeter.git
