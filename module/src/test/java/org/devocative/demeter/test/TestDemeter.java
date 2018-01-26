@@ -63,11 +63,13 @@ public class TestDemeter {
 
 	@Test
 	public void b00IncompleteStartup() {
-		Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
-		Assert.assertTrue(DemeterCore.get().getDbDiffs().size() > 0);
+		if (!ConfigUtil.getBoolean("dmt.db.update.ddl", false)) {
+			Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
+			Assert.assertTrue(DemeterCore.get().getDbDiffs().size() > 0);
 
-		DemeterCore.get().applyAllDbDiffs();
-		DemeterCore.get().resume();
+			DemeterCore.get().applyAllDbDiffs();
+			DemeterCore.get().resume();
+		}
 		Assert.assertEquals(EStartupStep.End, DemeterCore.get().getLatestStat().getStep());
 
 		if (ConfigUtil.hasKey(DemeterConfigKey.StartupGroovyScript)) {
@@ -105,6 +107,8 @@ public class TestDemeter {
 	public void d01Login() {
 		Assert.assertFalse(ConfigUtil.getBoolean(DemeterConfigKey.LoginCaptchaEnabled));
 
+		Assert.assertEquals("guest", securityService.getCurrentUser().getUsername());
+
 		LoginDPage loginDPage = new LoginDPage("dPage", Collections.<String>emptyList());
 		tester.startComponentInPage(loginDPage);
 
@@ -121,8 +125,9 @@ public class TestDemeter {
 		String roles = securityService.getCurrentUser().getRoles().toString();
 
 		Assert.assertTrue(roles.contains("Root"));
-		Assert.assertTrue(roles.contains("User"));
+		Assert.assertTrue(roles.contains("Admin"));
 		Assert.assertTrue(roles.contains("AuthByDB"));
+		Assert.assertTrue(roles.contains("User"));
 	}
 
 	@Test

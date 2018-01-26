@@ -75,10 +75,10 @@ public class HibernatePersistorService implements IPersistorService {
 			config.setProperty("hibernate.default_schema", schema);
 		}
 
-		/*Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.apply.ddl"), false);
+		Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.update.ddl"), false);
 		if (applyDDL) {
 			config.setProperty("hibernate.hbm2ddl.auto", "update");
-		}*/
+		}
 
 		// In Hibernate 4.3:
 		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();

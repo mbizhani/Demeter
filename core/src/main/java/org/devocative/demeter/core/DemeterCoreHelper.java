@@ -3,6 +3,7 @@ package org.devocative.demeter.core;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.sql.plugin.EDatabaseType;
 import org.devocative.adroit.sql.plugin.PaginationPlugin;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
@@ -21,19 +22,31 @@ public class DemeterCoreHelper {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterCoreHelper.class);
 
 	public static void initDatabase(List<String> modules, boolean force) {
-		try (Connection connection = createConnection()) {
-			List<DbDiffVO> diffs = findDiffs(connection, modules, PaginationPlugin.findDatabaseType(connection).toString().toLowerCase());
-			logger.info("Database Found Diff(s): no = [{}]", diffs.size());
+		final String handler = ConfigUtil.getString(DemeterConfigKey.DatabaseDiffHandler).toLowerCase();
+		logger.info("Init Database, Handler=[{}]", handler);
 
-			if (!diffs.isEmpty()) {
-				if (force || ConfigUtil.getBoolean(DemeterConfigKey.DatabaseDiffAuto)) {
-					applyDiffs(connection, diffs);
+		if ("script".equals(handler) || "auto".equals(handler)) {
+			try (Connection connection = createConnection()) {
+				EDatabaseType databaseType = PaginationPlugin.findDatabaseType(connection);
+				if (databaseType != EDatabaseType.Unknown) {
+					List<DbDiffVO> diffs = findDiffs(connection, modules, databaseType.toString().toLowerCase());
+					logger.info("Database Found Diff(s): no = [{}]", diffs.size());
+
+					if (!diffs.isEmpty()) {
+						if (force || "auto".equals(handler)) {
+							applyDiffs(connection, diffs);
+						} else {
+							throw new DSystemException("Database Diff Found: Numbers=" + diffs.size());
+						}
+					}
 				} else {
-					throw new DSystemException("Database Diff Found: Numbers=" + diffs.size());
+					throw new DSystemException("Unknown Database Type for Handling Database Change Script");
 				}
+			} catch (IOException | SQLException e) {
+				throw new DSystemException(e);
 			}
-		} catch (IOException | SQLException e) {
-			throw new DSystemException(e);
+		} else if ("hbm2ddl".equals(handler)) {
+			ConfigUtil.updateKey("dmt.db.update.ddl", "true");
 		}
 	}
 

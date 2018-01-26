@@ -9,7 +9,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
 	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
-	DatabaseDiffAuto("dmt.db.diff.auto", false, Arrays.asList(true, false)),
+	DatabaseDiffHandler("dmt.db.diff.handler", "script", Arrays.asList("script", "auto", "hbm2ddl", "none")),
 
 	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
 	//SecurityRealm(true, "dmt.security.realm"),
