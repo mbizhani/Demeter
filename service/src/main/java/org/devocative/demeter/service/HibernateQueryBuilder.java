@@ -111,11 +111,11 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	@Override
 	public IQueryBuilder addJoin(String alias, String joinExpr, EJoinMode joinMode) {
-		if (!join.containsKey(alias.toLowerCase())) {
+		if (!join.containsKey(alias)) {
 			if (joinExpr.toLowerCase().contains("join")) {
-				join.put(alias.toLowerCase(), joinExpr);
+				join.put(alias, joinExpr);
 			} else {
-				join.put(alias.toLowerCase(), String.format("%s %s", joinMode.getExpr(), joinExpr));
+				join.put(alias, String.format("%s %s", joinMode.getExpr(), joinExpr));
 			}
 		} else {
 			throw new DSystemException("Duplicate join alias: " + alias);

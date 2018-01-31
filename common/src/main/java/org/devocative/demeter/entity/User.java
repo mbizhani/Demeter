@@ -62,7 +62,7 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@Column(name = "n_session_timeout")
 	private Integer sessionTimeout;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "user2person"))
 	private Person person;
 
