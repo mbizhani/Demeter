@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>demeter-parent</artifactId>
 		<groupId>org.devocative</groupId>
-		<version>1.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>demeter-core</artifactId>
 
@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-common</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
