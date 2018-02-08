@@ -361,14 +361,16 @@ public class DemeterCore {
 	}
 
 	private void initSpringContext() {
-		boolean clientMode = ConfigUtil.getString(DemeterConfigKey.ServiceRemoteHost) != null;
-		logger.info("Client Mode: {}", clientMode);
+		//TODO boolean clientMode = ConfigUtil.getString(DemeterConfigKey.ServiceRemoteHost) != null;
+		//logger.info("Client Mode: {}", clientMode);
 
 		String[] springConfigLocations = new String[MODULES.size()];
-		String springPrefixConfig = clientMode ? "client" : "local";
+		String springPrefixConfig = /*clientMode ? "client" :*/ "local";
 		int i = 0;
 		for (Map.Entry<String, XModule> moduleEntry : MODULES.entrySet()) {
-			String springXML = String.format("/%s%s.xml", springPrefixConfig, moduleEntry.getValue().getShortName());
+			String springXML = String.format("/%s%s.xml",
+				springPrefixConfig,
+				moduleEntry.getValue().getShortName().toUpperCase());
 			logger.info("Loading Spring Config Location: {}", springXML);
 			springConfigLocations[i] = springXML;
 			i++;
@@ -465,7 +467,7 @@ public class DemeterCore {
 						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript), e);
 				}
 			} else {
-				logger.error("Script file not found: " + ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
+				logger.error("Script file not found: {}", ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
 			}
 		}
 

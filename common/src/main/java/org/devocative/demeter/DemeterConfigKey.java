@@ -48,7 +48,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	DPageInstRolesByXML("dmt.service.dpage.roles.xml", false, Arrays.asList(true, false)),
 	StringTemplateCacheEnabled("dmt.service.string.template.cache.enabled", true, Arrays.asList(true, false)),
 	FileBaseDir(true, "dmt.service.file.base.dir"),
-	ServiceRemoteHost("dmt.service.remote.host"),
+	//TODO ServiceRemoteHost("dmt.service.remote.host"),
 
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
@@ -82,6 +82,7 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	LogMDCEnabled("dmt.log.mdc.enabled", true, Arrays.asList(true, false));
 
+	// ------------------------------
 
 	private String key;
 	private boolean validate = false;
