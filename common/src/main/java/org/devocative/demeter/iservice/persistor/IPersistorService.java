@@ -13,6 +13,8 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 
 	void commitOrRollback();
 
+	void rollback();
+
 	void endSession();
 
 	void saveOrUpdate(Object obj);

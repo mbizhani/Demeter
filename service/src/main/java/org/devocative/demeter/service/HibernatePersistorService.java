@@ -143,7 +143,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void commitOrRollback() {
-		Session session = currentSession.get();
+		Session session = getCurrentSession();
 
 		if (session != null && session.isOpen()) {
 			Transaction trx = session.getTransaction();
@@ -155,6 +155,18 @@ public class HibernatePersistorService implements IPersistorService {
 				logger.error("Hibernate commitOrRollback(): ", e);
 				trx.rollback();
 				throw e;
+			}
+		}
+	}
+
+	@Override
+	public void rollback() {
+		Session session = getCurrentSession();
+
+		if (session != null && session.isOpen()) {
+			Transaction trx = session.getTransaction();
+			if (trx != null && trx.isActive()) {
+				trx.rollback();
 			}
 		}
 	}
@@ -454,14 +466,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
-	}
-
-	private void rollback() {
-		Session session = getCurrentSession();
-		Transaction trx = session.getTransaction();
-		if (trx != null && trx.isActive()) {
-			trx.rollback();
-		}
 	}
 
 	private String getConstraintName(ConstraintViolationException e) {
