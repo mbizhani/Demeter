@@ -102,7 +102,7 @@ public class DemeterCore {
 	}
 
 	public void generatePersistorSchemaDiff() {
-		startUntil(EStartupStep.BeansStartup);
+		startUntil(EStartupStep.Database);
 
 		if (!MAIN_STARTUP.isSuccessful()) {
 			logger.error("=======================================");
@@ -130,7 +130,7 @@ public class DemeterCore {
 	}
 
 	public void applyAllDbDiffs() {
-		startUntil(EStartupStep.Database);
+		startUntil(EStartupStep.PersistenceServices);
 
 		DemeterCoreHelper.initDatabase(new ArrayList<>(MODULE_SHORT_NAMES), true);
 	}
@@ -188,29 +188,28 @@ public class DemeterCore {
 		StepResultVO result = null;
 		EStartupStep step = MAIN_STARTUP.getStep();
 
-		while (step.ordinal() < last.ordinal()) {
-			logger.info("## Executing Step: [{}]", EStartupStep.next(step));
-			result = doNext(step);
-			logger.info("## Executed Step: [{}], successful=[{}]", EStartupStep.next(step), result.isSuccessful());
+		while (step.ordinal() <= last.ordinal()) {
+			logger.info("");
+			logger.info("## Executing Step: [{}]", step);
+			result = doStepAndGetNext(step);
+			logger.info(" Executed Step: [{}], successful=[{}]", step, result.isSuccessful());
 			step = result.getStep();
 
-			if (!result.isSuccessful()) {
+			if (!result.isSuccessful() || step == EStartupStep.End) {
 				break;
 			}
 		}
 
-		if (result != null) {
-			MAIN_STARTUP = result;
-		}
+		MAIN_STARTUP = result;
 	}
 
-	private StepResultVO doNext(EStartupStep current) {
+	private StepResultVO doStepAndGetNext(EStartupStep current) {
 		Exception error = null;
-		EStartupStep next = EStartupStep.next(current);
 
 		try {
-			switch (next) {
+			switch (current) {
 				case Begin:
+					initBegin();
 					break;
 
 				case Config:
@@ -241,8 +240,8 @@ public class DemeterCore {
 					initBeansStartup();
 					break;
 
-				case End:
-					initEnd();
+				case Finalize:
+					initFinalize();
 					break;
 
 				default:
@@ -250,11 +249,12 @@ public class DemeterCore {
 			}
 		} catch (Exception e) {
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
-			logger.warn("!! Step = [{}]", next, e);
+			logger.warn("!! Step = [{}]", current, e);
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
 			error = e;
 		}
 
+		EStartupStep next = EStartupStep.next(current);
 		return new StepResultVO(next, error);
 	}
 
@@ -268,6 +268,10 @@ public class DemeterCore {
 	}
 
 	// --------------- STEPS
+
+	private void initBegin() {
+		logger.info("--------------- B E G I N I N G   S T E P S ---------------");
+	}
 
 	private void initConfig() {
 		String configFile = "/config.properties";
@@ -451,7 +455,7 @@ public class DemeterCore {
 		iPersistorServiceMap.values().forEach(org.devocative.demeter.iservice.persistor.IPersistorService::endSession);
 	}
 
-	private void initEnd() {
+	private void initFinalize() {
 		if (ConfigUtil.hasKey(DemeterConfigKey.StartupGroovyScript)) {
 			File file = new File(ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
 			if (file.exists()) {
@@ -463,7 +467,7 @@ public class DemeterCore {
 					logger.info("Script executed successfully: [{}]",
 						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
 				} catch (Exception e) {
-					logger.error("initEnd: script file = [{}]",
+					logger.error("initFinalize: script file = [{}]",
 						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript), e);
 				}
 			} else {
@@ -472,6 +476,8 @@ public class DemeterCore {
 		}
 
 		startUpDate = new Date();
+
+		logger.info("--------------- S T E P S   E N D ---------------");
 	}
 
 	// ---------------

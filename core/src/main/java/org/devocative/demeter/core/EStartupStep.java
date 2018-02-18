@@ -10,6 +10,7 @@ public enum EStartupStep {
 	PersistenceServices,
 	Database,
 	BeansStartup,
+	Finalize,
 	End;
 
 	public static EStartupStep next(EStartupStep current) {
