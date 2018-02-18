@@ -1,7 +1,7 @@
 package org.devocative.demeter.entity;
 
 public interface IRowMode {
-	ERowMode getRowMod();
+	ERowMode getRowMode();
 
-	void setRowMod(ERowMode rowMod);
+	void setRowMode(ERowMode rowMode);
 }

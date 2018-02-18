@@ -2,6 +2,7 @@
 package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
+import org.devocative.demeter.entity.ERoleMode;
 import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.User;
@@ -16,10 +17,10 @@ public class RoleFVO implements Serializable {
 	private static final long serialVersionUID = -1494627878L;
 
 	private String name;
-	private Boolean dynamic;
+	private List<ERoleMode> roleMode;
 	private List<Privilege> permissions;
 	private List<Privilege> denials;
-	private List<ERowMode> rowMod;
+	private List<ERowMode> rowMode;
 	private RangeVO<Date> creationDate;
 	private List<User> creatorUser;
 	private RangeVO<Date> modificationDate;
@@ -35,12 +36,12 @@ public class RoleFVO implements Serializable {
 		this.name = name;
 	}
 
-	public Boolean getDynamic() {
-		return dynamic;
+	public List<ERoleMode> getRoleMode() {
+		return roleMode;
 	}
 
-	public void setDynamic(Boolean dynamic) {
-		this.dynamic = dynamic;
+	public void setRoleMode(List<ERoleMode> roleMode) {
+		this.roleMode = roleMode;
 	}
 
 	public List<Privilege> getPermissions() {
@@ -59,12 +60,12 @@ public class RoleFVO implements Serializable {
 		this.denials = denials;
 	}
 
-	public List<ERowMode> getRowMod() {
-		return rowMod;
+	public List<ERowMode> getRowMode() {
+		return rowMode;
 	}
 
-	public void setRowMod(List<ERowMode> rowMod) {
-		this.rowMod = rowMod;
+	public void setRowMode(List<ERowMode> rowMode) {
+		this.rowMode = rowMode;
 	}
 
 	public RangeVO<Date> getCreationDate() {

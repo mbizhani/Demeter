@@ -126,10 +126,10 @@ class HibernateInterceptor extends EmptyInterceptor {
 	}
 
 	private boolean setRowLevelAccess(Object entity, Serializable id, Object[] state, String[] propertyNames) {
-		IRowMode rowMod = (IRowMode) entity;
+		IRowMode rowMode = (IRowMode) entity;
 		IRoleRowAccess roleRowAccess = (IRoleRowAccess) entity;
 
-		if (ERowMode.ROLE.equals(rowMod.getRowMod())) {
+		if (ERowMode.ROLE.equals(rowMode.getRowMode())) {
 			for (int i = 0; i < propertyNames.length; i++) {
 				if ("allowedRoles".equals(propertyNames[i])) {
 					if (roleRowAccess.getAllowedRoles() == null || roleRowAccess.getAllowedRoles().isEmpty()) {
@@ -137,7 +137,7 @@ class HibernateInterceptor extends EmptyInterceptor {
 						if (currentUser != null && currentUser.getRoles() != null && currentUser.getRoles().size() > 0) {
 							List<Role> roles = new ArrayList<>();
 							for (Role role : currentUser.getRoles()) {
-								if (!role.getDynamic()) {
+								if (!ERoleMode.DYNAMIC.equals(role.getRoleMode())) {
 									roles.add(role);
 									break;
 								}

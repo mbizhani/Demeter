@@ -1,10 +1,10 @@
-//overwrite
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.devocative.demeter.entity.ERoleMode;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.web.DPage;
@@ -61,11 +61,14 @@ public class RoleFormDPage extends DPage {
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
 			.setRequired(true)
-			.setLabel(new ResourceModel("Role.name")));
+			.setLabel(new ResourceModel("Role.name", "name")));
+		floatTable.add(new WSelectionInput("roleMode", ERoleMode.list(), false)
+			.setRequired(true)
+			.setLabel(new ResourceModel("Role.roleMode", "roleMode")));
 		floatTable.add(new WSelectionInput("permissions", roleService.getPermissionsList(), true)
-			.setLabel(new ResourceModel("Role.permissions")));
+			.setLabel(new ResourceModel("Role.permissions", "permissions")));
 		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
-			.setLabel(new ResourceModel("Role.denials")));
+			.setLabel(new ResourceModel("Role.denials", "denials")));
 
 		Form<Role> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);

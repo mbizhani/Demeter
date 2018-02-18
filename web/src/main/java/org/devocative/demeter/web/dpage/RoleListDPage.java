@@ -6,6 +6,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.DemeterPrivilegeKey;
+import org.devocative.demeter.entity.ERoleMode;
 import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
@@ -16,11 +17,9 @@ import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.demeter.web.component.grid.ORowModChangeAjaxColumn;
 import org.devocative.wickomp.WModel;
-import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
 import org.devocative.wickomp.form.range.WDateRangeInput;
-import org.devocative.wickomp.formatter.OBooleanFormatter;
 import org.devocative.wickomp.formatter.ODateFormatter;
 import org.devocative.wickomp.formatter.ONumberFormatter;
 import org.devocative.wickomp.grid.IGridDataSource;
@@ -101,26 +100,26 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
-			.setLabel(new ResourceModel("Role.name")));
-		floatTable.add(new WBooleanInput("dynamic")
-			.setLabel(new ResourceModel("Role.dynamic")));
+			.setLabel(new ResourceModel("Role.name", "name")));
+		floatTable.add(new WSelectionInput("roleMode", ERoleMode.list(), true)
+			.setLabel(new ResourceModel("Role.roleMode", "roleMode")));
 		floatTable.add(new WSelectionInput("permissions", roleService.getPermissionsList(), true)
-			.setLabel(new ResourceModel("Role.permissions")));
+			.setLabel(new ResourceModel("Role.permissions", "permissions")));
 		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
-			.setLabel(new ResourceModel("Role.denials")));
-		floatTable.add(new WSelectionInput("rowMod", ERowMode.list(), true)
-			.setLabel(new ResourceModel("entity.rowMod"))
+			.setLabel(new ResourceModel("Role.denials", "denials")));
+		floatTable.add(new WSelectionInput("rowMode", ERowMode.list(), true)
+			.setLabel(new ResourceModel("entity.rowMode", "rowMode"))
 			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("creationDate")
 			.setTimePartVisible(true)
-			.setLabel(new ResourceModel("entity.creationDate")));
+			.setLabel(new ResourceModel("entity.creationDate", "creationDate")));
 		floatTable.add(new WSelectionInput("creatorUser", roleService.getCreatorUserList(), true)
-			.setLabel(new ResourceModel("entity.creatorUser")));
+			.setLabel(new ResourceModel("entity.creatorUser", "creatorUser")));
 		floatTable.add(new WDateRangeInput("modificationDate")
 			.setTimePartVisible(true)
-			.setLabel(new ResourceModel("entity.modificationDate")));
+			.setLabel(new ResourceModel("entity.modificationDate", "modificationDate")));
 		floatTable.add(new WSelectionInput("modifierUser", roleService.getModifierUserList(), true)
-			.setLabel(new ResourceModel("entity.modifierUser")));
+			.setLabel(new ResourceModel("entity.modifierUser", "modifierUser")));
 
 		Form<RoleFVO> form = new Form<>("form", new CompoundPropertyModel<>(filter));
 		form.add(floatTable);
@@ -136,25 +135,24 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 		add(form);
 
 		OColumnList<Role> columnList = new OColumnList<>();
-		columnList.add(new OPropertyColumn<>(new ResourceModel("Role.name"), "name"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.dynamic"), "dynamic")
-			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions"), "permissions")
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Role.name", "name"), "name"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("Role.roleMode", "roleMode"), "roleMode"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.permissions", "permissions"), "permissions")
 			.setWidth(OSize.fixed(250)));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials"), "denials")
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("Role.denials", "denials"), "denials")
 			.setWidth(OSize.fixed(250)));
 		if (getCurrentUser().isRoot()) {
-			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMod"), "rowMod"));
+			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMode", "rowMode"), "rowMode"));
 		}
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.creationDate"), "creationDate")
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.creationDate", "creationDate"), "creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser"), "creatorUser"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.modificationDate"), "modificationDate")
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.creatorUser", "creatorUser"), "creatorUser"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.modificationDate", "modificationDate"), "modificationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser"), "modifierUser"));
-		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.version"), "version")
+		columnList.add(new OPropertyColumn<>(new ResourceModel("entity.modifierUser", "modifierUser"), "modifierUser"));
+		columnList.add(new OPropertyColumn<Role>(new ResourceModel("entity.version", "version"), "version")
 			.setFormatter(ONumberFormatter.integer())
 			.setStyle("direction:ltr"));
 

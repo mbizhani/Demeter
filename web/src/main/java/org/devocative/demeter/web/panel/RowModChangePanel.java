@@ -30,7 +30,7 @@ public class RowModChangePanel extends DPanel {
 		super(id);
 
 		this.row = row;
-		this.old = row.getRowMod();
+		this.old = row.getRowMode();
 	}
 
 	@Override
@@ -38,17 +38,17 @@ public class RowModChangePanel extends DPanel {
 		super.onInitialize();
 
 		Form form = new Form("form");
-		form.add(new WSelectionInput("list", new PropertyModel<>(row, "rowMod"), ERowMode.accessList(), false));
+		form.add(new WSelectionInput("list", new PropertyModel<>(row, "rowMode"), ERowMode.accessList(), false));
 		form.add(new DAjaxButton("update", DemeterIcon.SAVE) {
 			private static final long serialVersionUID = -1528622888194462174L;
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				Object id = persistorService.updateFields(row, "rowMod");
+				Object id = persistorService.updateFields(row, "rowMode");
 				persistorService.commitOrRollback();
 
 				logger.warn("RowModChangePanel: entity [{}] with id [{}] has changed from [{}] to [{}]",
-					row.getClass().getName(), id, old, row.getRowMod());
+					row.getClass().getName(), id, old, row.getRowMode());
 
 				WModalWindow.closeParentWindow(RowModChangePanel.this, target);
 			}

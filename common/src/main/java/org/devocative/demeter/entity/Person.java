@@ -57,7 +57,7 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
-	private ERowMode rowMod;
+	private ERowMode rowMode;
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -166,13 +166,13 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 	// ---------------
 
 	@Override
-	public ERowMode getRowMod() {
-		return rowMod;
+	public ERowMode getRowMode() {
+		return rowMode;
 	}
 
 	@Override
-	public void setRowMod(ERowMode rowMod) {
-		this.rowMod = rowMod;
+	public void setRowMode(ERowMode rowMode) {
+		this.rowMode = rowMode;
 	}
 
 	@Override

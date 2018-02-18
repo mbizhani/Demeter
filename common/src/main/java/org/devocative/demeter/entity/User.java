@@ -229,13 +229,13 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	// ---------------
 
 	@Override
-	public ERowMode getRowMod() {
-		return getPersonSafely().getRowMod();
+	public ERowMode getRowMode() {
+		return getPersonSafely().getRowMode();
 	}
 
 	@Override
-	public void setRowMod(ERowMode rowMod) {
-		getPersonSafely().setRowMod(rowMod);
+	public void setRowMode(ERowMode rowMode) {
+		getPersonSafely().setRowMode(rowMode);
 	}
 
 	@Override

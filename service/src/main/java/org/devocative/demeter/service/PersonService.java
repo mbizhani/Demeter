@@ -25,8 +25,8 @@ public class PersonService implements IPersonService {
 
 	@Override
 	public void saveOrUpdate(Person entity) {
-		if (entity.getRowMod() == null) {
-			entity.setRowMod(ERowMode.NORMAL);
+		if (entity.getRowMode() == null) {
+			entity.setRowMode(ERowMode.NORMAL);
 		}
 		persistorService.saveOrUpdate(entity);
 	}

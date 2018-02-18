@@ -30,8 +30,9 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	@Column(name = "c_name", nullable = false)
 	private String name;
 
-	@Column(name = "b_dynamic", nullable = false)
-	private Boolean dynamic = false;
+	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "e_role_mode", nullable = false))
+	private ERoleMode roleMode = ERoleMode.NORMAL;
 
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -57,7 +58,7 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
-	private ERowMode rowMod;
+	private ERowMode rowMode;
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -106,12 +107,13 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		this.name = name;
 	}
 
-	public Boolean getDynamic() {
-		return dynamic;
+	public ERoleMode getRoleMode() {
+		return roleMode;
 	}
 
-	public void setDynamic(Boolean dynamic) {
-		this.dynamic = dynamic;
+	public Role setRoleMode(ERoleMode roleMode) {
+		this.roleMode = roleMode;
+		return this;
 	}
 
 	public List<Privilege> getPermissions() {
@@ -133,13 +135,13 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	// ---------------
 
 	@Override
-	public ERowMode getRowMod() {
-		return rowMod;
+	public ERowMode getRowMode() {
+		return rowMode;
 	}
 
 	@Override
-	public void setRowMod(ERowMode rowMod) {
-		this.rowMod = rowMod;
+	public void setRowMode(ERowMode rowMode) {
+		this.rowMode = rowMode;
 	}
 
 	@Override

@@ -90,7 +90,8 @@ public class UserService implements IUserService {
 	public List<Role> getRolesList() {
 		return persistorService.createQueryBuilder()
 			.addFrom(Role.class, "ent")
-			.addWhere("and ent.dynamic = false")
+			.addWhere("and ent.roleMode <> :mode")
+			.addParam("mode", ERoleMode.DYNAMIC)
 			.list();
 	}
 
@@ -167,8 +168,8 @@ public class UserService implements IUserService {
 			person.setFirstName(userInputVO.getFirstName());
 			person.setLastName(userInputVO.getLastName());
 
-			if (userInputVO.getRowMod() != null) {
-				person.setRowMod(userInputVO.getRowMod());
+			if (userInputVO.getRowMode() != null) {
+				person.setRowMode(userInputVO.getRowMode());
 			}
 
 			saveOrUpdate(user, password);

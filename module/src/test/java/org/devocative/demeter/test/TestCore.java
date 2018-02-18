@@ -47,7 +47,7 @@ public class TestCore {
 			person.setFirstName("John" + i);
 			person.setLastName("Blue" + i);
 			person.setBirthRegDate(new Date());
-			person.setRowMod(ERowMode.NORMAL);
+			person.setRowMode(ERowMode.NORMAL);
 
 			try {
 				Thread.sleep(1000);

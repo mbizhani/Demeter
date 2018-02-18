@@ -3,10 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.ERowMode;
-import org.devocative.demeter.entity.Privilege;
-import org.devocative.demeter.entity.Role;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.filter.RoleFVO;
@@ -28,8 +25,8 @@ public class RoleService implements IRoleService {
 
 	@Override
 	public void saveOrUpdate(Role entity) {
-		if (entity.getRowMod() == null) {
-			entity.setRowMod(ERowMode.NORMAL);
+		if (entity.getRowMode() == null) {
+			entity.setRowMode(ERowMode.NORMAL);
 		}
 		try {
 			persistorService.saveOrUpdate(entity);
@@ -103,14 +100,14 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public Role createOrUpdateRole(String name, ERowMode rowMod, boolean dynamic) {
+	public Role createOrUpdateRole(String name, ERowMode rowMode, ERoleMode roleMode) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();
 			role.setName(name);
 		}
-		role.setDynamic(dynamic);
-		role.setRowMod(rowMod);
+		role.setRoleMode(roleMode);
+		role.setRowMode(rowMode);
 		saveOrUpdate(role);
 		//persistorService.commitOrRollback();
 

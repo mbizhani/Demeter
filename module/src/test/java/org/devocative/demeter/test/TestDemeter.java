@@ -245,7 +245,7 @@ public class TestDemeter {
 		// Insert New Record
 		Role merge = new Role();
 		merge.setName("Merge");
-		merge.setRowMod(ERowMod.NORMAL);
+		merge.setRowMode(ERowMod.NORMAL);
 		persistorService.merge(merge);
 
 		Role testDup = roleService.loadByName("TestDup");

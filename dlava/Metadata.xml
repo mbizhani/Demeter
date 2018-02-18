@@ -278,7 +278,7 @@
 				<field name="user">
 					<finfo hasForm="false" hasFVO="false"/>
 				</field>
-				<field name="rowMod">
+				<field name="rowMode">
 					<finfo hasForm="false"/>
 				</field>
 				<field name="creationDate">
@@ -329,8 +329,8 @@
 				<field name="name">
 					<finfo/>
 				</field>
-				<field name="dynamic">
-					<finfo hasForm="false"/>
+				<field name="roleMode">
+					<finfo/>
 				</field>
 				<field name="permissions">
 					<finfo/>
@@ -338,7 +338,7 @@
 				<field name="denials">
 					<finfo/>
 				</field>
-				<field name="rowMod">
+				<field name="rowMode">
 					<finfo hasForm="false"/>
 				</field>
 				<field name="creationDate">

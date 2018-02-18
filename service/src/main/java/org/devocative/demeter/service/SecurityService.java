@@ -58,7 +58,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
-				.setRowMod(ERowMode.SYSTEM)
+				.setRowMode(ERowMode.SYSTEM)
 				.setSessionTimeout(0),
 			null,
 			true
@@ -68,7 +68,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		userService.createOrUpdateUser(
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
-				.setRowMod(ERowMode.SYSTEM),
+				.setRowMode(ERowMode.SYSTEM),
 			null,
 			true
 		);
@@ -76,7 +76,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		guest = userService.createOrUpdateUser(
 			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
-				.setRowMod(ERowMode.SYSTEM)
+				.setRowMode(ERowMode.SYSTEM)
 				.setSessionTimeout(-1),
 			null,
 			true
@@ -87,13 +87,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("User", ERowMode.ROOT, true);
-		roleService.createOrUpdateRole("Admin", ERowMode.ROOT, true);
-		roleService.createOrUpdateRole("Root", ERowMode.SYSTEM, true);
+		roleService.createOrUpdateRole("User", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdateRole("Admin", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdateRole("Root", ERowMode.SYSTEM, ERoleMode.DYNAMIC);
 
-		roleService.createOrUpdateRole("AuthByDB", ERowMode.ROOT, true);
-		roleService.createOrUpdateRole("AuthByLDAP", ERowMode.ROOT, true);
-		roleService.createOrUpdateRole("AuthByOther", ERowMode.ROOT, true);
+		roleService.createOrUpdateRole("AuthByDB", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdateRole("AuthByLDAP", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdateRole("AuthByOther", ERowMode.ROOT, ERoleMode.DYNAMIC);
 
 		persistorService.commitOrRollback();
 	}

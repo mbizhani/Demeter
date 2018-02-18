@@ -18,7 +18,7 @@ public class UserInputVO implements Serializable {
 	private Boolean admin;
 	private EUserStatus status;
 	private EAuthMechanism authMechanism;
-	private ERowMode rowMod;
+	private ERowMode rowMode;
 	private Integer sessionTimeout;
 	private Set<String> roles = new HashSet<>();
 
@@ -86,12 +86,12 @@ public class UserInputVO implements Serializable {
 		return this;
 	}
 
-	public ERowMode getRowMod() {
-		return rowMod;
+	public ERowMode getRowMode() {
+		return rowMode;
 	}
 
-	public UserInputVO setRowMod(ERowMode rowMod) {
-		this.rowMod = rowMod;
+	public UserInputVO setRowMode(ERowMode rowMode) {
+		this.rowMode = rowMode;
 		return this;
 	}
 

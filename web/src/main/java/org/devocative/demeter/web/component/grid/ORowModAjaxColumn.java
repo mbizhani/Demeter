@@ -27,7 +27,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 	@Override
 	public boolean onCellRender(T bean, String id) {
 		if (bean instanceof IRowMode) {
-			IRowMode rowMod = (IRowMode) bean;
+			IRowMode rowMode = (IRowMode) bean;
 
 			ICreatorUser creatorUser = null;
 			if (bean instanceof ICreatorUser) {
@@ -39,7 +39,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 				roleRowAccess = (IRoleRowAccess) bean;
 			}
 
-			switch (rowMod.getRowMod().getId()) {
+			switch (rowMode.getRowMode().getId()) {
 				case ERowMode.NORMAL_ID:
 					return true;
 
@@ -51,14 +51,14 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 
 				case ERowMode.ROLE_ID:
 					if (roleRowAccess == null) {
-						throw new RuntimeException("Invalid Row: row with rowMod=ROLE must implements IRoleRowAccess");
+						throw new RuntimeException("Invalid Row: row with rowMode=ROLE must implements IRoleRowAccess");
 					}
 					return currentUser.isRoot() || currentUser.isAdmin() ||
 						!Collections.disjoint(currentUser.getRoles(), roleRowAccess.getAllowedRoles());
 
 				case ERowMode.CREATOR_ID:
 					if (creatorUser == null) {
-						throw new RuntimeException("Invalid Row: row with rowMod=CREATOR must implements ICreatorUser");
+						throw new RuntimeException("Invalid Row: row with rowMode=CREATOR must implements ICreatorUser");
 					}
 					return currentUser.isRoot() || currentUser.isAdmin() ||
 						currentUser.getUserId().equals(creatorUser.getCreatorUserId());

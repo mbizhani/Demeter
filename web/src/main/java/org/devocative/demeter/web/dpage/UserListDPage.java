@@ -135,8 +135,8 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		floatTable.add(new WSelectionInput("denials", userService.getDenialsList(), true)
 			.setLabel(new ResourceModel("User.denials")));
 
-		floatTable.add(new WSelectionInput("person.rowMod", ERowMode.list(), true)
-			.setLabel(new ResourceModel("entity.rowMod"))
+		floatTable.add(new WSelectionInput("person.rowMode", ERowMode.list(), true)
+			.setLabel(new ResourceModel("entity.rowMode"))
 			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("person.creationDate")
 			.setTimePartVisible(true)
@@ -192,7 +192,7 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 
 		// -- Person
 		if (getCurrentUser().isRoot()) {
-			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMod"), "person.rowMod"));
+			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMode"), "person.rowMode"));
 		}
 		columnList.add(new OPropertyColumn<User>(new ResourceModel("entity.creationDate"), "person.creationDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())

@@ -21,7 +21,7 @@ public class PersonFVO implements Serializable {
 	private String mobile;
 	private String systemNumber;
 	private Boolean hasUser;
-	private List<ERowMode> rowMod;
+	private List<ERowMode> rowMode;
 	private RangeVO<Date> creationDate;
 	private List<User> creatorUser;
 	private RangeVO<Date> modificationDate;
@@ -85,12 +85,12 @@ public class PersonFVO implements Serializable {
 		this.hasUser = hasUser;
 	}
 
-	public List<ERowMode> getRowMod() {
-		return rowMod;
+	public List<ERowMode> getRowMode() {
+		return rowMode;
 	}
 
-	public void setRowMod(List<ERowMode> rowMod) {
-		this.rowMod = rowMod;
+	public void setRowMode(List<ERowMode> rowMode) {
+		this.rowMode = rowMode;
 	}
 
 	public RangeVO<Date> getCreationDate() {

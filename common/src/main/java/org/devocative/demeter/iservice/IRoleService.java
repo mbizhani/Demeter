@@ -1,9 +1,6 @@
 package org.devocative.demeter.iservice;
 
-import org.devocative.demeter.entity.ERowMode;
-import org.devocative.demeter.entity.Privilege;
-import org.devocative.demeter.entity.Role;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.vo.filter.RoleFVO;
 
 import java.util.List;
@@ -31,5 +28,5 @@ public interface IRoleService {
 
 	// ==============================
 
-	Role createOrUpdateRole(String name, ERowMode rowMod, boolean dynamic);
+	Role createOrUpdateRole(String name, ERowMode rowMode, ERoleMode roleMode);
 }
