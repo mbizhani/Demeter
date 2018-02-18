@@ -2,7 +2,7 @@
 package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.persistor.Filterer;
 
@@ -21,7 +21,7 @@ public class PersonFVO implements Serializable {
 	private String mobile;
 	private String systemNumber;
 	private Boolean hasUser;
-	private List<ERowMod> rowMod;
+	private List<ERowMode> rowMod;
 	private RangeVO<Date> creationDate;
 	private List<User> creatorUser;
 	private RangeVO<Date> modificationDate;
@@ -85,11 +85,11 @@ public class PersonFVO implements Serializable {
 		this.hasUser = hasUser;
 	}
 
-	public List<ERowMod> getRowMod() {
+	public List<ERowMode> getRowMod() {
 		return rowMod;
 	}
 
-	public void setRowMod(List<ERowMod> rowMod) {
+	public void setRowMod(List<ERowMode> rowMod) {
 		this.rowMod = rowMod;
 	}
 

@@ -3,12 +3,12 @@ package org.devocative.demeter.web.component.grid;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.devocative.demeter.entity.IRowMod;
+import org.devocative.demeter.entity.IRowMode;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.panel.RowModChangePanel;
 import org.devocative.wickomp.html.window.WModalWindow;
 
-public class ORowModChangeAjaxColumn<T extends IRowMod> extends ORowModAjaxColumn<T> {
+public class ORowModChangeAjaxColumn<T extends IRowMode> extends ORowModAjaxColumn<T> {
 	private static final long serialVersionUID = -3783348687276724102L;
 
 	private final WModalWindow modalWindow;

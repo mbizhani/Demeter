@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "t_dmt_role", uniqueConstraints = {
 	@UniqueConstraint(name = "uk_dmt_role_name", columnNames = {"c_name"})
 })
-public class Role implements IRowMod, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	private static final long serialVersionUID = -7388401924357240473L;
 
 	@Id
@@ -57,7 +57,7 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
-	private ERowMod rowMod;
+	private ERowMode rowMod;
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -133,12 +133,12 @@ public class Role implements IRowMod, ICreationDate, ICreatorUser, IModification
 	// ---------------
 
 	@Override
-	public ERowMod getRowMod() {
+	public ERowMode getRowMod() {
 		return rowMod;
 	}
 
 	@Override
-	public void setRowMod(ERowMod rowMod) {
+	public void setRowMod(ERowMode rowMod) {
 		this.rowMod = rowMod;
 	}
 

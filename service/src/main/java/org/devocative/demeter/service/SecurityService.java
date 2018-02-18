@@ -58,7 +58,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
-				.setRowMod(ERowMod.SYSTEM)
+				.setRowMod(ERowMode.SYSTEM)
 				.setSessionTimeout(0),
 			null,
 			true
@@ -68,7 +68,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		userService.createOrUpdateUser(
 			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
-				.setRowMod(ERowMod.SYSTEM),
+				.setRowMod(ERowMode.SYSTEM),
 			null,
 			true
 		);
@@ -76,7 +76,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		guest = userService.createOrUpdateUser(
 			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
-				.setRowMod(ERowMod.SYSTEM)
+				.setRowMod(ERowMode.SYSTEM)
 				.setSessionTimeout(-1),
 			null,
 			true
@@ -87,13 +87,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("User", ERowMod.ROOT, true);
-		roleService.createOrUpdateRole("Admin", ERowMod.ROOT, true);
-		roleService.createOrUpdateRole("Root", ERowMod.SYSTEM, true);
+		roleService.createOrUpdateRole("User", ERowMode.ROOT, true);
+		roleService.createOrUpdateRole("Admin", ERowMode.ROOT, true);
+		roleService.createOrUpdateRole("Root", ERowMode.SYSTEM, true);
 
-		roleService.createOrUpdateRole("AuthByDB", ERowMod.ROOT, true);
-		roleService.createOrUpdateRole("AuthByLDAP", ERowMod.ROOT, true);
-		roleService.createOrUpdateRole("AuthByOther", ERowMod.ROOT, true);
+		roleService.createOrUpdateRole("AuthByDB", ERowMode.ROOT, true);
+		roleService.createOrUpdateRole("AuthByLDAP", ERowMode.ROOT, true);
+		roleService.createOrUpdateRole("AuthByOther", ERowMode.ROOT, true);
 
 		persistorService.commitOrRollback();
 	}

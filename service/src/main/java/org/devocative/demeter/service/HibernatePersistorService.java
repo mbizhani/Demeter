@@ -3,7 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.demeter.DBConstraintViolationException;
-import org.devocative.demeter.entity.*;
+import org.devocative.demeter.entity.IModificationDate;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.ELockMode;
@@ -16,7 +16,6 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +55,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
 		if ("CreateModify".equals(interceptor)) {
-			config.setInterceptor(new MainInterceptor());
+			config.setInterceptor(new HibernateInterceptor(securityService));
 		} else {
 			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
 		}
@@ -482,104 +480,6 @@ public class HibernatePersistorService implements IPersistorService {
 	}
 
 	//----------------------------- INNER CLASSES
-
-	private class MainInterceptor extends EmptyInterceptor {
-		private static final long serialVersionUID = -820555101887857570L;
-
-		// insert
-		public boolean onSave(
-			Object entity,
-			Serializable id,
-			Object[] state,
-			String[] propertyNames,
-			Type[] types) {
-
-			if (entity instanceof ICreationDate ||
-				entity instanceof ICreatorUser ||
-				entity instanceof IRowMod) {
-				setCreatedValues(entity, id, state, propertyNames);
-				return true;
-			}
-
-			if (entity instanceof IModificationDate || entity instanceof IModifierUser) {
-				setModifiedValues(entity, id, state, propertyNames);
-				return true;
-			}
-
-			return false;
-		}
-
-		// update
-		public boolean onFlushDirty(
-			Object entity,
-			Serializable id,
-			Object[] currentState,
-			Object[] previousState,
-			String[] propertyNames,
-			Type[] types) {
-
-			if (entity instanceof IModificationDate ||
-				entity instanceof IModifierUser ||
-				entity instanceof IRowMod) {
-				setModifiedValues(entity, id, currentState, propertyNames);
-				return true;
-			}
-
-			return false;
-		}
-
-		private void setCreatedValues(Object entity, Serializable id, Object[] state, String[] propertyNames) {
-			for (int i = 0; i < propertyNames.length; i++) {
-				if ("creatorUserId".equals(propertyNames[i])) {
-					if (securityService != null && securityService.getCurrentUser() != null) {
-						state[i] = securityService.getCurrentUser().getUserId();
-					} else {
-						logger.warn("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
-						if (entity instanceof Person) {
-							Person p = (Person) entity;
-							if (!"system".equals(p.getLastName())) {
-								throw new RuntimeException("Invalid CurrentUser");
-							}
-						} else {
-							throw new RuntimeException("Invalid CurrentUser");
-						}
-					}
-				} else if ("creationDate".equals(propertyNames[i])) {
-					state[i] = new Date();
-				} /*else if ("rowMod".equals(propertyNames[i])) {
-					if (state[i] == null) {
-						state[i] = ERowMod.NORMAL;
-					}
-				}*/
-			}
-		}
-
-		private void setModifiedValues(Object entity, Serializable id, Object[] state, String[] propertyNames) {
-			for (int i = 0; i < propertyNames.length; i++) {
-				if ("modifierUserId".equals(propertyNames[i])) {
-					if (securityService != null && securityService.getCurrentUser() != null) {
-						state[i] = securityService.getCurrentUser().getUserId();
-					} else {
-						logger.error("Hibernate.Interceptor for creatorUserId: invalid currentUser, entity=[{}] id=[{}]", entity.getClass().getName(), id);
-						if (entity instanceof Person) {
-							Person p = (Person) entity;
-							if (!"system".equals(p.getLastName())) {
-								throw new RuntimeException("Invalid CurrentUser");
-							}
-						} else {
-							throw new RuntimeException("Invalid CurrentUser");
-						}
-					}
-				} else if ("modificationDate".equals(propertyNames[i])) {
-					state[i] = new Date();
-				} else if ("rowMod".equals(propertyNames[i])) {
-					if (state[i] == null) {
-						state[i] = ERowMod.NORMAL;
-					}
-				}
-			}
-		}
-	}
 
 	private class EntityResetInfo {
 		private Object object;

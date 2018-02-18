@@ -2,7 +2,7 @@
 package org.devocative.demeter.vo.filter;
 
 import org.devocative.adroit.vo.RangeVO;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.persistor.Filterer;
@@ -19,7 +19,7 @@ public class RoleFVO implements Serializable {
 	private Boolean dynamic;
 	private List<Privilege> permissions;
 	private List<Privilege> denials;
-	private List<ERowMod> rowMod;
+	private List<ERowMode> rowMod;
 	private RangeVO<Date> creationDate;
 	private List<User> creatorUser;
 	private RangeVO<Date> modificationDate;
@@ -59,11 +59,11 @@ public class RoleFVO implements Serializable {
 		this.denials = denials;
 	}
 
-	public List<ERowMod> getRowMod() {
+	public List<ERowMode> getRowMod() {
 		return rowMod;
 	}
 
-	public void setRowMod(List<ERowMod> rowMod) {
+	public void setRowMod(List<ERowMode> rowMod) {
 		this.rowMod = rowMod;
 	}
 

@@ -135,7 +135,7 @@ public class UserListDPage extends DPage implements IGridDataSource<User> {
 		floatTable.add(new WSelectionInput("denials", userService.getDenialsList(), true)
 			.setLabel(new ResourceModel("User.denials")));
 
-		floatTable.add(new WSelectionInput("person.rowMod", ERowMod.list(), true)
+		floatTable.add(new WSelectionInput("person.rowMod", ERowMode.list(), true)
 			.setLabel(new ResourceModel("entity.rowMod"))
 			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("person.creationDate")

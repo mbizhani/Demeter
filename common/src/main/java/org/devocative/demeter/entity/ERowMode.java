@@ -4,10 +4,10 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.*;
 
-public class ERowMod implements Serializable {
+public class ERowMode implements Serializable {
 	private static final long serialVersionUID = -3933153565923626628L;
 
-	private static final Map<Integer, ERowMod> ID_TO_LIT = new LinkedHashMap<>();
+	private static final Map<Integer, ERowMode> ID_TO_LIT = new LinkedHashMap<>();
 
 	// ------------------------------
 
@@ -22,14 +22,14 @@ public class ERowMod implements Serializable {
 
 	// ---------------
 
-	public static final ERowMod DELETED = new ERowMod(DELETED_ID, "Deleted");
-	public static final ERowMod NORMAL = new ERowMod(NORMAL_ID, "Normal");
-	public static final ERowMod ROLE = new ERowMod(ROLE_ID, "Role");
+	public static final ERowMode DELETED = new ERowMode(DELETED_ID, "Deleted");
+	public static final ERowMode NORMAL = new ERowMode(NORMAL_ID, "Normal");
+	public static final ERowMode ROLE = new ERowMode(ROLE_ID, "Role");
 
-	public static final ERowMod SYSTEM = new ERowMod(SYSTEM_ID, "System");
-	public static final ERowMod ROOT = new ERowMod(ROOT_ID, "Root");
-	public static final ERowMod ADMIN = new ERowMod(ADMIN_ID, "Admin");
-	public static final ERowMod CREATOR = new ERowMod(CREATOR_ID, "Creator");
+	public static final ERowMode SYSTEM = new ERowMode(SYSTEM_ID, "System");
+	public static final ERowMode ROOT = new ERowMode(ROOT_ID, "Root");
+	public static final ERowMode ADMIN = new ERowMode(ADMIN_ID, "Admin");
+	public static final ERowMode CREATOR = new ERowMode(CREATOR_ID, "Creator");
 
 	// ------------------------------
 
@@ -40,14 +40,14 @@ public class ERowMod implements Serializable {
 
 	// ------------------------------
 
-	private ERowMod(Integer id, String name) {
+	private ERowMode(Integer id, String name) {
 		this.id = id;
 		this.name = name;
 
 		ID_TO_LIT.put(id, this);
 	}
 
-	public ERowMod() {
+	public ERowMode() {
 	}
 
 	// ------------------------------
@@ -65,11 +65,11 @@ public class ERowMod implements Serializable {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof ERowMod)) return false;
+		if (!(o instanceof ERowMode)) return false;
 
-		ERowMod eRowMod = (ERowMod) o;
+		ERowMode eRowMode = (ERowMode) o;
 
-		return !(getId() != null ? !getId().equals(eRowMod.getId()) : eRowMod.getId() != null);
+		return !(getId() != null ? !getId().equals(eRowMode.getId()) : eRowMode.getId() != null);
 	}
 
 	@Override
@@ -84,17 +84,17 @@ public class ERowMod implements Serializable {
 
 	// ------------------------------
 
-	public static List<ERowMod> list() {
+	public static List<ERowMode> list() {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
 
-	public static List<ERowMod> notDeleted() {
-		List<ERowMod> list = list();
+	public static List<ERowMode> notDeleted() {
+		List<ERowMode> list = list();
 		list.remove(DELETED);
 		return list;
 	}
 
-	public static List<ERowMod> accessList() {
+	public static List<ERowMode> accessList() {
 		return Arrays.asList(ROOT, ADMIN, CREATOR, NORMAL);
 	}
 }

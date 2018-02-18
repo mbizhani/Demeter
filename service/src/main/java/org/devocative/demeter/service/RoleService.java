@@ -3,7 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Privilege;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.entity.User;
@@ -29,7 +29,7 @@ public class RoleService implements IRoleService {
 	@Override
 	public void saveOrUpdate(Role entity) {
 		if (entity.getRowMod() == null) {
-			entity.setRowMod(ERowMod.NORMAL);
+			entity.setRowMod(ERowMode.NORMAL);
 		}
 		try {
 			persistorService.saveOrUpdate(entity);
@@ -103,7 +103,7 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public Role createOrUpdateRole(String name, ERowMod rowMod, boolean dynamic) {
+	public Role createOrUpdateRole(String name, ERowMode rowMod, boolean dynamic) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();

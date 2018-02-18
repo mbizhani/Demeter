@@ -6,7 +6,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.DemeterPrivilegeKey;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.vo.filter.RoleFVO;
@@ -108,7 +108,7 @@ public class RoleListDPage extends DPage implements IGridDataSource<Role> {
 			.setLabel(new ResourceModel("Role.permissions")));
 		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
 			.setLabel(new ResourceModel("Role.denials")));
-		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), true)
+		floatTable.add(new WSelectionInput("rowMod", ERowMode.list(), true)
 			.setLabel(new ResourceModel("entity.rowMod"))
 			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("creationDate")

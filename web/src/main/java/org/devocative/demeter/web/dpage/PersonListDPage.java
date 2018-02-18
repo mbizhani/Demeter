@@ -7,7 +7,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.DemeterPrivilegeKey;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.vo.filter.PersonFVO;
@@ -116,7 +116,7 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 			.setLabel(new ResourceModel("Person.systemNumber")));
 		floatTable.add(new WBooleanInput("hasUser")
 			.setLabel(new ResourceModel("Person.hasUser")));
-		floatTable.add(new WSelectionInput("rowMod", ERowMod.list(), true)
+		floatTable.add(new WSelectionInput("rowMod", ERowMode.list(), true)
 			.setLabel(new ResourceModel("entity.rowMod"))
 			.setVisible(getCurrentUser().isRoot()));
 		floatTable.add(new WDateRangeInput("creationDate")

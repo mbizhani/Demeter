@@ -3,8 +3,8 @@ package org.devocative.demeter.web.panel;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.PropertyModel;
-import org.devocative.demeter.entity.ERowMod;
-import org.devocative.demeter.entity.IRowMod;
+import org.devocative.demeter.entity.ERowMode;
+import org.devocative.demeter.entity.IRowMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.web.DPanel;
 import org.devocative.demeter.web.DemeterIcon;
@@ -20,13 +20,13 @@ public class RowModChangePanel extends DPanel {
 	private static final long serialVersionUID = -7301702757714281743L;
 	private static final Logger logger = LoggerFactory.getLogger(RowModChangePanel.class);
 
-	private IRowMod row;
-	private ERowMod old;
+	private IRowMode row;
+	private ERowMode old;
 
 	@Inject
 	private IPersistorService persistorService;
 
-	public RowModChangePanel(String id, IRowMod row) {
+	public RowModChangePanel(String id, IRowMode row) {
 		super(id);
 
 		this.row = row;
@@ -38,7 +38,7 @@ public class RowModChangePanel extends DPanel {
 		super.onInitialize();
 
 		Form form = new Form("form");
-		form.add(new WSelectionInput("list", new PropertyModel<>(row, "rowMod"), ERowMod.accessList(), false));
+		form.add(new WSelectionInput("list", new PropertyModel<>(row, "rowMod"), ERowMode.accessList(), false));
 		form.add(new DAjaxButton("update", DemeterIcon.SAVE) {
 			private static final long serialVersionUID = -1528622888194462174L;
 

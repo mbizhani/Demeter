@@ -1,7 +1,7 @@
 package org.devocative.demeter.vo;
 
 import org.devocative.demeter.entity.EAuthMechanism;
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.EUserStatus;
 
 import java.io.Serializable;
@@ -18,7 +18,7 @@ public class UserInputVO implements Serializable {
 	private Boolean admin;
 	private EUserStatus status;
 	private EAuthMechanism authMechanism;
-	private ERowMod rowMod;
+	private ERowMode rowMod;
 	private Integer sessionTimeout;
 	private Set<String> roles = new HashSet<>();
 
@@ -86,11 +86,11 @@ public class UserInputVO implements Serializable {
 		return this;
 	}
 
-	public ERowMod getRowMod() {
+	public ERowMode getRowMod() {
 		return rowMod;
 	}
 
-	public UserInputVO setRowMod(ERowMod rowMod) {
+	public UserInputVO setRowMod(ERowMode rowMod) {
 		this.rowMod = rowMod;
 		return this;
 	}

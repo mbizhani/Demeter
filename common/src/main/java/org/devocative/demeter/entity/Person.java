@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 @Table(name = "t_dmt_person")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Person implements IRowMod, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
 	private static final long serialVersionUID = 6377393773056642925L;
 
 	@Id
@@ -57,7 +57,7 @@ public class Person implements IRowMod, ICreationDate, ICreatorUser, IModificati
 
 	@Embedded
 	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
-	private ERowMod rowMod;
+	private ERowMode rowMod;
 
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
@@ -166,12 +166,12 @@ public class Person implements IRowMod, ICreationDate, ICreatorUser, IModificati
 	// ---------------
 
 	@Override
-	public ERowMod getRowMod() {
+	public ERowMode getRowMod() {
 		return rowMod;
 	}
 
 	@Override
-	public void setRowMod(ERowMod rowMod) {
+	public void setRowMod(ERowMode rowMod) {
 		this.rowMod = rowMod;
 	}
 

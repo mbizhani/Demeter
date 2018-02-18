@@ -1,7 +1,7 @@
 //overwrite
 package org.devocative.demeter.service;
 
-import org.devocative.demeter.entity.ERowMod;
+import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.Person;
 import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.IPersonService;
@@ -26,7 +26,7 @@ public class PersonService implements IPersonService {
 	@Override
 	public void saveOrUpdate(Person entity) {
 		if (entity.getRowMod() == null) {
-			entity.setRowMod(ERowMod.NORMAL);
+			entity.setRowMod(ERowMode.NORMAL);
 		}
 		persistorService.saveOrUpdate(entity);
 	}
