@@ -44,6 +44,7 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 	@JoinColumn(name = "f_page_info", nullable = false, foreignKey = @ForeignKey(name = "pageinst2pageinfo"))
 	private DPageInfo pageInfo;
 
+	@OrderBy("name")
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "mt_dmt_pageinst_role",
 		joinColumns = {@JoinColumn(name = "f_page_inst", nullable = false)},

@@ -66,6 +66,7 @@ public class User implements IRowMod, ICreationDate, ICreatorUser, IModification
 	@JoinColumn(name = "id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "user2person"))
 	private Person person;
 
+	@OrderBy("name")
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "mt_dmt_user_role",
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
