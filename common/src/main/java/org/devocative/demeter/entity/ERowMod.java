@@ -11,12 +11,25 @@ public class ERowMod implements Serializable {
 
 	// ------------------------------
 
-	public static final ERowMod DELETED = new ERowMod(-1, "Deleted");
-	public static final ERowMod NORMAL = new ERowMod(1, "Normal");
-	public static final ERowMod SYSTEM = new ERowMod(10, "System");
-	public static final ERowMod ROOT = new ERowMod(11, "Root");
-	public static final ERowMod ADMIN = new ERowMod(12, "Admin");
-	public static final ERowMod CREATOR = new ERowMod(13, "Creator");
+	public static final int DELETED_ID = -1;
+	public static final int NORMAL_ID = 1;
+	public static final int ROLE_ID = 2;
+
+	public static final int SYSTEM_ID = 10;
+	public static final int ROOT_ID = 11;
+	public static final int ADMIN_ID = 12;
+	public static final int CREATOR_ID = 13;
+
+	// ---------------
+
+	public static final ERowMod DELETED = new ERowMod(DELETED_ID, "Deleted");
+	public static final ERowMod NORMAL = new ERowMod(NORMAL_ID, "Normal");
+	public static final ERowMod ROLE = new ERowMod(ROLE_ID, "Role");
+
+	public static final ERowMod SYSTEM = new ERowMod(SYSTEM_ID, "System");
+	public static final ERowMod ROOT = new ERowMod(ROOT_ID, "Root");
+	public static final ERowMod ADMIN = new ERowMod(ADMIN_ID, "Admin");
+	public static final ERowMod CREATOR = new ERowMod(CREATOR_ID, "Creator");
 
 	// ------------------------------
 
@@ -45,12 +58,6 @@ public class ERowMod implements Serializable {
 
 	public String getName() {
 		return ID_TO_LIT.get(getId()).name;
-	}
-
-	// ---------------
-
-	public boolean isAllowedFor(ERowMod rowMod) {
-		return this.id >= rowMod.id;
 	}
 
 	// ---------------
