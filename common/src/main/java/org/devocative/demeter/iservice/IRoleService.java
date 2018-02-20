@@ -28,5 +28,7 @@ public interface IRoleService {
 
 	// ==============================
 
-	Role createOrUpdateRole(String name, ERowMode rowMode, ERoleMode roleMode);
+	Role createOrUpdate(String name, ERowMode rowMode, ERoleMode roleMode);
+
+	Role createOnly(String name, ERowMode rowMode, ERoleMode roleMode);
 }

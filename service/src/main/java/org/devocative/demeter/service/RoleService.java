@@ -100,7 +100,7 @@ public class RoleService implements IRoleService {
 	// ==============================
 
 	@Override
-	public Role createOrUpdateRole(String name, ERowMode rowMode, ERoleMode roleMode) {
+	public Role createOrUpdate(String name, ERowMode rowMode, ERoleMode roleMode) {
 		Role role = loadByName(name);
 		if (role == null) {
 			role = new Role();
@@ -111,6 +111,19 @@ public class RoleService implements IRoleService {
 		saveOrUpdate(role);
 		//persistorService.commitOrRollback();
 
+		return role;
+	}
+
+	@Override
+	public Role createOnly(String name, ERowMode rowMode, ERoleMode roleMode) {
+		Role role = loadByName(name);
+		if (role == null) {
+			role = new Role();
+			role.setName(name);
+			role.setRoleMode(roleMode);
+			role.setRowMode(rowMode);
+			saveOrUpdate(role);
+		}
 		return role;
 	}
 }

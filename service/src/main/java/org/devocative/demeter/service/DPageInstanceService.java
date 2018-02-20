@@ -4,10 +4,7 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.entity.DPageInfo;
-import org.devocative.demeter.entity.DPageInstance;
-import org.devocative.demeter.entity.Role;
-import org.devocative.demeter.entity.User;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -115,19 +112,31 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	@Override
 	public void init() {
-		persistorService.executeUpdate("update DPageInfo ent set ent.enabled = false");
-
 		int totalDPageSize = 0;
+		List<Long> validIds = new ArrayList<>();
 		List<DModuleInfoVO> modules = demeterCoreService.getModules();
 		for (DModuleInfoVO xModule : modules) {
 			List<DPageInfoVO> dPages = xModule.getDPages();
 			if (dPages != null) {
 				for (DPageInfoVO dPage : dPages) {
-					addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
+					DPageInfo pageInfo = addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
+					validIds.add(pageInfo.getId());
 				}
 				totalDPageSize += dPages.size();
 			}
 		}
+
+		Long count = persistorService.createQueryBuilder()
+			.addSelect("select count(1) from DPageInfo")
+			.object();
+		if (validIds.size() < count) {
+			int noOfDisables = persistorService.createQueryBuilder()
+				.addSelect("update DPageInfo ent set ent.enabled = false where ent.id not in (:validIds)")
+				.addParam("validIds", validIds)
+				.update();
+			logger.warn("DPageInfo are disabled: count=[{}] dbAffect=[{}]", count - validIds.size(), noOfDisables);
+		}
+
 		persistorService.commitOrRollback();
 
 		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2);
@@ -253,7 +262,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	// ------------------------------
 
-	private void addOrUpdatePageInfo(String module, DPageInfoVO xdPage) {
+	private DPageInfo addOrUpdatePageInfo(String module, DPageInfoVO xdPage) {
 		String baseUri;
 		if (xdPage.getUri().startsWith("/")) {
 			baseUri = String.format("/%s%s", module, xdPage.getUri());
@@ -303,25 +312,25 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
 
 		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
-			Set<Role> roles;
+			List<Role> roles;
 			if (ConfigUtil.getBoolean(DemeterConfigKey.DPageInstRolesByXML) || pageInstance.getRoles() == null) {
-				roles = new LinkedHashSet<>();
+				roles = new ArrayList<>();
 			} else {
-				roles = new LinkedHashSet<>(pageInstance.getRoles());
+				roles = pageInstance.getRoles();
 			}
 
 			String[] roleNames = xdPage.getRoles().split("[,]");
 			for (String roleName : roleNames) {
-				Role role = roleService.loadByName(roleName.trim());
-				if (role != null) {
+				Role role = roleService.createOnly(roleName.trim(), ERowMode.NORMAL, ERoleMode.NORMAL);
+				if (!roles.contains(role)) {
 					roles.add(role);
-				} else {
-					throw new RuntimeException(String.format("Invalid role name [%s] for DPage [%s]", roleName, xdPage.getUri()));
 				}
 			}
-			pageInstance.setRoles(new ArrayList<>(roles));
+			pageInstance.setRoles(roles);
 		}
 
 		persistorService.saveOrUpdate(pageInstance);
+
+		return pageInfo;
 	}
 }

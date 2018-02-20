@@ -58,34 +58,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			return;
 		}
 
-		threadPoolExecutor = new DemeterThreadPoolExecutor(
-			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolSize),
-			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolMax),
-			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolAliveTime),
-			TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<>());
-
-		threadPoolExecutor.setRejectedExecutionHandler(this);
-
-		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
-
-		requestLifecycleBeans = demeterCoreService.getBeansOfType(IRequestLifecycle.class);
-
-		try {
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
-			scheduler.start();
-			logger.info("TaskService.init(): Scheduler Up!");
-		} catch (SchedulerException e) {
-			logger.error("TaskService.init(): StdSchedulerFactory: ", e);
-			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
-		}
-
-		persistorService
-			.createQueryBuilder()
-			.addSelect("update DTaskInfo ent set ent.enabled=false")
-			.update();
-		persistorService.commitOrRollback();
-
+		List<Long> validIds = new ArrayList<>();
 		List<DModuleInfoVO> modules = demeterCoreService.getModules();
 		for (DModuleInfoVO xModule : modules) {
 			if (xModule.getTasks() != null) {
@@ -97,17 +70,54 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 						throw new DSystemException("Unknown task type as bean: " + xdTask.getType());
 					}
 
-					addOrUpdateTask(xModule.getShortName().toLowerCase(), xdTask);
+					DTaskInfo dTaskInfo = addOrUpdateTask(xModule.getShortName().toLowerCase(), xdTask);
+					validIds.add(dTaskInfo.getId());
 				}
 			}
+		}
+
+		Long count = persistorService.createQueryBuilder()
+			.addSelect("select count(1) from DTaskInfo")
+			.object();
+		if (validIds.size() < count) {
+			int noOfDisables = persistorService
+				.createQueryBuilder()
+				.addSelect("update DTaskInfo ent set ent.enabled = false where ent.id not in (:validIds)")
+				.addParam("validIds", validIds)
+				.update();
+
+			logger.warn("DTaskInfo are disabled: count=[{}] dbAffect=[{}]", count - validIds.size(), noOfDisables);
+		}
+
+		persistorService.commitOrRollback();
+
+		requestLifecycleBeans = demeterCoreService.getBeansOfType(IRequestLifecycle.class);
+
+		threadPoolExecutor = new DemeterThreadPoolExecutor(
+			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolSize),
+			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolMax),
+			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolAliveTime),
+			TimeUnit.MILLISECONDS,
+			new LinkedBlockingQueue<>());
+
+		threadPoolExecutor.setRejectedExecutionHandler(this);
+
+		logger.info("TaskService.init(): ThreadPoolExecutor Up!");
+
+		try {
+			scheduler = StdSchedulerFactory.getDefaultScheduler();
+			scheduler.start();
+			logger.info("TaskService.init(): Scheduler Up!");
+		} catch (SchedulerException e) {
+			logger.error("TaskService.init(): StdSchedulerFactory: ", e);
+			throw new DSystemException("TaskService.init(): StdSchedulerFactory", e);
 		}
 
 		List<DTaskSchedule> list = persistorService
 			.createQueryBuilder()
 			.addFrom(DTaskSchedule.class, "ent")
-			.addWhere("and ent.enabled=true and ent.task.enabled=true")
+			.addWhere("and ent.enabled = true and ent.task.enabled = true")
 			.list();
-
 		for (DTaskSchedule schedule : list) {
 			schedule(schedule);
 		}
@@ -369,11 +379,11 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		return new DTaskResult(result, dTask);
 	}
 
-	private void addOrUpdateTask(String module, DTaskInfoVO xdTask) {
+	private DTaskInfo addOrUpdateTask(String module, DTaskInfoVO xdTask) {
 		DTaskInfo dTaskInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DTaskInfo.class, "ent")
-			.addWhere("and ent.type=:type")
+			.addWhere("and ent.type = :type")
 			.addParam("type", xdTask.getType())
 			.object();
 
@@ -382,34 +392,25 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			dTaskInfo.setType(xdTask.getType());
 			dTaskInfo.setModule(module);
 			persistorService.saveOrUpdate(dTaskInfo);
-
-			if (xdTask.getCronExpression() != null) {
-				DTaskSchedule schedule = new DTaskSchedule();
-				schedule.setCronExpression(xdTask.getCronExpression());
-				schedule.setTask(dTaskInfo);
-				persistorService.saveOrUpdate(schedule);
-			}
-		} else {
-			persistorService
-				.createQueryBuilder()
-				.addSelect("update DTaskInfo ent set ent.enabled=true")
-				.addWhere("and ent.type=:type")
-				.addParam("type", xdTask.getType())
-				.update();
-
-			if (xdTask.getCronExpression() != null) {
-				persistorService
-					.createQueryBuilder()
-					.addSelect("update DTaskSchedule ent set ent.cronExpression=:crExpr")
-					.addWhere("and ent.refId is null")
-					.addWhere("and ent.task.id=:taskId")
-					.addParam("taskId", dTaskInfo.getId())
-					.addParam("crExpr", xdTask.getCronExpression())
-					.update();
-			}
 		}
 
-		persistorService.commitOrRollback();
+		if (xdTask.getCronExpression() != null) {
+			DTaskSchedule schedule = persistorService
+				.createQueryBuilder()
+				.addSelect("from DTaskSchedule ent")
+				.addWhere("and ent.refId is null")
+				.addWhere("and ent.task.id = :taskId")
+				.addParam("taskId", dTaskInfo.getId())
+				.object();
+			if (schedule == null) {
+				schedule = new DTaskSchedule();
+				schedule.setTask(dTaskInfo);
+			}
+			schedule.setCronExpression(xdTask.getCronExpression());
+			persistorService.saveOrUpdate(schedule);
+		}
+
+		return dTaskInfo;
 	}
 
 	private void schedule(DTaskSchedule taskSchedule) {

@@ -56,7 +56,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		storePrivilegeKeys();
 
 		system = userService.createOrUpdateUser(
-			new UserInputVO("system", null, "", "system", EAuthMechanism.DATABASE)
+			new UserInputVO("system", null, null, "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMode(ERowMode.SYSTEM)
 				.setSessionTimeout(0),
@@ -66,7 +66,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		authenticate(system);
 
 		userService.createOrUpdateUser(
-			new UserInputVO("root", "root", "", "root", EAuthMechanism.DATABASE)
+			new UserInputVO("root", "root", null, "root", EAuthMechanism.DATABASE)
 				.setAdmin(true)
 				.setRowMode(ERowMode.SYSTEM),
 			null,
@@ -74,7 +74,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		);
 
 		guest = userService.createOrUpdateUser(
-			new UserInputVO("guest", null, "", "guest", EAuthMechanism.DATABASE)
+			new UserInputVO("guest", null, null, "guest", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
 				.setRowMode(ERowMode.SYSTEM)
 				.setSessionTimeout(-1),
@@ -87,13 +87,13 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			guest.setPageVO(pageInstanceService.getDefaultPages());
 		}
 
-		roleService.createOrUpdateRole("User", ERowMode.ROOT, ERoleMode.DYNAMIC);
-		roleService.createOrUpdateRole("Admin", ERowMode.ROOT, ERoleMode.DYNAMIC);
-		roleService.createOrUpdateRole("Root", ERowMode.SYSTEM, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("User", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("Admin", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("Root", ERowMode.SYSTEM, ERoleMode.DYNAMIC);
 
-		roleService.createOrUpdateRole("AuthByDB", ERowMode.ROOT, ERoleMode.DYNAMIC);
-		roleService.createOrUpdateRole("AuthByLDAP", ERowMode.ROOT, ERoleMode.DYNAMIC);
-		roleService.createOrUpdateRole("AuthByOther", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("AuthByDB", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("AuthByLDAP", ERowMode.ROOT, ERoleMode.DYNAMIC);
+		roleService.createOrUpdate("AuthByOther", ERowMode.ROOT, ERoleMode.DYNAMIC);
 
 		persistorService.commitOrRollback();
 	}
