@@ -40,6 +40,9 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 			}
 
 			switch (rowMode.getRowMode().getId()) {
+				case ERowMode.SYSTEM_ID:
+					return false;
+
 				case ERowMode.NORMAL_ID:
 					return true;
 

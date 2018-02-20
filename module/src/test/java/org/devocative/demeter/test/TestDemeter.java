@@ -51,7 +51,9 @@ public class TestDemeter {
 		securityService = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class);
 		tester = new WicketTester(new DemeterWebApplication());
 
-		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");
+		// NOTE: the following config overwrites whatever is set in config_*.properties
+		ConfigUtil.updateKey(DemeterConfigKey.UserDefaultLocale.getKey(), "fa");       //for d00CheckAccessDenied()
+		ConfigUtil.updateKey(DemeterConfigKey.LoginCaptchaEnabled.getKey(), "false");  //for d01Login()
 	}
 
 	@AfterClass
@@ -99,6 +101,7 @@ public class TestDemeter {
 
 	@Test
 	public void d00CheckAccessDenied() {
+		Assert.assertEquals("Default Locale: ", "fa", ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
 		tester.executeUrl("./dvc/dmt/users");
 		Assert.assertTrue(tester.getLastResponseAsString().contains("<title>ورود به سامانه</title>"));
 	}

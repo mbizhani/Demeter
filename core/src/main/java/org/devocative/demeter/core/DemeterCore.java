@@ -200,11 +200,17 @@ public class DemeterCore {
 			}
 		}
 
-		MAIN_STARTUP = result;
+		/*
+		'result' can be null, when MAIN_STARTUP.step is passed the 'last' step!
+		*/
+		if (result != null) {
+			MAIN_STARTUP = result;
+		}
 	}
 
 	private StepResultVO doStepAndGetNext(EStartupStep current) {
 		Exception error = null;
+		EStartupStep next;
 
 		try {
 			switch (current) {
@@ -247,14 +253,17 @@ public class DemeterCore {
 				default:
 					throw new DSystemException("Unhandled Step: " + current);
 			}
+
+			next = EStartupStep.next(current);
 		} catch (Exception e) {
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
 			logger.warn("!! Step = [{}]", current, e);
 			logger.warn("!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*");
 			error = e;
+
+			next = current;
 		}
 
-		EStartupStep next = EStartupStep.next(current);
 		return new StepResultVO(next, error);
 	}
 

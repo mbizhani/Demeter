@@ -48,9 +48,11 @@ class HibernateInterceptor extends EmptyInterceptor {
 			result = true;
 		}
 
+		/*
+		TODO
 		if (entity instanceof IRowMode && entity instanceof IRoleRowAccess) {
 			result = setRowLevelAccess(entity, id, state, propertyNames) || result;
-		}
+		}*/
 
 		return result;
 	}
@@ -72,9 +74,11 @@ class HibernateInterceptor extends EmptyInterceptor {
 			result = true;
 		}
 
+		/*
+		TODO: Got ClassCastException: can't cast ArrayList to PersistenceBag!
 		if (entity instanceof IRowMode && entity instanceof IRoleRowAccess) {
 			result = setRowLevelAccess(entity, id, currentState, propertyNames) || result;
-		}
+		}*/
 
 		return result;
 	}
