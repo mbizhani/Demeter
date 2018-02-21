@@ -1,4 +1,4 @@
-<!ELEMENT module (dependencies|entities|dPages|tasks)*>
+<!ELEMENT module (dependencies|entities|dPages|tasks|roles)*>
 		<!ATTLIST module
 				shortName CDATA #REQUIRED
 				mainResource CDATA #REQUIRED
@@ -28,3 +28,8 @@
 				type CDATA #REQUIRED
 				cronExpression CDATA
 				calendar (jalali|gregorian)>
+		<!ELEMENT roles (role)*>
+		<!ELEMENT role (#PCDATA)>
+		<!ATTLIST role
+				name CDATA #REQUIRED
+				permissions CDATA>

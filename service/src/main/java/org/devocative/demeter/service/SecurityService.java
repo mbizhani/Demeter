@@ -9,6 +9,7 @@ import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.vo.core.DModuleInfoVO;
+import org.devocative.demeter.vo.core.DRoleInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		roleService.createOrUpdate("AuthByOther", ERowMode.ROOT, ERoleMode.DYNAMIC);
 
 		persistorService.commitOrRollback();
+
+		storeAdditionalRoles();
 	}
 
 	@Override
@@ -312,6 +315,55 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			privilege.setName(name);
 			persistorService.saveOrUpdate(privilege);
 		}
+	}
+
+	private void storeAdditionalRoles() {
+		Collection<DModuleInfoVO> dModules = demeterCoreService.getModules();
+
+		for (DModuleInfoVO dModule : dModules) {
+			for (DRoleInfoVO dRole : dModule.getRoles()) {
+				Role role = roleService.loadByName(dRole.getName());
+				if (role == null) {
+					role = new Role();
+					role.setName(dRole.getName());
+					role.setRowMode(ERowMode.NORMAL);
+					role.setRoleMode(ERoleMode.findByName(dRole.getName()));
+				}
+
+				if (role.getPermissions() == null) {
+					role.setPermissions(new ArrayList<>());
+				}
+				List<Privilege> privileges = role.getPermissions();
+
+				String[] permissions;
+				if (dRole.getPermissions() != null) {
+					permissions = dRole.getPermissions().split("[,]");
+				} else {
+					permissions = new String[0];
+				}
+
+				for (String permission : permissions) {
+					String privilegeName = String.format("%s.%s", dModule.getShortName().toLowerCase(), permission.trim());
+					Privilege privilege = persistorService.createQueryBuilder()
+						.addFrom(Privilege.class, "ent")
+						.addWhere("and ent.name = :name")
+						.addParam("name", privilegeName)
+						.object();
+
+					if (privilege == null) {
+						throw new DSystemException("Can't find Privilege: " + privilegeName);
+					}
+
+					if (!privileges.contains(privilege)) {
+						privileges.add(privilege);
+					}
+				}
+
+				roleService.saveOrUpdate(role);
+			}
+		}
+
+		persistorService.commitOrRollback();
 	}
 
 	// ---------------

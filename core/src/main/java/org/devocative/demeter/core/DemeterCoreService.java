@@ -3,9 +3,11 @@ package org.devocative.demeter.core;
 import org.devocative.demeter.core.xml.XDPage;
 import org.devocative.demeter.core.xml.XDTask;
 import org.devocative.demeter.core.xml.XModule;
+import org.devocative.demeter.core.xml.XRole;
 import org.devocative.demeter.iservice.IDemeterCoreService;
 import org.devocative.demeter.vo.core.DModuleInfoVO;
 import org.devocative.demeter.vo.core.DPageInfoVO;
+import org.devocative.demeter.vo.core.DRoleInfoVO;
 import org.devocative.demeter.vo.core.DTaskInfoVO;
 
 import java.util.*;
@@ -34,7 +36,14 @@ public class DemeterCoreService implements IDemeterCoreService {
 					}
 				}
 
-				modules.add(new DModuleInfoVO(xModule.getShortName(), xModule.getPrivilegeKeyClass(), pages, tasks));
+				List<DRoleInfoVO> roles = new ArrayList<>();
+				if (xModule.getRoles() != null) {
+					for (XRole xRole : xModule.getRoles()) {
+						roles.add(new DRoleInfoVO(xRole.getName(), xRole.getPermissions()));
+					}
+				}
+
+				modules.add(new DModuleInfoVO(xModule.getShortName(), xModule.getPrivilegeKeyClass(), pages, tasks, roles));
 			}
 		}
 

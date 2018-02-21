@@ -66,34 +66,34 @@ public class TestDemeter {
 	@Test
 	public void b00IncompleteStartup() {
 		if (!ConfigUtil.getBoolean("dmt.db.update.ddl", false)) {
-			Assert.assertEquals(EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
-			Assert.assertTrue(DemeterCore.get().getDbDiffs().size() > 0);
+			Assert.assertEquals("Check startup 'Database' step: ", EStartupStep.Database, DemeterCore.get().getLatestStat().getStep());
+			Assert.assertTrue("Check database diff of applied scripts: ", DemeterCore.get().getDbDiffs().size() > 0);
 
 			DemeterCore.get().applyAllDbDiffs();
 			DemeterCore.get().resume();
 		}
-		Assert.assertEquals(EStartupStep.End, DemeterCore.get().getLatestStat().getStep());
+		Assert.assertEquals("Check startup 'End' step: ", EStartupStep.End, DemeterCore.get().getLatestStat().getStep());
 
 		if (ConfigUtil.hasKey(DemeterConfigKey.StartupGroovyScript)) {
-			Assert.assertEquals("UP", System.getProperty("THE_LDAP"));
+			Assert.assertEquals("Check StartupGroovyScript: ", "UP", System.getProperty("THE_LDAP"));
 		}
 	}
 
 	@Test
 	public void b01CheckAllEntities() throws ClassNotFoundException {
 		IPersistorService persistorService = DemeterCore.get().getApplicationContext().getBean(IPersistorService.class);
-		Assert.assertNotNull(persistorService);
+		Assert.assertNotNull("Check IPersistorService existence: ", persistorService);
 
 		List<String> entities = DemeterCore.get().getEntities();
 		Assert.assertNotNull(entities);
-		Assert.assertTrue(entities.size() > 0);
+		Assert.assertTrue("Check entities names existence: ", entities.size() > 0);
 
 		System.out.println("--- TOTAL ENTITIES: " + entities.size());
 
 		for (String entity : entities) {
 			System.out.println("\t--- " + entity);
 			List<?> list = persistorService.list(Class.forName(entity));
-			Assert.assertNotNull(list);
+			Assert.assertNotNull("Check entities class existence: ", list);
 		}
 	}
 
@@ -103,14 +103,14 @@ public class TestDemeter {
 	public void d00CheckAccessDenied() {
 		Assert.assertEquals("Default Locale: ", "fa", ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
 		tester.executeUrl("./dvc/dmt/users");
-		Assert.assertTrue(tester.getLastResponseAsString().contains("<title>ورود به سامانه</title>"));
+		Assert.assertTrue("Check login redirect: ", tester.getLastResponseAsString().contains("<title>ورود به سامانه</title>"));
 	}
 
 	@Test
 	public void d01Login() {
-		Assert.assertFalse(ConfigUtil.getBoolean(DemeterConfigKey.LoginCaptchaEnabled));
+		Assert.assertFalse("Check no-captcha config item: ", ConfigUtil.getBoolean(DemeterConfigKey.LoginCaptchaEnabled));
 
-		Assert.assertEquals("guest", securityService.getCurrentUser().getUsername());
+		Assert.assertEquals("Check current user as 'guest': ", "guest", securityService.getCurrentUser().getUsername());
 
 		LoginDPage loginDPage = new LoginDPage("dPage", Collections.<String>emptyList());
 		tester.startComponentInPage(loginDPage);
@@ -123,14 +123,14 @@ public class TestDemeter {
 
 	@Test
 	public void d02CurrentUser() {
-		Assert.assertEquals("root", securityService.getCurrentUser().getUsername());
+		Assert.assertEquals("Check current user as 'root': ", "root", securityService.getCurrentUser().getUsername());
 
 		String roles = securityService.getCurrentUser().getRoles().toString();
 
-		Assert.assertTrue(roles.contains("Root"));
-		Assert.assertTrue(roles.contains("Admin"));
-		Assert.assertTrue(roles.contains("AuthByDB"));
-		Assert.assertTrue(roles.contains("User"));
+		Assert.assertTrue("Check user 'root' has 'Root' role: ", roles.contains("Root"));
+		Assert.assertTrue("Check user 'root' has 'Admin' role: ", roles.contains("Admin"));
+		Assert.assertTrue("Check user 'root' has 'AuthByDB' role: ", roles.contains("AuthByDB"));
+		Assert.assertTrue("Check user 'root' has 'User' role: ", roles.contains("User"));
 	}
 
 	@Test
@@ -145,15 +145,15 @@ public class TestDemeter {
 			System.out.printf("\n\n >>>> uri = %s\n\n", uri);
 			tester.executeUrl(uri);
 			String responseAsString = tester.getLastResponseAsString();
-			Assert.assertTrue(responseAsString.length() > 0);
-			Assert.assertFalse(responseAsString.contains("<title></title>"));
+			Assert.assertTrue("Check response content for uri '" + uri + "'", responseAsString.length() > 0);
+			Assert.assertFalse("Check response content has title for uri '" + uri + "'", responseAsString.contains("<title></title>"));
 
 			pageInfoSet.add(dPageInstance.getPageInfo());
 		}
 
 		for (DPageInfo pageInfo : pageInfoSet) {
 			String type = pageInfo.getTypeAlt() != null ? pageInfo.getTypeAlt() : pageInfo.getType();
-			Assert.assertNotNull(type);
+			Assert.assertNotNull("Check DPageInfo has type '" + type + "'", type);
 
 			Class<?> dPageClass = Class.forName(type);
 			Constructor<?> constructor = dPageClass.getDeclaredConstructor(String.class, List.class);
@@ -181,10 +181,10 @@ public class TestDemeter {
 			userService.saveOrUpdate(user); //Exception should be raised!
 			Assert.assertEquals("DemeterException.DuplicateUsername should be thrown!", 1, 2);
 		} catch (DemeterException e) {
-			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateUsername));
+			Assert.assertTrue("DemeterException.DuplicateUsername catched: ", e.getErrorCode().equals(DemeterErrorCode.DuplicateUsername));
 		}
 
-		Assert.assertEquals(3, userService.list().size());
+		Assert.assertEquals("Check total number of users: ", 3, userService.list().size());
 
 
 		Role role = new Role();
@@ -193,13 +193,13 @@ public class TestDemeter {
 		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
 		try {
 			roleService.saveOrUpdate(role); //Exception should be raised!
-			Assert.assertEquals("DemeterException.DuplicateRoleName should be thrown!", 1, 2);
+			Assert.assertTrue("DemeterException.DuplicateRoleName should be thrown!", false);
 		} catch (DemeterException e) {
-			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+			Assert.assertTrue("DemeterException.DuplicateRoleName catched", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
 		}
 		persistorService.endSession();
 
-		Assert.assertEquals(6, roleService.list().size());
+		Assert.assertEquals("Check total number of roles 1st", 7, roleService.list().size());
 
 		// ---------------
 
@@ -219,7 +219,7 @@ public class TestDemeter {
 				roleService.saveOrUpdate(rTh);
 				aint.incrementAndGet();
 			} catch (DemeterException e) {
-				Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+				Assert.assertTrue("Check role name duplication prevention in thread", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
 			}
 
 			persistorService.endSession();
@@ -230,7 +230,7 @@ public class TestDemeter {
 			roleService.saveOrUpdate(rMain);
 			aint.incrementAndGet();
 		} catch (DemeterException e) {
-			Assert.assertTrue(e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+			Assert.assertTrue("Check role name duplication prevention", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
 		}
 		persistorService.endSession();
 
@@ -240,8 +240,8 @@ public class TestDemeter {
 			e.printStackTrace();
 		}
 
-		Assert.assertEquals(1, aint.get());
-		Assert.assertEquals(7, roleService.list().size()); // TOTAL ROLES = 7
+		Assert.assertEquals("Check new role name insertion once", 1, aint.get());
+		Assert.assertEquals("Check total number of roles 2nd", 8, roleService.list().size()); // TOTAL ROLES = 8
 
 
 		/*
@@ -278,6 +278,6 @@ public class TestDemeter {
 		tester.executeAjaxEvent("dPage:form:save", "click");
 
 		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
-		Assert.assertEquals(8, roleService.list().size()); // TOTAL ROLES = 8
+		Assert.assertEquals("Check total number of roles 3rd", 9, roleService.list().size()); // TOTAL ROLES = 9
 	}
 }

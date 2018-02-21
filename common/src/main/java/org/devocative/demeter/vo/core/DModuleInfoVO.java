@@ -7,14 +7,16 @@ public class DModuleInfoVO {
 	private String privilegeKeyClass;
 	private List<DPageInfoVO> dPages;
 	private List<DTaskInfoVO> tasks;
+	private List<DRoleInfoVO> roles;
 
 	// ------------------------------
 
-	public DModuleInfoVO(String shortName, String privilegeKeyClass, List<DPageInfoVO> dPages, List<DTaskInfoVO> tasks) {
+	public DModuleInfoVO(String shortName, String privilegeKeyClass, List<DPageInfoVO> dPages, List<DTaskInfoVO> tasks, List<DRoleInfoVO> roles) {
 		this.shortName = shortName;
 		this.privilegeKeyClass = privilegeKeyClass;
 		this.dPages = dPages;
 		this.tasks = tasks;
+		this.roles = roles;
 	}
 
 	// ------------------------------
@@ -33,5 +35,9 @@ public class DModuleInfoVO {
 
 	public List<DTaskInfoVO> getTasks() {
 		return tasks;
+	}
+
+	public List<DRoleInfoVO> getRoles() {
+		return roles;
 	}
 }

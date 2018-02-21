@@ -4,7 +4,10 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.cache.ICache;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
-import org.devocative.demeter.entity.*;
+import org.devocative.demeter.entity.DPageInfo;
+import org.devocative.demeter.entity.DPageInstance;
+import org.devocative.demeter.entity.Role;
+import org.devocative.demeter.entity.User;
 import org.devocative.demeter.iservice.*;
 import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
@@ -321,7 +324,12 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 			String[] roleNames = xdPage.getRoles().split("[,]");
 			for (String roleName : roleNames) {
-				Role role = roleService.createOnly(roleName.trim(), ERowMode.NORMAL, ERoleMode.NORMAL);
+				Role role = roleService.loadByName(roleName.trim());
+
+				if (role == null) {
+					throw new DSystemException("Role not Found: " + roleName);
+				}
+
 				if (!roles.contains(role)) {
 					roles.add(role);
 				}

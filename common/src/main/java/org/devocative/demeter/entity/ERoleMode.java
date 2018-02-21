@@ -74,4 +74,13 @@ public class ERoleMode implements Serializable {
 	public static List<ERoleMode> list() {
 		return new ArrayList<>(ID_TO_LIT.values());
 	}
+
+	public static ERoleMode findByName(String name) {
+		for (ERoleMode roleMode : ID_TO_LIT.values()) {
+			if (roleMode.getName().equals(name)) {
+				return roleMode;
+			}
+		}
+		return null;
+	}
 }

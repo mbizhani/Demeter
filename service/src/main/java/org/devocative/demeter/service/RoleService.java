@@ -28,6 +28,11 @@ public class RoleService implements IRoleService {
 		if (entity.getRowMode() == null) {
 			entity.setRowMode(ERowMode.NORMAL);
 		}
+
+		if (entity.getRoleMode() == null) {
+			entity.setRoleMode(ERoleMode.NORMAL);
+		}
+
 		try {
 			persistorService.saveOrUpdate(entity);
 		} catch (DBConstraintViolationException e) {

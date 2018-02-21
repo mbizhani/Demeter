@@ -30,6 +30,8 @@ public class XModule {
 
 	private List<XEntity> entities;
 
+	private List<XRole> roles;
+
 	private List<XDPage> dPages;
 
 	private List<XDTask> tasks;
@@ -80,9 +82,8 @@ public class XModule {
 		return configKeyClass;
 	}
 
-	public XModule setConfigKeyClass(String configKeyClass) {
+	public void setConfigKeyClass(String configKeyClass) {
 		this.configKeyClass = configKeyClass;
-		return this;
 	}
 
 	public List<String> getDependencies() {
@@ -101,13 +102,20 @@ public class XModule {
 		this.entities = entities;
 	}
 
+	public List<XRole> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<XRole> roles) {
+		this.roles = roles;
+	}
+
 	public List<XDPage> getDPages() {
 		return dPages;
 	}
 
-	public XModule setDPages(List<XDPage> dPages) {
+	public void setDPages(List<XDPage> dPages) {
 		this.dPages = dPages;
-		return this;
 	}
 
 	public List<XDTask> getTasks() {

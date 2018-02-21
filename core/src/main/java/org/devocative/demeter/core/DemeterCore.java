@@ -196,6 +196,15 @@ public class DemeterCore {
 			step = result.getStep();
 
 			if (!result.isSuccessful() || step == EStartupStep.End) {
+				if (!result.isSuccessful() && step.ordinal() >= EStartupStep.BeansStartup.ordinal()) {
+					try {
+						Map<String, IPersistorService> iPersistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
+						iPersistorServiceMap.values().forEach(IPersistorService::rollback);
+					} catch (Exception e) {
+						logger.error("Rollback during lifecycle startup", e);
+						throw e;
+					}
+				}
 				break;
 			}
 		}
@@ -461,7 +470,7 @@ public class DemeterCore {
 		}
 
 		Map<String, IPersistorService> iPersistorServiceMap = appCtx.getBeansOfType(IPersistorService.class);
-		iPersistorServiceMap.values().forEach(org.devocative.demeter.iservice.persistor.IPersistorService::endSession);
+		iPersistorServiceMap.values().forEach(IPersistorService::endSession);
 	}
 
 	private void initFinalize() {
