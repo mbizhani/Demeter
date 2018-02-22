@@ -1,27 +1,28 @@
 package org.devocative.demeter.web.component.grid;
 
 import org.apache.wicket.model.IModel;
-import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.ICreatorUser;
 import org.devocative.demeter.entity.IRoleRowAccess;
 import org.devocative.demeter.entity.IRowMode;
-import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.web.DemeterWebSession;
 import org.devocative.wickomp.grid.column.link.OAjaxLinkColumn;
 import org.devocative.wickomp.html.HTMLBase;
 
 import java.util.Collections;
 
-public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
+/**
+ * Since subclass {@link OEditAjaxColumn} must be used for all types, the {@code T} can not extends
+ * {@link IRowMode} (in spite of {@link ORowModeChangeAjaxColumn})
+ *
+ * @param <T>
+ */
+public abstract class ORowModeAjaxColumn<T> extends OAjaxLinkColumn<T> {
 	private static final long serialVersionUID = -1722174140462799957L;
 
-	private UserVO currentUser;
-
-	public ORowModAjaxColumn(IModel<String> text, HTMLBase linkContent) {
+	public ORowModeAjaxColumn(IModel<String> text, HTMLBase linkContent) {
 		super(text, linkContent);
-
-		currentUser = DemeterCore.get().getApplicationContext().getBean(ISecurityService.class).getCurrentUser();
 	}
 
 	@Override
@@ -39,6 +40,7 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 				roleRowAccess = (IRoleRowAccess) bean;
 			}
 
+			UserVO currentUser = DemeterWebSession.get().getUserVO();
 			switch (rowMode.getRowMode().getId()) {
 				case ERowMode.SYSTEM_ID:
 					return false;
@@ -50,28 +52,27 @@ public abstract class ORowModAjaxColumn<T> extends OAjaxLinkColumn<T> {
 					return currentUser.isRoot();
 
 				case ERowMode.ADMIN_ID:
-					return currentUser.isRoot() || currentUser.isAdmin();
+					return currentUser.isAdmin();
 
 				case ERowMode.ROLE_ID:
 					if (roleRowAccess == null) {
 						throw new RuntimeException("Invalid Row: row with rowMode=ROLE must implements IRoleRowAccess");
 					}
-					return currentUser.isRoot() || currentUser.isAdmin() ||
+					return currentUser.isAdmin() ||
 						!Collections.disjoint(currentUser.getRoles(), roleRowAccess.getAllowedRoles());
 
 				case ERowMode.CREATOR_ID:
 					if (creatorUser == null) {
 						throw new RuntimeException("Invalid Row: row with rowMode=CREATOR must implements ICreatorUser");
 					}
-					return currentUser.isRoot() || currentUser.isAdmin() ||
-						currentUser.getUserId().equals(creatorUser.getCreatorUserId());
+					return currentUser.isAdmin() || currentUser.getUserId().equals(creatorUser.getCreatorUserId());
 
 				default:
 					return currentUser.isRoot();
 
 			}
-		} else {
-			return true;
 		}
+
+		return true;
 	}
 }

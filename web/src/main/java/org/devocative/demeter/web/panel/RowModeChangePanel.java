@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-public class RowModChangePanel extends DPanel {
+public class RowModeChangePanel extends DPanel {
 	private static final long serialVersionUID = -7301702757714281743L;
-	private static final Logger logger = LoggerFactory.getLogger(RowModChangePanel.class);
+	private static final Logger logger = LoggerFactory.getLogger(RowModeChangePanel.class);
 
 	private IRowMode row;
 	private ERowMode old;
@@ -26,7 +26,7 @@ public class RowModChangePanel extends DPanel {
 	@Inject
 	private IPersistorService persistorService;
 
-	public RowModChangePanel(String id, IRowMode row) {
+	public RowModeChangePanel(String id, IRowMode row) {
 		super(id);
 
 		this.row = row;
@@ -50,7 +50,7 @@ public class RowModChangePanel extends DPanel {
 				logger.warn("RowModChangePanel: entity [{}] with id [{}] has changed from [{}] to [{}]",
 					row.getClass().getName(), id, old, row.getRowMode());
 
-				WModalWindow.closeParentWindow(RowModChangePanel.this, target);
+				WModalWindow.closeParentWindow(RowModeChangePanel.this, target);
 			}
 		});
 		add(form);

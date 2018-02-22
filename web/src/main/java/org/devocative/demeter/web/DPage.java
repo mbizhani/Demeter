@@ -6,7 +6,6 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.devocative.demeter.entity.IPrivilegeKey;
 import org.devocative.demeter.iservice.IDPageInstanceService;
-import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
 
 import javax.inject.Inject;
@@ -17,9 +16,6 @@ public abstract class DPage extends Panel {
 
 	@Inject
 	private IDPageInstanceService pageInstanceService;
-
-	@Inject
-	private ISecurityService securityService;
 
 	// ------------------------------
 
@@ -42,7 +38,7 @@ public abstract class DPage extends Panel {
 	}
 
 	protected UserVO getCurrentUser() {
-		return securityService.getCurrentUser();
+		return DemeterWebSession.get().getUserVO();
 	}
 
 	protected boolean hasPermission(IPrivilegeKey privilegeKey) {

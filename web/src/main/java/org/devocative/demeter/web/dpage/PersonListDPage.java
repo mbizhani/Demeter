@@ -15,7 +15,7 @@ import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
-import org.devocative.demeter.web.component.grid.ORowModChangeAjaxColumn;
+import org.devocative.demeter.web.component.grid.ORowModeChangeAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WBooleanInput;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -180,8 +180,10 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 					window.show(target);
 				}
 			});
+		}
 
-			columnList.add(new ORowModChangeAjaxColumn<>(window));
+		if (getCurrentUser().isRoot()) {
+			columnList.add(new ORowModeChangeAjaxColumn<>(window));
 		}
 
 		OGrid<Person> oGrid = new OGrid<>();
