@@ -10,7 +10,8 @@ public enum DemeterErrorCode implements DErrorCode {
 	DBConstraintViolation("DB Constraint Violated"),
 
 	DuplicateUsername("Duplicate Username"),
-	DuplicateRoleName("Duplicate Role Name");
+	DuplicateRoleName("Duplicate Role Name"),
+	NoMainRoleForUser("Current user must have at least one main role for this entity");
 
 	private String defaultDescription;
 

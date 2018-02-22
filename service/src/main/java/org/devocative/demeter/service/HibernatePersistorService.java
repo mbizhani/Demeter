@@ -3,12 +3,15 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.demeter.DBConstraintViolationException;
-import org.devocative.demeter.entity.IModificationDate;
+import org.devocative.demeter.DemeterErrorCode;
+import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.ELockMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
+import org.devocative.demeter.vo.UserVO;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -27,6 +30,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -184,6 +189,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void saveOrUpdate(Object obj) {
+		onBeforeInsertOrUpdate(obj);
+
 		EntityResetInfo info = new EntityResetInfo(obj);
 
 		try {
@@ -200,6 +207,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public Serializable save(Object obj) {
+		onBeforeInsertOrUpdate(obj);
+
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
@@ -216,6 +225,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void update(Object obj) {
+		onBeforeInsertOrUpdate(obj);
+
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
@@ -267,6 +278,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void persist(Object obj) {
+		onBeforeInsertOrUpdate(obj);
+
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
@@ -280,6 +293,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public <T> T merge(T obj) {
+		onBeforeInsertOrUpdate(obj);
+
 		try {
 			Session session = getCurrentSession();
 			checkTransaction(session);
@@ -477,6 +492,41 @@ public class HibernatePersistorService implements IPersistorService {
 		}
 
 		return null;
+	}
+
+	private void onBeforeInsertOrUpdate(Object entity) {
+		UserVO currentUser = securityService.getCurrentUser();
+
+		//TODO the following code must be placed in HibernateInterceptor
+		if (entity instanceof IRowMode && entity instanceof IRoleRowAccess && !currentUser.isAdmin()) {
+			IRowMode rowMode = (IRowMode) entity;
+			IRoleRowAccess roleRowAccess = (IRoleRowAccess) entity;
+
+			if (ERowMode.ROLE.equals(rowMode.getRowMode())) {
+				if (roleRowAccess.getAllowedRoles() == null) {
+					roleRowAccess.setAllowedRoles(new ArrayList<>());
+				}
+				List<Role> roles = roleRowAccess.getAllowedRoles();
+
+				if (Collections.disjoint(currentUser.getRoles(), roles)) {
+					Role currentUserMainRole = null;
+					for (Role role : currentUser.getRoles()) {
+						if (ERoleMode.MAIN.equals(role.getRoleMode())) {
+							currentUserMainRole = role;
+							break;
+						}
+					}
+
+					if (currentUserMainRole != null) {
+						if (!roles.contains(currentUserMainRole)) {
+							roles.add(currentUserMainRole);
+						}
+					} else {
+						throw new DemeterException(DemeterErrorCode.NoMainRoleForUser);
+					}
+				}
+			}
+		}
 	}
 
 	//----------------------------- INNER CLASSES
