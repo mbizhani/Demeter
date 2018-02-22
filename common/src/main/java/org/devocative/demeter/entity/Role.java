@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "t_dmt_role", uniqueConstraints = {
 	@UniqueConstraint(name = "uk_dmt_role_name", columnNames = {"c_name"})
 })
-public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificationDate, IModifierUser, Comparable<Role> {
 	private static final long serialVersionUID = -7388401924357240473L;
 
 	@Id
@@ -230,6 +230,16 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	@Override
 	public String toString() {
-		return getName();
+		String str = getName();
+
+		if(ERoleMode.MAIN.equals(getRoleMode())) {
+			str += "*";
+		}
+		return str;
+	}
+
+	@Override
+	public int compareTo(Role o) {
+		return getName().compareTo(o.getName());
 	}
 }

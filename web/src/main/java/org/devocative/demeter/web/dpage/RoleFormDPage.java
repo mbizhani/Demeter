@@ -13,6 +13,7 @@ import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.wickomp.form.WSelectionInput;
 import org.devocative.wickomp.form.WTextInput;
+import org.devocative.wickomp.form.validator.WAsciiIdentifierValidator;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
 
@@ -61,7 +62,9 @@ public class RoleFormDPage extends DPage {
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
 			.setRequired(true)
-			.setLabel(new ResourceModel("Role.name", "name")));
+			.setLabel(new ResourceModel("Role.name", "name"))
+			.add(new  WAsciiIdentifierValidator())
+		);
 		floatTable.add(new WSelectionInput("roleMode", ERoleMode.list(), false)
 			.setRequired(true)
 			.setLabel(new ResourceModel("Role.roleMode", "roleMode")));

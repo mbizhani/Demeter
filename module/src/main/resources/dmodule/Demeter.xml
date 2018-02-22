@@ -36,7 +36,7 @@
 	</tasks>
 
 	<roles>
-		<role name="UserAdmin" permissions="UserAdd,UserEdit,PersonAdd,PersonEdit,RoleAdd,RoleEdit"/>
+		<role name="UserAdmin" permissions="UserAdd,UserEdit,PersonAdd,PersonEdit,RoleAdd,RoleEdit,DPageInstEdit"/>
 	</roles>
 
 	<dPages>

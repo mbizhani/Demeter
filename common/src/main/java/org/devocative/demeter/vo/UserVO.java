@@ -17,7 +17,7 @@ public class UserVO implements Serializable {
 	private boolean root = false;
 	private boolean admin = false;
 	private EAuthMechanism authMechanism;
-	private Set<Role> roles = new HashSet<>();
+	private Set<Role> roles = new TreeSet<>();
 	private Set<String> permissions = new HashSet<>();
 	private Set<String> denials = new HashSet<>();
 

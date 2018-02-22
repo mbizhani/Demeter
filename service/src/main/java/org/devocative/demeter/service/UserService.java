@@ -92,6 +92,7 @@ public class UserService implements IUserService {
 			.addFrom(Role.class, "ent")
 			.addWhere("and ent.roleMode <> :mode")
 			.addParam("mode", ERoleMode.DYNAMIC)
+			.setOrderBy("ent.name")
 			.list();
 	}
 
