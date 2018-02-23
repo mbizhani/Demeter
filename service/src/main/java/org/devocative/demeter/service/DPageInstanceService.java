@@ -87,7 +87,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	@Override
 	public List<Role> getRolesList() {
-		return persistorService.list(Role.class);
+		return persistorService.list("from Role ent order by ent.name");
 	}
 
 	@Override

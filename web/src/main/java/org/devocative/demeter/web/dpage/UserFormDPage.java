@@ -15,8 +15,8 @@ import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.demeter.web.component.DPasswordStrengthValidator;
 import org.devocative.wickomp.form.*;
-import org.devocative.wickomp.form.validator.WAsciiIdentifierValidator;
 import org.devocative.wickomp.form.validator.WEqualInputValidator;
+import org.devocative.wickomp.form.validator.WPatternValidator;
 import org.devocative.wickomp.html.WFloatTable;
 import org.devocative.wickomp.html.window.WModalWindow;
 
@@ -82,8 +82,8 @@ public class UserFormDPage extends DPage {
 		floatTable.add(new WTextInput("username")
 			.setRequired(true)
 			.setLabel(new ResourceModel("User.username"))
-				.add(new WAsciiIdentifierValidator())
-		);
+			.add(new WPatternValidator("^[A-Za-z]+?[A-Za-z0-9.]*?$", "User.username.invalid.format")));
+		//NOTE: since in LDAP, '.' is acceptable in username, the above pattern must be used (not WAsciiIdentifierValidator)
 
 		password = new WTextInput("password", new Model<>(), true);
 		password
