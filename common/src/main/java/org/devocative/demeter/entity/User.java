@@ -72,7 +72,8 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)},
 		foreignKey = @ForeignKey(name = "userRole2user"),
-		inverseForeignKey = @ForeignKey(name = "userRole2role")
+		inverseForeignKey = @ForeignKey(name = "userRole2role"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtUserRole", columnNames = {"f_user", "f_role"})}
 	)
 	private List<Role> roles;
 
@@ -82,7 +83,8 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
 		foreignKey = @ForeignKey(name = "prvlgUserPerm2user"),
-		inverseForeignKey = @ForeignKey(name = "prvlgUserPerm2prvlg")
+		inverseForeignKey = @ForeignKey(name = "prvlgUserPerm2prvlg"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtPrvlgUserPerm", columnNames = {"f_user", "f_prvlg"})}
 	)
 	private List<Privilege> permissions;
 
@@ -92,7 +94,8 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		joinColumns = {@JoinColumn(name = "f_user", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
 		foreignKey = @ForeignKey(name = "prvlgUserDeny2user"),
-		inverseForeignKey = @ForeignKey(name = "prvlgUserDeny2prvlg")
+		inverseForeignKey = @ForeignKey(name = "prvlgUserDeny2prvlg"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtPrvlgUserDeny", columnNames = {"f_user", "f_prvlg"})}
 	)
 	private List<Privilege> denials;
 

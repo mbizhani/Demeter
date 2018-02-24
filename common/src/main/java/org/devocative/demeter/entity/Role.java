@@ -40,7 +40,8 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		joinColumns = {@JoinColumn(name = "f_role", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
 		foreignKey = @ForeignKey(name = "prvlgRolePerm2role"),
-		inverseForeignKey = @ForeignKey(name = "prvlgRolePerm2prvlg")
+		inverseForeignKey = @ForeignKey(name = "prvlgRolePerm2prvlg"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtPrvlgRolePerm", columnNames = {"f_role", "f_prvlg"})}
 	)
 	private List<Privilege> permissions;
 
@@ -50,7 +51,8 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		joinColumns = {@JoinColumn(name = "f_role", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_prvlg", nullable = false)},
 		foreignKey = @ForeignKey(name = "prvlgRoleDeny2role"),
-		inverseForeignKey = @ForeignKey(name = "prvlgRoleDeny2prvlg")
+		inverseForeignKey = @ForeignKey(name = "prvlgRoleDeny2prvlg"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtPrvlgRoleDeny", columnNames = {"f_role", "f_prvlg"})}
 	)
 	private List<Privilege> denials;
 
@@ -232,7 +234,7 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	public String toString() {
 		String str = getName();
 
-		if(ERoleMode.MAIN.equals(getRoleMode())) {
+		if (ERoleMode.MAIN.equals(getRoleMode())) {
 			str += "*";
 		}
 		return str;

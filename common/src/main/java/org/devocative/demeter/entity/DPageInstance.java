@@ -50,7 +50,8 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 		joinColumns = {@JoinColumn(name = "f_page_inst", nullable = false)},
 		inverseJoinColumns = {@JoinColumn(name = "f_role", nullable = false)},
 		foreignKey = @ForeignKey(name = "pageInstRole2pageInst"),
-		inverseForeignKey = @ForeignKey(name = "pageInstRole2role")
+		inverseForeignKey = @ForeignKey(name = "pageInstRole2role"),
+		uniqueConstraints = {@UniqueConstraint(name = "uk_dmt_mtPageInstRole", columnNames = {"f_page_inst", "f_role"})}
 	)
 	private List<Role> roles;
 
