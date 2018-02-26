@@ -50,8 +50,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		return persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInstance.class, "ent")
-			.addWhere("and ent.uri = :uri")
-			.addParam("uri", uri)
+			.addWhere("and ent.uri = :uri", "uri", uri)
 			.object();
 	}
 
@@ -146,8 +145,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		pageInstCache.setMissedHitHandler(key -> persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInstance.class, "ent")
-			.addWhere("and ent.uri = :uri")
-			.addParam("uri", key)
+			.addWhere("and ent.uri = :uri", "uri", key)
 			.object());
 
 		uriCache = cacheService.create("DMT_D_PAGE_URI", totalDPageSize * 2);
@@ -155,8 +153,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 			DPageInfo pageInfo = persistorService
 				.createQueryBuilder()
 				.addFrom(DPageInfo.class, "ent")
-				.addWhere("and (ent.type = :type or ent.typeAlt = :type)")
-				.addParam("type", key.getName())
+				.addWhere("and (ent.type = :type or ent.typeAlt = :type)", "type", key.getName())
 				.object();
 
 			if (pageInfo != null) {
@@ -235,8 +232,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		if (roles != null && !roles.isEmpty()) {
 			queryBuilder
-				.addWhere("and (rl in (:roles) or rl.id is null)")
-				.addParam("roles", roles);
+				.addWhere("and (rl in (:roles) or rl.id is null)", "roles", roles);
 		} else {
 			queryBuilder.addWhere("and rl.id is null");
 		}
@@ -295,9 +291,8 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		DPageInstance pageInstance = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInstance.class, "ent")
-			.addWhere("and ent.pageInfo.id = :pageId")
+			.addWhere("and ent.pageInfo.id = :pageId", "pageId", pageInfo.getId())
 			.addWhere("and ent.refId is null")
-			.addParam("pageId", pageInfo.getId())
 			.object();
 
 		if (pageInstance == null) {

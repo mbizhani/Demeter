@@ -9,6 +9,7 @@ import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IPersonService;
 import org.devocative.demeter.iservice.IUserService;
+import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.UserInputVO;
 import org.devocative.demeter.vo.UserVO;
@@ -48,7 +49,11 @@ public class UserService implements IUserService {
 
 	@Override
 	public User load(Long id) {
-		return persistorService.get(User.class, id);
+		return persistorService.createQueryBuilder()
+			.addFrom(User.class, "ent")
+			.addJoin("prs", "ent.person", EJoinMode.LeftFetch)
+			.addWhere("and ent.id = :id", "id", id)
+			.object();
 	}
 
 	@Override
@@ -56,8 +61,8 @@ public class UserService implements IUserService {
 		return persistorService
 			.createQueryBuilder()
 			.addFrom(User.class, "ent")
-			.addWhere("and ent.username = :username")
-			.addParam("username", username)
+			.addJoin("prs", "ent.person", EJoinMode.LeftFetch)
+			.addWhere("and ent.username = :username", "username", username)
 			.object();
 	}
 

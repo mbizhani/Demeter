@@ -105,6 +105,11 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 	}
 
 	@Override
+	public IQueryBuilder addWhere(String whereClause, String paramName, Object paramValue) {
+		return addWhere(whereClause).addParam(paramName, paramValue);
+	}
+
+	@Override
 	public IQueryBuilder addJoin(String alias, String joinExpr) {
 		return addJoin(alias, joinExpr, EJoinMode.Inner);
 	}

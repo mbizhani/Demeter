@@ -26,6 +26,8 @@ public interface IQueryBuilder {
 
 	IQueryBuilder addWhere(String whereClause);
 
+	IQueryBuilder addWhere(String whereClause, String paramName, Object paramValue);
+
 	IQueryBuilder addJoin(String alias, String joinExpr);
 
 	IQueryBuilder addJoin(String alias, String joinExpr, EJoinMode joinMode);
