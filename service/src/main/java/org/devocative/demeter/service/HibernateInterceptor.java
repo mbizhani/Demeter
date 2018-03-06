@@ -43,11 +43,6 @@ class HibernateInterceptor extends EmptyInterceptor {
 			result = true;
 		}
 
-		if (entity instanceof IModificationDate || entity instanceof IModifierUser) {
-			setModifiedValues(entity, id, state, propertyNames);
-			result = true;
-		}
-
 		/*
 		TODO
 		if (entity instanceof IRowMode && entity instanceof IRoleRowAccess) {
