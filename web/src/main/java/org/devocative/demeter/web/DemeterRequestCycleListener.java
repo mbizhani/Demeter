@@ -86,6 +86,10 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 
 	@Override
 	public IRequestHandler onException(RequestCycle cycle, Exception ex) {
+		logger.error("---> DemeterRequestCycleListener.onException", ex);
+
+		onEndRequest(cycle);
+
 		//TODO an Exception Page
 		return super.onException(cycle, ex);
 	}

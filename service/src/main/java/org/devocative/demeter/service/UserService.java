@@ -260,7 +260,5 @@ public class UserService implements IUserService {
 			.addParam("lld", new Date())
 			.addParam("username", username)
 			.update();
-
-		persistorService.commitOrRollback();
 	}
 }

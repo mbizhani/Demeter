@@ -45,7 +45,6 @@ public class RowModeChangePanel extends DPanel {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
 				Object id = persistorService.updateFields(row, "rowMode");
-				persistorService.commitOrRollback();
 
 				logger.warn("RowModChangePanel: entity [{}] with id [{}] has changed from [{}] to [{}]",
 					row.getClass().getName(), id, old, row.getRowMode());

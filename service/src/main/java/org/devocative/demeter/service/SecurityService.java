@@ -56,6 +56,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	public void init() {
 		storePrivilegeKeys();
 
+		persistorService.startTrx();
+
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, null, "system", EAuthMechanism.DATABASE)
 				.setStatus(EUserStatus.DISABLED)
@@ -267,6 +269,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	// ------------------------------
 
 	private void storePrivilegeKeys() {
+		persistorService.startTrx();
+
 		Collection<DModuleInfoVO> xModules = demeterCoreService.getModules();
 		for (DModuleInfoVO xModule : xModules) {
 			try {
@@ -318,6 +322,8 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	}
 
 	private void storeAdditionalRoles() {
+		persistorService.startTrx();
+
 		Collection<DModuleInfoVO> dModules = demeterCoreService.getModules();
 
 		for (DModuleInfoVO dModule : dModules) {

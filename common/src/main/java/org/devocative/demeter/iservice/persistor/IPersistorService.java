@@ -11,6 +11,10 @@ import java.util.List;
 public interface IPersistorService extends IApplicationLifecycle, IRequestLifecycle {
 	void setInitData(List<Class> entities, String prefix);
 
+	void startTrx();
+
+	void startTrx(boolean forceNew);
+
 	void commitOrRollback();
 
 	void rollback();

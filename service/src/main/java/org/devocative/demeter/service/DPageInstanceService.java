@@ -114,6 +114,8 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	@Override
 	public void init() {
+		persistorService.startTrx();
+
 		int totalDPageSize = 0;
 		List<Long> validIds = new ArrayList<>();
 		List<DModuleInfoVO> modules = demeterCoreService.getModules();

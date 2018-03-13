@@ -2,6 +2,7 @@ package org.devocative.demeter.service;
 
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
+import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.filter.CollectionUtil;
 import org.devocative.demeter.filter.IFilterEvent;
@@ -10,6 +11,7 @@ import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,18 +202,26 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	@Override
 	public int update() {
-		Session session = persistorService.getCurrentSession();
-		persistorService.checkTransaction(session);
+		int result = 0;
+		try {
+			Session session = persistorService.getCurrentSession();
+			boolean chk = persistorService.checkTransaction(session);
 
-		buildQuery();
-		applyParams();
+			buildQuery();
+			applyParams();
 
-		if (lockOptions != null) {
-			query.setLockOptions(lockOptions);
+			if (lockOptions != null) {
+				query.setLockOptions(lockOptions);
+			}
+
+			result = query.executeUpdate();
+			session.flush();
+			persistorService.processTransaction(chk);
+		} catch (ConstraintViolationException e) {
+			persistorService.rollback();
+			throw new DBConstraintViolationException(persistorService.getConstraintName(e));
 		}
 
-		int result = query.executeUpdate();
-		session.flush();
 		return result;
 	}
 

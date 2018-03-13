@@ -58,6 +58,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			return;
 		}
 
+		persistorService.startTrx();
+
 		List<Long> validIds = new ArrayList<>();
 		List<DModuleInfoVO> modules = demeterCoreService.getModules();
 		for (DModuleInfoVO xModule : modules) {

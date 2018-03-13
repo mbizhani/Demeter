@@ -114,7 +114,6 @@ public class RoleService implements IRoleService {
 		role.setRoleMode(roleMode);
 		role.setRowMode(rowMode);
 		saveOrUpdate(role);
-		//persistorService.commitOrRollback();
 
 		return role;
 	}

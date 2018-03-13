@@ -42,6 +42,8 @@ public class TestCore {
 
 	@Test
 	public void test01() {
+		persistorService.startTrx();
+
 		for (int i = 1; i <= 3; i++) {
 			Person person = new Person();
 			person.setFirstName("John" + i);

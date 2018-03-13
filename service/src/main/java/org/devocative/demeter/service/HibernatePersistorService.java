@@ -3,6 +3,7 @@ package org.devocative.demeter.service;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.demeter.DBConstraintViolationException;
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.entity.*;
@@ -38,7 +39,9 @@ import java.util.regex.Pattern;
 
 public class HibernatePersistorService implements IPersistorService {
 	private static final Logger logger = LoggerFactory.getLogger(HibernatePersistorService.class);
+
 	private static final ThreadLocal<Session> currentSession = new ThreadLocal<>();
+	private static final ThreadLocal<Transaction> currentLongTermTrx = new ThreadLocal<>();
 
 	private static final Pattern HSQLDB_CONSTRAINT_NAME = Pattern.compile("unique constraint or index violation; (.+?) table:");
 
@@ -145,20 +148,48 @@ public class HibernatePersistorService implements IPersistorService {
 	}
 
 	@Override
+	public void startTrx() {
+		startTrx(true);
+	}
+
+	@Override
+	public void startTrx(boolean forceNew) {
+		Session session = getCurrentSession();
+
+		if (session == null || !session.isOpen()) {
+			throw new DSystemException("Starting Long-Term Trx While No Session!");
+		}
+
+		Transaction trx = session.getTransaction();
+		if (!trx.isActive()) {
+			trx = session.beginTransaction();
+			currentLongTermTrx.set(trx);
+		} else if (forceNew) {
+			throw new DSystemException("Already Active While Expecting New Trx in Long-Term");
+		}
+	}
+
+	@Override
 	public void commitOrRollback() {
 		Session session = getCurrentSession();
 
-		if (session != null && session.isOpen()) {
-			Transaction trx = session.getTransaction();
-			try {
-				if (trx.isActive()) {
-					trx.commit();
-				}
-			} catch (Exception e) {
-				logger.error("Hibernate commitOrRollback(): ", e);
-				trx.rollback();
-				throw e;
-			}
+		if (session == null || !session.isOpen()) {
+			throw new DSystemException("Trying to Commit/Rollback Long-Term Trx While No Session!");
+		}
+
+		Transaction trx = currentLongTermTrx.get();
+		if (trx == null || !trx.isActive()) {
+			throw new DSystemException("No Long-Term Transaction to Commit/Rollback");
+		}
+
+		try {
+			trx.commit();
+		} catch (Exception e) {
+			logger.error("Hibernate commitOrRollback(): ", e);
+			trx.rollback();
+			throw e;
+		} finally {
+			currentLongTermTrx.remove();
 		}
 	}
 
@@ -168,7 +199,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 		if (session != null && session.isOpen()) {
 			Transaction trx = session.getTransaction();
-			if (trx != null && trx.isActive()) {
+			if (trx.isActive()) {
 				trx.rollback();
 			}
 		}
@@ -176,14 +207,27 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void endSession() {
+		Session session = currentSession.get();
+
 		try {
-			commitOrRollback();
+			if (session != null && session.isOpen()) {
+				Transaction trx = session.getTransaction();
+
+				if (trx.isActive()) {
+					logger.error("----------------------------------");
+					logger.error(">>> Open Transaction Before Close!");
+					logger.error("----------------------------------");
+
+					trx.rollback();
+				}
+			}
 		} finally {
-			Session session = currentSession.get();
+			currentLongTermTrx.remove();
+			currentSession.remove();
+
 			if (session != null && session.isOpen()) {
 				session.close();
 			}
-			currentSession.remove();
 		}
 	}
 
@@ -195,9 +239,11 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
+
+			boolean chk = checkTransaction(session);
 			session.saveOrUpdate(obj);
 			session.flush();
+			processTransaction(chk);
 		} catch (ConstraintViolationException e) {
 			rollback();
 			info.reset();
@@ -211,11 +257,12 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
 
-			Serializable result;
-			result = session.save(obj);
+			boolean chk = checkTransaction(session);
+			Serializable result = session.save(obj);
 			session.flush();
+			processTransaction(chk);
+
 			return result;
 		} catch (ConstraintViolationException e) {
 			rollback();
@@ -229,9 +276,10 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
+			boolean chk = checkTransaction(session);
 			session.update(obj);
 			session.flush();
+			processTransaction(chk);
 		} catch (ConstraintViolationException e) {
 			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
@@ -260,15 +308,21 @@ public class HibernatePersistorService implements IPersistorService {
 
 			logger.debug("updateFields query: {}", builder.toString());
 
-			Session session = getCurrentSession();
-			checkTransaction(session);
-			Query query = session.createQuery(builder.toString());
-			for (int i = 0; i < fields.length; i++) {
-				query.setParameter("f" + i, ObjectUtil.getPropertyValue(obj, fields[i], false));
+			try {
+				Session session = getCurrentSession();
+				boolean chk = checkTransaction(session);
+				Query query = session.createQuery(builder.toString());
+				for (int i = 0; i < fields.length; i++) {
+					query.setParameter("f" + i, ObjectUtil.getPropertyValue(obj, fields[i], false));
+				}
+				query.setParameter("id", idPropValue);
+				query.executeUpdate();
+				session.flush();
+				processTransaction(chk);
+			} catch (ConstraintViolationException e) {
+				rollback();
+				throw new DBConstraintViolationException(getConstraintName(e));
 			}
-			query.setParameter("id", idPropValue);
-			query.executeUpdate();
-			session.flush();
 
 			return idPropValue;
 		} else {
@@ -282,9 +336,10 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
+			boolean chk = checkTransaction(session);
 			session.persist(obj);
 			session.flush();
+			processTransaction(chk);
 		} catch (ConstraintViolationException e) {
 			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
@@ -297,12 +352,13 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
+			boolean chk = checkTransaction(session);
 
 			T result;
 			result = (T) session.merge(obj);
 			session.flush();
-			session.setFlushMode(FlushMode.ALWAYS);
+			processTransaction(chk);
+
 			return result;
 		} catch (ConstraintViolationException e) {
 			rollback();
@@ -331,19 +387,32 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void delete(Class entity, Serializable id) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		String q = String.format("delete from %s ent where ent.id=:entId", entity.getName());
-		Query query = session.createQuery(q);
-		query.setParameter("entId", id);
-		query.executeUpdate();
+		try {
+			Session session = getCurrentSession();
+			boolean chk = checkTransaction(session);
+			String q = String.format("delete from %s ent where ent.id=:entId", entity.getName());
+			Query query = session.createQuery(q);
+			query.setParameter("entId", id);
+			query.executeUpdate();
+			session.flush();
+			processTransaction(chk);
+		} catch (ConstraintViolationException e) {
+			rollback();
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
 	public void delete(Object obj) {
-		Session session = getCurrentSession();
-		checkTransaction(session);
-		session.delete(obj);
+		try {
+			Session session = getCurrentSession();
+			boolean chk = checkTransaction(session);
+			session.delete(obj);
+			processTransaction(chk);
+		} catch (ConstraintViolationException e) {
+			rollback();
+			throw new DBConstraintViolationException(getConstraintName(e));
+		}
 	}
 
 	@Override
@@ -371,10 +440,12 @@ public class HibernatePersistorService implements IPersistorService {
 	public void executeUpdate(String simpleQuery) {
 		try {
 			Session session = getCurrentSession();
-			checkTransaction(session);
+			boolean chk = checkTransaction(session);
 			session.createQuery(simpleQuery).executeUpdate();
 			session.flush();
+			processTransaction(chk);
 		} catch (ConstraintViolationException e) {
+			rollback();
 			throw new DBConstraintViolationException(getConstraintName(e));
 		}
 	}
@@ -443,11 +514,38 @@ public class HibernatePersistorService implements IPersistorService {
 		return session;
 	}
 
-	void checkTransaction(Session session) {
+	boolean checkTransaction(Session session) {
 		Transaction trx = session.getTransaction();
-		if (trx == null || !trx.isActive()) {
+		if (!trx.isActive()) {
 			session.beginTransaction();
+			return true;
 		}
+		return false;
+	}
+
+	void processTransaction(boolean check) {
+		if (check) {
+			Session session = getCurrentSession();
+			if (session != null && session.isOpen()) {
+				Transaction trx = session.getTransaction();
+				if (trx.isActive()) {
+					trx.commit();
+				}
+			}
+		}
+	}
+
+	String getConstraintName(ConstraintViolationException e) {
+		if (e.getConstraintName() != null) {
+			return e.getConstraintName();
+		} else {
+			Matcher matcher = HSQLDB_CONSTRAINT_NAME.matcher(e.getSQLException().getMessage());
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
+		}
+
+		return null;
 	}
 
 	//----------------------------- PRIVATE METHODS
@@ -479,19 +577,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
-	}
-
-	private String getConstraintName(ConstraintViolationException e) {
-		if (e.getConstraintName() != null) {
-			return e.getConstraintName();
-		} else {
-			Matcher matcher = HSQLDB_CONSTRAINT_NAME.matcher(e.getSQLException().getMessage());
-			if (matcher.find()) {
-				return matcher.group(1);
-			}
-		}
-
-		return null;
 	}
 
 	private void onBeforeInsertOrUpdate(Object entity) {
