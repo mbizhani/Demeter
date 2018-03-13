@@ -34,6 +34,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +42,7 @@ public class HibernatePersistorService implements IPersistorService {
 	private static final Logger logger = LoggerFactory.getLogger(HibernatePersistorService.class);
 
 	private static final ThreadLocal<Session> currentSession = new ThreadLocal<>();
-	private static final ThreadLocal<Transaction> currentLongTermTrx = new ThreadLocal<>();
+	private static final ThreadLocal<AtomicInteger> currentLongTermTrx = new ThreadLocal<>();
 
 	private static final Pattern HSQLDB_CONSTRAINT_NAME = Pattern.compile("unique constraint or index violation; (.+?) table:");
 
@@ -149,7 +150,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void startTrx() {
-		startTrx(true);
+		startTrx(false);
 	}
 
 	@Override
@@ -160,10 +161,14 @@ public class HibernatePersistorService implements IPersistorService {
 			throw new DSystemException("Starting Long-Term Trx While No Session!");
 		}
 
+		if (currentLongTermTrx.get() == null) {
+			currentLongTermTrx.set(new AtomicInteger(0));
+		}
+		currentLongTermTrx.get().incrementAndGet();
+
 		Transaction trx = session.getTransaction();
 		if (!trx.isActive()) {
-			trx = session.beginTransaction();
-			currentLongTermTrx.set(trx);
+			session.beginTransaction();
 		} else if (forceNew) {
 			throw new DSystemException("Already Active While Expecting New Trx in Long-Term");
 		}
@@ -177,19 +182,20 @@ public class HibernatePersistorService implements IPersistorService {
 			throw new DSystemException("Trying to Commit/Rollback Long-Term Trx While No Session!");
 		}
 
-		Transaction trx = currentLongTermTrx.get();
+		Transaction trx = session.getTransaction();
 		if (trx == null || !trx.isActive()) {
 			throw new DSystemException("No Long-Term Transaction to Commit/Rollback");
 		}
 
+		AtomicInteger trxCounter = currentLongTermTrx.get();
 		try {
-			trx.commit();
+			if (trxCounter.decrementAndGet() == 0) {
+				trx.commit();
+			}
 		} catch (Exception e) {
 			logger.error("Hibernate commitOrRollback(): ", e);
 			trx.rollback();
 			throw e;
-		} finally {
-			currentLongTermTrx.remove();
 		}
 	}
 
@@ -208,6 +214,7 @@ public class HibernatePersistorService implements IPersistorService {
 	@Override
 	public void endSession() {
 		Session session = currentSession.get();
+		int count = currentLongTermTrx.get() != null ? currentLongTermTrx.get().get() : 0;
 
 		try {
 			if (session != null && session.isOpen()) {
@@ -216,9 +223,18 @@ public class HibernatePersistorService implements IPersistorService {
 				if (trx.isActive()) {
 					logger.error("----------------------------------");
 					logger.error(">>> Open Transaction Before Close!");
+					if (count > 0) {
+						logger.error(">>>>> Long-Term Trx Running While End Session: Count = {}", count);
+					}
 					logger.error("----------------------------------");
 
 					trx.rollback();
+
+					if (count > 0) {
+						throw new DSystemException("Long-Term Trx Running While End Session: count = " + count);
+					}
+				} else if (count > 0) {
+					throw new DSystemException("Invalid Long-Term Trx State: No Active Trx, But Counter > 0");
 				}
 			}
 		} finally {
