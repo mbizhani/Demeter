@@ -22,6 +22,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service("dmtSecurityService")
@@ -52,11 +53,12 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 
 	// ------------------------------ IApplicationLifecycle METHODS
 
+	@Transactional
 	@Override
 	public void init() {
 		storePrivilegeKeys();
 
-		persistorService.startTrx();
+		//persistorService.startTrx();
 
 		system = userService.createOrUpdateUser(
 			new UserInputVO("system", null, null, "system", EAuthMechanism.DATABASE)
@@ -98,7 +100,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 		roleService.createOrUpdate("AuthByLDAP", ERowMode.ROOT, ERoleMode.DYNAMIC);
 		roleService.createOrUpdate("AuthByOther", ERowMode.ROOT, ERoleMode.DYNAMIC);
 
-		persistorService.commitOrRollback();
+		//persistorService.commitOrRollback();
 
 		storeAdditionalRoles();
 	}
@@ -269,7 +271,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	// ------------------------------
 
 	private void storePrivilegeKeys() {
-		persistorService.startTrx();
+		//persistorService.startTrx();
 
 		Collection<DModuleInfoVO> xModules = demeterCoreService.getModules();
 		for (DModuleInfoVO xModule : xModules) {
@@ -294,7 +296,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			}
 		}
 
-		persistorService.commitOrRollback();
+		//persistorService.commitOrRollback();
 
 		if (logger.isDebugEnabled()) {
 			List<Privilege> list = persistorService.list(Privilege.class);
@@ -322,7 +324,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 	}
 
 	private void storeAdditionalRoles() {
-		persistorService.startTrx();
+		//persistorService.startTrx();
 
 		Collection<DModuleInfoVO> dModules = demeterCoreService.getModules();
 
@@ -369,7 +371,7 @@ public class SecurityService implements ISecurityService, IApplicationLifecycle,
 			}
 		}
 
-		persistorService.commitOrRollback();
+		//persistorService.commitOrRollback();
 	}
 
 	// ---------------

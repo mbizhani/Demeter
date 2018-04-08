@@ -55,12 +55,12 @@
 		<jetty.context>/ctx</jetty.context>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<d.adroit.ver>1.6-SNAPSHOT</d.adroit.ver>
+		<d.adroit.ver>1.6</d.adroit.ver>
 		<d.wickomp.ver>2.11-SNAPSHOT</d.wickomp.ver>
 		<d.diadem.ver>1.2</d.diadem.ver>
 
 		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
-		<d.spring.ver>4.3.14.RELEASE</d.spring.ver>
+		<d.spring.ver>5.0.5.RELEASE</d.spring.ver>
 
 		<d.slf4j.ver>1.7.25</d.slf4j.ver>
 		<d.servlet.ver>3.1.0</d.servlet.ver>

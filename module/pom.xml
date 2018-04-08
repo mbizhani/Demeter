@@ -100,11 +100,11 @@
 			</plugin>
 
 			<!-- Demeter Helper Plugin -->
-			<plugin>
+			<!--<plugin>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-maven-plugin</artifactId>
 				<version>1.1-SNAPSHOT</version>
-			</plugin>
+			</plugin>-->
 
 			<!-- Create JAR of Test Classes -->
 			<plugin>
@@ -137,8 +137,8 @@
 
 				<dependency>
 					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc6</artifactId>
-					<version>11.2.0.4.0</version>
+					<artifactId>ojdbc7</artifactId>
+					<version>12.1.0.2</version>
 					<scope>test</scope>
 				</dependency>
 

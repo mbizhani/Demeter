@@ -1,4 +1,4 @@
-package org.devocative.demeter.service;
+package org.devocative.demeter.service.hibernate;
 
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
@@ -22,14 +22,15 @@ import java.util.*;
 public class HibernateQueryBuilder implements IQueryBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(HibernateQueryBuilder.class);
 
-	private StringBuilder selectBuilder = new StringBuilder();
-	private StringBuilder whereClauseBuilder = new StringBuilder();
-	private Map<String, Object> params = new HashMap<>();
-	private Map<String, IQueryBuilder> subQueries = new HashMap<>();
-	private Map<String, Integer> subQueriesParamIndex = new HashMap<>();
+	private final StringBuilder selectBuilder = new StringBuilder();
+	private final StringBuilder whereClauseBuilder = new StringBuilder();
+	private final Map<String, Object> params = new HashMap<>();
+	private final Map<String, IQueryBuilder> subQueries = new HashMap<>();
+	private final Map<String, Integer> subQueriesParamIndex = new HashMap<>();
+	private final Map<String, String> join = new LinkedHashMap<>(); // alias -> join expression
+	private final Map<String, String> from = new HashMap<>(); // alias -> entity name
+
 	private int subQueriesIndex = 1;
-	private Map<String, String> join = new LinkedHashMap<>(); // alias -> join expression
-	private Map<String, String> from = new HashMap<>(); // alias -> entity name
 	private String orderBy;
 	private String groupBy;
 	private String having;
@@ -38,7 +39,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 	private Query query;
 	private LockOptions lockOptions;
 
-	private HibernatePersistorService persistorService;
+	private final HibernatePersistorService persistorService;
 
 	// ------------------------------
 
@@ -202,10 +203,13 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	@Override
 	public int update() {
-		int result = 0;
+		final int result;
+
+		persistorService.assertActiveTrx();
+
 		try {
-			Session session = persistorService.getCurrentSession();
-			boolean chk = persistorService.checkTransaction(session);
+			final Session session = persistorService.getCurrentSession();
+			//boolean chk = persistorService.checkTransaction(session);
 
 			buildQuery();
 			applyParams();
@@ -216,9 +220,9 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 			result = query.executeUpdate();
 			session.flush();
-			persistorService.processTransaction(chk);
+			//persistorService.processTransaction(chk);
 		} catch (ConstraintViolationException e) {
-			persistorService.rollback();
+			//persistorService.rollback();
 			throw new DBConstraintViolationException(persistorService.getConstraintName(e));
 		}
 

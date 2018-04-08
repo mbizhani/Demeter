@@ -15,6 +15,8 @@ public interface IPersistorService extends IApplicationLifecycle, IRequestLifecy
 
 	void startTrx(boolean forceNew);
 
+	void assertActiveTrx();
+
 	void commitOrRollback();
 
 	void rollback();

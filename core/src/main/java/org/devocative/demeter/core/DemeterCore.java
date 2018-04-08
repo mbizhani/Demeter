@@ -489,7 +489,7 @@ public class DemeterCore {
 						ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript), e);
 				}
 			} else {
-				logger.error("Script file not found: {}", ConfigUtil.getString(DemeterConfigKey.StartupGroovyScript));
+				logger.error("Script file not found: {}", file.getAbsolutePath());
 			}
 		}
 

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -34,8 +35,11 @@ public class UserService implements IUserService {
 
 	// ------------------------------
 
+	@Transactional
 	@Override
 	public void saveOrUpdate(User entity) {
+		persistorService.assertActiveTrx();
+
 		personService.saveOrUpdate(entity.getPerson());
 		entity.setId(entity.getPerson().getId());
 		try {
@@ -113,6 +117,7 @@ public class UserService implements IUserService {
 
 	// ==============================
 
+	@Transactional
 	@Override
 	public void saveOrUpdate(User user, String password) {
 		user.getPerson().setHasUser(true);
@@ -122,9 +127,9 @@ public class UserService implements IUserService {
 		}
 
 		saveOrUpdate(user);
-		//persistorService.commitOrRollback();
 	}
 
+	@Transactional
 	@Override
 	public void updateUser(User user, String password, String oldPassword) {
 		String old = StringEncryptorUtil.hash(oldPassword);
@@ -137,6 +142,7 @@ public class UserService implements IUserService {
 		saveOrUpdate(user);
 	}
 
+	@Transactional
 	@Override
 	public UserVO createOrUpdateUser(UserInputVO userInputVO, User user, boolean forceUpdate) {
 		if (user == null) {
@@ -253,6 +259,7 @@ public class UserService implements IUserService {
 		return userVO;
 	}
 
+	@Transactional
 	@Override
 	public void updateLastLoginDate(String username) {
 		persistorService.createQueryBuilder()

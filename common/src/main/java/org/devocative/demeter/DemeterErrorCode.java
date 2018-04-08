@@ -9,6 +9,14 @@ public enum DemeterErrorCode implements DErrorCode {
 	UserDisabled("User is disabled"),
 	DBConstraintViolation("DB Constraint Violated"),
 
+	TrxInvalidPropagation("Invalid trx propagation"),
+	TrxAlreadyActiveNoForce("Can'nt force new trx on active trx"),
+	TrxNotActive("No active trx"),
+	TrxInvalidLevel("Invalid Trx Level"),
+	TrxNoObject("No Trx Instance"),
+	TrxInvalidActive("Invalid Active Trx"),
+	TrxPropagationNotSupported("Trx Propagation Not Supported"),
+
 	DuplicateUsername("Duplicate Username"),
 	DuplicateRoleName("Duplicate Role Name"),
 	NoMainRoleForUser("Current user must have at least one main role for this entity");

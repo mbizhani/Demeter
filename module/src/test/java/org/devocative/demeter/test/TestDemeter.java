@@ -112,7 +112,7 @@ public class TestDemeter {
 
 		Assert.assertEquals("Check current user as 'guest': ", "guest", securityService.getCurrentUser().getUsername());
 
-		LoginDPage loginDPage = new LoginDPage("dPage", Collections.<String>emptyList());
+		LoginDPage loginDPage = new LoginDPage("dPage", Collections.emptyList());
 		tester.startComponentInPage(loginDPage);
 
 		FormTester form = tester.newFormTester("dPage:form");
@@ -181,10 +181,11 @@ public class TestDemeter {
 			userService.saveOrUpdate(user); //Exception should be raised!
 			Assert.assertEquals("DemeterException.DuplicateUsername should be thrown!", 1, 2);
 		} catch (DemeterException e) {
-			Assert.assertTrue("DemeterException.DuplicateUsername catched: ", e.getErrorCode().equals(DemeterErrorCode.DuplicateUsername));
+			Assert.assertEquals("DemeterException.DuplicateUsername caught: ", e.getErrorCode(), DemeterErrorCode.DuplicateUsername);
 		}
 
 		Assert.assertEquals("Check total number of users: ", 3, userService.list().size());
+		Assert.assertEquals("Check total number of persons: ", 3, persistorService.list(Person.class).size());
 
 
 		Role role = new Role();
@@ -193,9 +194,9 @@ public class TestDemeter {
 		IRoleService roleService = DemeterCore.get().getApplicationContext().getBean(IRoleService.class);
 		try {
 			roleService.saveOrUpdate(role); //Exception should be raised!
-			Assert.assertTrue("DemeterException.DuplicateRoleName should be thrown!", false);
+			Assert.fail("DemeterException.DuplicateRoleName should be thrown!");
 		} catch (DemeterException e) {
-			Assert.assertTrue("DemeterException.DuplicateRoleName catched", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+			Assert.assertEquals("DemeterException.DuplicateRoleName caught", e.getErrorCode(), DemeterErrorCode.DuplicateRoleName);
 		}
 		persistorService.endSession();
 
@@ -219,7 +220,7 @@ public class TestDemeter {
 				roleService.saveOrUpdate(rTh);
 				aint.incrementAndGet();
 			} catch (DemeterException e) {
-				Assert.assertTrue("Check role name duplication prevention in thread", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+				Assert.assertEquals("Check role name duplication prevention in thread", e.getErrorCode(), DemeterErrorCode.DuplicateRoleName);
 			}
 
 			persistorService.endSession();
@@ -230,7 +231,7 @@ public class TestDemeter {
 			roleService.saveOrUpdate(rMain);
 			aint.incrementAndGet();
 		} catch (DemeterException e) {
-			Assert.assertTrue("Check role name duplication prevention", e.getErrorCode().equals(DemeterErrorCode.DuplicateRoleName));
+			Assert.assertEquals("Check role name duplication prevention", e.getErrorCode(), DemeterErrorCode.DuplicateRoleName);
 		}
 		persistorService.endSession();
 

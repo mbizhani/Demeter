@@ -1,4 +1,4 @@
-package org.devocative.demeter.service;
+package org.devocative.demeter.service.hibernate;
 
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.ISecurityService;
