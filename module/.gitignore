@@ -4,5 +4,6 @@ logs/
 src/test/webapp/fonts
 src/test/webapp/styles
 src/test/resources/config_oracle.properties
+src/test/resources/sql
 
 *.iml
