@@ -277,207 +277,207 @@ CREATE TABLE t_dmt_user (
 -----------------------------
 
 ALTER TABLE t_dmt_d_page
-ADD CONSTRAINT uk_dmt_page_type UNIQUE (c_type);
+	ADD CONSTRAINT uk_dmt_page_type UNIQUE (c_type);
 
 ALTER TABLE t_dmt_d_page
-ADD CONSTRAINT uk_dmt_page_baseuri UNIQUE (c_base_uri);
+	ADD CONSTRAINT uk_dmt_page_baseuri UNIQUE (c_base_uri);
 
 ALTER TABLE t_dmt_d_page_inst
-ADD CONSTRAINT uk_dmt_pageinst_uri UNIQUE (c_uri);
+	ADD CONSTRAINT uk_dmt_pageinst_uri UNIQUE (c_uri);
 
 ALTER TABLE t_dmt_d_task
-ADD CONSTRAINT uk_dmt_task_type UNIQUE (c_type);
+	ADD CONSTRAINT uk_dmt_task_type UNIQUE (c_type);
 
 ALTER TABLE t_dmt_file_store
-ADD CONSTRAINT uk_dmt_filestore_fileid UNIQUE (c_file_id);
+	ADD CONSTRAINT uk_dmt_filestore_fileid UNIQUE (c_file_id);
 
 ALTER TABLE t_dmt_privilege
-ADD CONSTRAINT uk_dmt_privilege_name UNIQUE (c_name);
+	ADD CONSTRAINT uk_dmt_privilege_name UNIQUE (c_name);
 
 ALTER TABLE t_dmt_role
-ADD CONSTRAINT uk_dmt_role_name UNIQUE (c_name);
+	ADD CONSTRAINT uk_dmt_role_name UNIQUE (c_name);
 
 ALTER TABLE t_dmt_user
-ADD CONSTRAINT uk_dmt_user_username UNIQUE (c_username);
+	ADD CONSTRAINT uk_dmt_user_username UNIQUE (c_username);
 
 ----------------------------------
 -- CREATE REFERENTIAL CONSTRAINTS
 ----------------------------------
 
 ALTER TABLE a_mt_dmt_pageinst_role
-ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
+	ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_role_deny
-ADD CONSTRAINT FK_mqwhogdldx9juleqmc9c185xr
+	ADD CONSTRAINT FK_mqwhogdldx9juleqmc9c185xr
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_role_perm
-ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
+	ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_user
-ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
+	ADD CONSTRAINT FK_ksrx5xc36yt315hn996r28tf3
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_user_role
-ADD CONSTRAINT FK_mqjoupr478iv6jchf7be9w2kf
+	ADD CONSTRAINT FK_mqjoupr478iv6jchf7be9w2kf
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_d_page_inst
-ADD CONSTRAINT FK_sarg1peou92ejerqwwav35ej1
+	ADD CONSTRAINT FK_sarg1peou92ejerqwwav35ej1
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_person
-ADD CONSTRAINT FK_g9l38x2ycntsvmn84wl6aqsa9
+	ADD CONSTRAINT FK_g9l38x2ycntsvmn84wl6aqsa9
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_role
-ADD CONSTRAINT FK_l9yemywu9lnbr39qyvstwnget
+	ADD CONSTRAINT FK_l9yemywu9lnbr39qyvstwnget
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_user
-ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
+	ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ------------------------------
 
 ALTER TABLE mt_dmt_pageinst_role
-ADD CONSTRAINT pageInstRole2role
+	ADD CONSTRAINT pageInstRole2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_pageinst_role
-ADD CONSTRAINT pageInstRole2pageInst
+	ADD CONSTRAINT pageInstRole2pageInst
 FOREIGN KEY (f_page_inst)
 REFERENCES t_dmt_d_page_inst;
 
 ALTER TABLE mt_dmt_prvlg_role_deny
-ADD CONSTRAINT prvlgRoleDeny2prvlg
+	ADD CONSTRAINT prvlgRoleDeny2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
 ALTER TABLE mt_dmt_prvlg_role_deny
-ADD CONSTRAINT prvlgRoleDeny2role
+	ADD CONSTRAINT prvlgRoleDeny2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_prvlg_role_perm
-ADD CONSTRAINT prvlgRolePerm2prvlg
+	ADD CONSTRAINT prvlgRolePerm2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
 ALTER TABLE mt_dmt_prvlg_role_perm
-ADD CONSTRAINT prvlgRolePerm2role
+	ADD CONSTRAINT prvlgRolePerm2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2prvlg
+	ADD CONSTRAINT prvlgUser2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
 ALTER TABLE mt_dmt_prvlg_user
-ADD CONSTRAINT prvlgUser2user
+	ADD CONSTRAINT prvlgUser2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE mt_dmt_user_role
-ADD CONSTRAINT userRole2role
+	ADD CONSTRAINT userRole2role
 FOREIGN KEY (f_role)
 REFERENCES t_dmt_role;
 
 ALTER TABLE mt_dmt_user_role
-ADD CONSTRAINT userRole2user
+	ADD CONSTRAINT userRole2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_page_inst
-ADD CONSTRAINT pageinst_crtrusr2user
+	ADD CONSTRAINT pageinst_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_page_inst
-ADD CONSTRAINT pageinst_mdfrusr2user
+	ADD CONSTRAINT pageinst_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_page_inst
-ADD CONSTRAINT pageinst2pageinfo
+	ADD CONSTRAINT pageinst2pageinfo
 FOREIGN KEY (f_page_info)
 REFERENCES t_dmt_d_page;
 
 ALTER TABLE t_dmt_d_task
-ADD CONSTRAINT task_crtrusr2user
+	ADD CONSTRAINT task_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_task
-ADD CONSTRAINT task_mdfrusr2user
+	ADD CONSTRAINT task_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_task_log
-ADD CONSTRAINT tasklog2task
+	ADD CONSTRAINT tasklog2task
 FOREIGN KEY (f_task)
 REFERENCES t_dmt_d_task;
 
 ALTER TABLE t_dmt_d_task_schd
-ADD CONSTRAINT taskschd_crtrusr2user
+	ADD CONSTRAINT taskschd_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_task_schd
-ADD CONSTRAINT taskschd_mdfrusr2user
+	ADD CONSTRAINT taskschd_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_d_task_schd
-ADD CONSTRAINT taskschd2task
+	ADD CONSTRAINT taskschd2task
 FOREIGN KEY (f_task)
 REFERENCES t_dmt_d_task;
 
 ALTER TABLE t_dmt_file_store
-ADD CONSTRAINT filestore_crtrusr2user
+	ADD CONSTRAINT filestore_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_file_store
-ADD CONSTRAINT filestore_mdfrusr2user
+	ADD CONSTRAINT filestore_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_person
-ADD CONSTRAINT prsn_crtrusr2user
+	ADD CONSTRAINT prsn_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_person
-ADD CONSTRAINT prsn_mdfrusr2user
+	ADD CONSTRAINT prsn_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_role
-ADD CONSTRAINT role_crtrusr2user
+	ADD CONSTRAINT role_crtrusr2user
 FOREIGN KEY (f_creator_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_role
-ADD CONSTRAINT role_mdfrusr2user
+	ADD CONSTRAINT role_mdfrusr2user
 FOREIGN KEY (f_modifier_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE t_dmt_user
-ADD CONSTRAINT user2person
+	ADD CONSTRAINT user2person
 FOREIGN KEY (id)
 REFERENCES t_dmt_person;
 
@@ -485,33 +485,51 @@ REFERENCES t_dmt_person;
 -- CREATE SEQUENCES
 --------------------
 
-CREATE SEQUENCE dmt_d_page START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_d_page
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_d_task START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_d_task
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_d_task_log START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_d_task_log
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_d_task_schd START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_d_task_schd
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_file_store START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_file_store
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_person START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_person
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_privilege START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_privilege
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE dmt_role START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE dmt_role
+	START WITH 1
+	INCREMENT BY 1;
 
-CREATE SEQUENCE hibernate_sequence START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE hibernate_sequence
+	START WITH 1
+	INCREMENT BY 1;
 
 ---------------
 -- CREATE MISC
 ---------------
 
 CREATE TABLE z_dmt_sql_apply (
-	c_module  VARCHAR2(10 CHAR) NOT NULL,
-	c_version VARCHAR2(10 CHAR) NOT NULL,
+	c_module  VARCHAR2(10 CHAR)  NOT NULL,
+	c_version VARCHAR2(10 CHAR)  NOT NULL,
 	c_file    VARCHAR2(255 CHAR) NOT NULL,
-	d_apply   DATE              NOT NULL,
+	d_apply   DATE               NOT NULL,
 
 	PRIMARY KEY (c_version, c_module)
 );

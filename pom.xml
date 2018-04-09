@@ -59,7 +59,7 @@
 		<d.wickomp.ver>2.11-SNAPSHOT</d.wickomp.ver>
 		<d.diadem.ver>1.2</d.diadem.ver>
 
-		<d.hibernate.ver>4.3.11.Final</d.hibernate.ver>
+		<d.hibernate.ver>5.2.16.Final</d.hibernate.ver>
 		<d.spring.ver>5.0.5.RELEASE</d.spring.ver>
 
 		<d.slf4j.ver>1.7.25</d.slf4j.ver>

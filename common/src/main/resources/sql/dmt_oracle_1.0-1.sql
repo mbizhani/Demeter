@@ -5,7 +5,8 @@
 DROP TABLE a_mt_dmt_prvlg_user;
 DROP TABLE mt_dmt_prvlg_user;
 
-ALTER TABLE t_dmt_d_page_inst MODIFY f_page_info NUMBER(19, 0) NOT NULL;
+ALTER TABLE t_dmt_d_page_inst
+	MODIFY f_page_info NUMBER(19, 0) NOT NULL;
 
 -----------------------
 -- CREATE AUDIT TABLES
@@ -46,33 +47,33 @@ CREATE TABLE mt_dmt_prvlg_user_perm (
 ----------------------------------
 
 ALTER TABLE a_mt_dmt_prvlg_user_deny
-ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
+	ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_user_perm
-ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
+	ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 -----------------
 
 ALTER TABLE mt_dmt_prvlg_user_deny
-ADD CONSTRAINT prvlgUserDeny2prvlg
+	ADD CONSTRAINT prvlgUserDeny2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
 ALTER TABLE mt_dmt_prvlg_user_deny
-ADD CONSTRAINT prvlgUserDeny2user
+	ADD CONSTRAINT prvlgUserDeny2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;
 
 ALTER TABLE mt_dmt_prvlg_user_perm
-ADD CONSTRAINT prvlgUserPerm2prvlg
+	ADD CONSTRAINT prvlgUserPerm2prvlg
 FOREIGN KEY (f_prvlg)
 REFERENCES t_dmt_privilege;
 
 ALTER TABLE mt_dmt_prvlg_user_perm
-ADD CONSTRAINT prvlgUserPerm2user
+	ADD CONSTRAINT prvlgUserPerm2user
 FOREIGN KEY (f_user)
 REFERENCES t_dmt_user;

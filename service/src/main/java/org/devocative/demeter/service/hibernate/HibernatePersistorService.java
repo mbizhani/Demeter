@@ -1,8 +1,11 @@
 package org.devocative.demeter.service.hibernate;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
+import org.devocative.adroit.obuilder.MapBuilder;
 import org.devocative.demeter.DBConstraintViolationException;
+import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
@@ -11,17 +14,23 @@ import org.devocative.demeter.iservice.persistor.ELockMode;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.*;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.SessionFactoryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.proxy.HibernateProxyHelper;
+import org.hibernate.query.Query;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -29,7 +38,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +54,7 @@ public class HibernatePersistorService implements IPersistorService {
 	private List<Class> entities;
 	private String prefix;
 
-	private Configuration config;
+	private Metadata metaData;
 	private SessionFactory sessionFactory;
 
 	@Autowired
@@ -55,39 +64,46 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void init() {
-		config = new Configuration();
-		entities.forEach(config::addAnnotatedClass);
+		String username = ConfigUtil.getString(true, getConfig("db.username"));
 
-		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
-		if ("CreateModify".equals(interceptor)) {
-			config.setInterceptor(new HibernateInterceptor(securityService));
-		} else {
-			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
-		}
-
-		config.configure("hibernate.cfg.xml")
-			.setProperty("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
-			.setProperty("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
-			.setProperty("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
-			.setProperty("hibernate.connection.username", ConfigUtil.getString(true, getConfig("db.username")))
-			.setProperty("hibernate.connection.password", ConfigUtil.getString(getConfig("db.password"), ""))
-			.setProperty("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
+		MapBuilder<String, Object> settingsBuilder = new MapBuilder<String, Object>(new HashMap<>())
+			.put("hibernate.dialect", ConfigUtil.getString(true, getConfig("db.dialect")))
+			.put("hibernate.connection.driver_class", ConfigUtil.getString(true, getConfig("db.driver")))
+			.put("hibernate.connection.url", ConfigUtil.getString(true, getConfig("db.url")))
+			.put("hibernate.connection.username", username)
+			.put("hibernate.connection.password", ConfigUtil.getString(getConfig("db.password"), ""))
+			.put("hibernate.show_sql", ConfigUtil.getString(getConfig("db.showSQL"), "false"));
 
 		String schema = ConfigUtil.getString(false, getConfig("db.schema"));
 		if (schema != null) {
-			config.setProperty("hibernate.default_schema", schema);
+			settingsBuilder.put("hibernate.default_schema", schema);
 		}
 
 		Boolean applyDDL = ConfigUtil.getBoolean(getConfig("db.update.ddl"), false);
 		if (applyDDL) {
-			config.setProperty("hibernate.hbm2ddl.auto", "update");
+			settingsBuilder.put("hibernate.hbm2ddl.auto", "update");
 		}
 
-		// In Hibernate 4.3:
 		StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
-		serviceRegistryBuilder.applySettings(config.getProperties());
-		sessionFactory = config.buildSessionFactory(serviceRegistryBuilder.build());
-		logger.info("HibernatePersistorService init(db = {})", ConfigUtil.getString(true, getConfig("db.username")));
+		StandardServiceRegistry serviceRegistry = serviceRegistryBuilder
+			.applySettings(settingsBuilder.get())
+			.configure("hibernate.cfg.xml")
+			.build();
+		MetadataSources metadataSources = new MetadataSources(serviceRegistry);
+		entities.forEach(metadataSources::addAnnotatedClass);
+		metaData = metadataSources.buildMetadata();
+		SessionFactoryBuilder sessionFactoryBuilder = metaData.getSessionFactoryBuilder();
+
+		String interceptor = ConfigUtil.getString(getConfig("db.interceptor"), "CreateModify");
+		if ("CreateModify".equals(interceptor)) {
+			sessionFactoryBuilder.applyInterceptor(new HibernateInterceptor(securityService));
+		} else {
+			logger.warn("HibernatePersistorService without CreateModifyInterceptor!");
+		}
+
+		sessionFactory = sessionFactoryBuilder.build();
+
+		logger.info("HibernatePersistorService init()");
 
 		String scriptFile = ConfigUtil.getString(getConfig("db.script"), null);
 		if (scriptFile != null) {
@@ -206,8 +222,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void rollback() {
-		//assertActiveTrx();
-
 		currentTrxLevel.get().set(0);
 
 		final Transaction trx = getCurrentTrx();
@@ -249,62 +263,55 @@ public class HibernatePersistorService implements IPersistorService {
 	@Transactional
 	@Override
 	public void saveOrUpdate(Object obj) {
-		//onBeforeInsertOrUpdate(obj);
-		//EntityResetInfo info = new EntityResetInfo(obj);
-
 		assertActiveTrx();
 
 		try {
+			final Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
+			final String idPropName = metaData.getIdentifierPropertyName(cls.getName());
+			final Object idPropValue = ObjectUtil.getPropertyValue(obj, idPropName, false);
+
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
-			session.saveOrUpdate(obj);
-			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			//info.reset();
-			throw new DBConstraintViolationException(getConstraintName(e));
+			if (idPropValue == null) {
+				final Object result = session.merge(obj);
+				session.flush();
+				copyProperties(result, obj);
+			} else {
+				session.saveOrUpdate(obj);
+				session.flush();
+			}
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
 	@Transactional
 	@Override
 	public Serializable save(Object obj) {
-		//onBeforeInsertOrUpdate(obj);
-
 		assertActiveTrx();
 
 		try {
 			final Session session = getCurrentSession();
-
-			//boolean chk = checkTransaction(session);
-			Serializable result = session.save(obj);
+			final Serializable result = session.save(obj);
 			session.flush();
-			//processTransaction(chk);
-
 			return result;
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
+
+		return null;
 	}
 
 	@Transactional
 	@Override
 	public void update(Object obj) {
-		//onBeforeInsertOrUpdate(obj);
-
 		assertActiveTrx();
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
 			session.update(obj);
 			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
@@ -315,8 +322,7 @@ public class HibernatePersistorService implements IPersistorService {
 			assertActiveTrx();
 
 			final Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-			final ClassMetadata classMetadata = sessionFactory.getClassMetadata(cls);
-			final String idPropName = classMetadata.getIdentifierPropertyName();
+			final String idPropName = metaData.getIdentifierPropertyName(cls.getName());
 			final Object idPropValue = ObjectUtil.getPropertyValue(obj, idPropName, false);
 
 			final StringBuilder builder = new StringBuilder();
@@ -335,7 +341,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 			try {
 				final Session session = getCurrentSession();
-				//boolean chk = checkTransaction(session);
 				final Query query = session.createQuery(builder.toString());
 				for (int i = 0; i < fields.length; i++) {
 					query.setParameter("f" + i, ObjectUtil.getPropertyValue(obj, fields[i], false));
@@ -343,57 +348,45 @@ public class HibernatePersistorService implements IPersistorService {
 				query.setParameter("id", idPropValue);
 				query.executeUpdate();
 				session.flush();
-				//processTransaction(chk);
-			} catch (ConstraintViolationException e) {
-				//rollback();
-				throw new DBConstraintViolationException(getConstraintName(e));
+			} catch (PersistenceException e) {
+				processPersistenceException(e);
 			}
 
 			return idPropValue;
 		} else {
-			throw new RuntimeException("No filed!");
+			throw new DSystemException("No Field Passed!");
 		}
 	}
 
 	@Transactional
 	@Override
 	public void persist(Object obj) {
-		//onBeforeInsertOrUpdate(obj);
-
 		assertActiveTrx();
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
 			session.persist(obj);
 			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
 	@Transactional
 	@Override
 	public <T> T merge(T obj) {
-		//onBeforeInsertOrUpdate(obj);
-
 		assertActiveTrx();
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
-
 			final T result = (T) session.merge(obj);
 			session.flush();
-			//processTransaction(chk);
-
 			return result;
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
+
+		return null;
 	}
 
 	@Transactional
@@ -403,16 +396,13 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
 			final String q = String.format("delete from %s ent where ent.id=:entId", entity.getName());
 			final Query query = session.createQuery(q);
 			query.setParameter("entId", id);
 			query.executeUpdate();
 			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
@@ -423,13 +413,10 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
 			session.delete(obj);
 			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
@@ -440,13 +427,10 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			final Session session = getCurrentSession();
-			//boolean chk = checkTransaction(session);
 			session.createQuery(simpleQuery).executeUpdate();
 			session.flush();
-			//processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//rollback();
-			throw new DBConstraintViolationException(getConstraintName(e));
+		} catch (PersistenceException e) {
+			processPersistenceException(e);
 		}
 	}
 
@@ -454,7 +438,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public <T> T get(Class<T> entity, Serializable id) {
-		return (T) getCurrentSession().get(entity, id);
+		return getCurrentSession().get(entity, id);
 	}
 
 	@Override
@@ -468,7 +452,7 @@ public class HibernatePersistorService implements IPersistorService {
 				lockOptions = LockOptions.UPGRADE;
 				break;
 		}
-		return (T) getCurrentSession().load(entity, id, lockOptions);
+		return getCurrentSession().load(entity, id, lockOptions);
 	}
 
 	@Override
@@ -480,7 +464,7 @@ public class HibernatePersistorService implements IPersistorService {
 	public <T> List<T> list(String simpleQuery) {
 		Session session = getCurrentSession();
 		Query query = session.createQuery(simpleQuery);
-		return (List<T>) query.list();
+		return query.list();
 	}
 
 	@Override
@@ -499,10 +483,10 @@ public class HibernatePersistorService implements IPersistorService {
 
 	@Override
 	public void generateSchemaDiff() {
-		SchemaUpdate schemaUpdate = new SchemaUpdate(config);
-		schemaUpdate.setDelimiter(";");
-		schemaUpdate.setFormat(true);
-		schemaUpdate.execute(true, false);
+		new SchemaUpdate()
+			.setDelimiter(";")
+			.setFormat(true)
+			.execute(EnumSet.of(TargetType.STDOUT), metaData);
 	}
 
 	@Override
@@ -547,7 +531,7 @@ public class HibernatePersistorService implements IPersistorService {
 			currentTrxLevel.set(new AtomicInteger(0));
 		} else {
 			try {
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
 			} catch (HibernateException e) {
 				logger.warn("Check current session error", e);
 				currentSession.remove();
@@ -555,38 +539,6 @@ public class HibernatePersistorService implements IPersistorService {
 			}
 		}
 		return session;
-	}
-
-	Transaction getCurrentTrx() {
-		final Session session = getCurrentSession();
-		final Transaction trx = session.getTransaction();
-
-		if (trx == null) {
-			throw new DemeterException(DemeterErrorCode.TrxNoObject);
-		}
-
-		return trx;
-	}
-
-	boolean checkTransaction(Session session) {
-		Transaction trx = session.getTransaction();
-		if (!trx.isActive()) {
-			session.beginTransaction();
-			return true;
-		}
-		return false;
-	}
-
-	void processTransaction(boolean check) {
-		if (check) {
-			Session session = getCurrentSession();
-			if (session != null && session.isOpen()) {
-				Transaction trx = session.getTransaction();
-				if (trx.isActive()) {
-					trx.commit();
-				}
-			}
-		}
 	}
 
 	String getConstraintName(ConstraintViolationException e) {
@@ -609,7 +561,7 @@ public class HibernatePersistorService implements IPersistorService {
 		while (true) {
 			try {
 				Session session = sessionFactory.openSession();
-				session.createSQLQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
 				return session;
 			} catch (HibernateException e) {
 				logger.error("Problem getting new session", e);
@@ -629,75 +581,57 @@ public class HibernatePersistorService implements IPersistorService {
 		}
 	}
 
+	private Transaction getCurrentTrx() {
+		final Session session = getCurrentSession();
+		final Transaction trx = session.getTransaction();
+
+		if (trx == null) {
+			throw new DemeterException(DemeterErrorCode.TrxNoObject);
+		}
+
+		return trx;
+	}
+
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
 	}
 
-	/*private void onBeforeInsertOrUpdate(Object entity) {
-		UserVO currentUser = securityService.getCurrentUser();
+	private void processPersistenceException(PersistenceException e) throws PersistenceException {
+		if (e.getCause() instanceof ConstraintViolationException) {
+			ConstraintViolationException cve = (ConstraintViolationException) e.getCause();
+			throw new DBConstraintViolationException(getConstraintName(cve));
+		}
 
-		//TODO the following code must be placed in HibernateInterceptor
-		if (entity instanceof IRowMode && entity instanceof IRoleRowAccess && !currentUser.isAdmin()) {
-			IRowMode rowMode = (IRowMode) entity;
-			IRoleRowAccess roleRowAccess = (IRoleRowAccess) entity;
+		throw e;
+	}
 
-			if (ERowMode.ROLE.equals(rowMode.getRowMode())) {
-				if (roleRowAccess.getAllowedRoles() == null) {
-					roleRowAccess.setAllowedRoles(new ArrayList<>());
-				}
-				List<Role> roles = roleRowAccess.getAllowedRoles();
+	private void copyProperties(Object src, Object dest) {
+		try {
+			Map<String, PropertyDescriptor> srcProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(src));
+			Map<String, PropertyDescriptor> destProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(dest));
 
-				if (Collections.disjoint(currentUser.getRoles(), roles)) {
-					Role currentUserMainRole = null;
-					for (Role role : currentUser.getRoles()) {
-						if (ERoleMode.MAIN.equals(role.getRoleMode())) {
-							currentUserMainRole = role;
-							break;
-						}
-					}
+			for (Map.Entry<String, PropertyDescriptor> entry : srcProps.entrySet()) {
+				final String srcPropName = entry.getKey();
 
-					if (currentUserMainRole != null) {
-						if (!roles.contains(currentUserMainRole)) {
-							roles.add(currentUserMainRole);
-						}
-					} else {
-						throw new DemeterException(DemeterErrorCode.NoMainRoleForUser);
-					}
+				final PropertyDescriptor srcProp = entry.getValue();
+				final PropertyDescriptor destProp = destProps.get(srcPropName);
+
+				if (destProp != null && destProp.getWriteMethod() != null) {
+					final Object srcValue = srcProp.getReadMethod().invoke(src);
+					destProp.getWriteMethod().invoke(dest, srcValue);
 				}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	private class EntityResetInfo {
-		private Object object;
-		private String idPropName;
-		private Object idPropValue;
-
-		private Integer ver = null;
-		private IModificationDate modificationDate = null;
-
-		public EntityResetInfo(Object object) {
-			this.object = object;
-
-			Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(object);
-			ClassMetadata classMetadata = sessionFactory.getClassMetadata(cls);
-
-			idPropName = classMetadata.getIdentifierPropertyName();
-			idPropValue = ObjectUtil.getPropertyValue(object, idPropName, false);
-
-			if (object instanceof IModificationDate) {
-				modificationDate = (IModificationDate) object;
-				ver = modificationDate.getVersion();
-			}
+	private Map<String, PropertyDescriptor> getPropertyDescriptorsAsMap(Class cls) {
+		Map<String, PropertyDescriptor> result = new LinkedHashMap<>();
+		PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(cls);
+		for (PropertyDescriptor p : propertyDescriptors) {
+			result.put(p.getName(), p);
 		}
-
-		public void reset() {
-			if (idPropValue == null) {
-				ObjectUtil.setPropertyValue(object, idPropName, null, false);
-			}
-			if (modificationDate != null) {
-				modificationDate.setVersion(ver);
-			}
-		}
-	}*/
+		return result;
+	}
 }
