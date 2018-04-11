@@ -28,16 +28,16 @@ public class FileStore implements ICreationDate, ICreatorUser, IModificationDate
 	@Column(name = "c_name", nullable = false)
 	private String name;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_status", nullable = false))
+	@Column(name = "e_status", nullable = false)
+	@Convert(converter = EFileStatus.Converter.class)
 	private EFileStatus status = EFileStatus.VALID;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_storage", nullable = false))
+	@Column(name = "e_storage", nullable = false)
+	@Convert(converter = EFileStorage.Converter.class)
 	private EFileStorage storage = EFileStorage.DISK;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_mime_type", nullable = false))
+	@Column(name = "e_mime_type", nullable = false)
+	@Convert(converter = EMimeType.Converter.class)
 	private EMimeType mimeType;
 
 	@Column(name = "c_file_id", nullable = false)

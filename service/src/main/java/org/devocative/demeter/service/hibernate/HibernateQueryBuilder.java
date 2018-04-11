@@ -9,9 +9,9 @@ import org.devocative.demeter.filter.IFilterEvent;
 import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	// ------------------------------
 
-	public HibernateQueryBuilder(HibernatePersistorService persistorService) {
+	HibernateQueryBuilder(HibernatePersistorService persistorService) {
 		this.persistorService = persistorService;
 	}
 
@@ -312,7 +312,7 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 		if (query == null) {
 			Session session = persistorService.getCurrentSession();
 			query = sqlMode ?
-				session.createSQLQuery(buildQueryString(true)) :
+				session.createNativeQuery(buildQueryString(true)) :
 				session.createQuery(buildQueryString(true));
 		}
 

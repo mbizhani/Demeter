@@ -266,19 +266,11 @@ public class HibernatePersistorService implements IPersistorService {
 		assertActiveTrx();
 
 		try {
-			final Class cls = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-			final String idPropName = metaData.getIdentifierPropertyName(cls.getName());
-			final Object idPropValue = ObjectUtil.getPropertyValue(obj, idPropName, false);
-
 			final Session session = getCurrentSession();
-			if (idPropValue == null) {
-				final Object result = session.merge(obj);
-				session.flush();
-				copyProperties(result, obj);
-			} else {
-				session.saveOrUpdate(obj);
-				session.flush();
-			}
+			final Object result = session.merge(obj);
+			session.flush();
+
+			copyProperties(result, obj);
 		} catch (PersistenceException e) {
 			processPersistenceException(e);
 		}

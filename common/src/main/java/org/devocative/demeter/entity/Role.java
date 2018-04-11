@@ -30,8 +30,8 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	@Column(name = "c_name", nullable = false)
 	private String name;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_role_mode", nullable = false))
+	@Column(name = "e_role_mode", nullable = false)
+	@Convert(converter = ERoleMode.Converter.class)
 	private ERoleMode roleMode = ERoleMode.NORMAL;
 
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
@@ -58,8 +58,8 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	// ---------------
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
+	@Column(name = "e_mod", nullable = false)
+	@Convert(converter = ERowMode.Converter.class)
 	private ERowMode rowMode;
 
 	@NotAudited

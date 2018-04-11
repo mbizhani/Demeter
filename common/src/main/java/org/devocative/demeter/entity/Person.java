@@ -55,8 +55,8 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 
 	//----------------------------- CREATE / MODIFY
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_mod", nullable = false))
+	@Column(name = "e_mod", nullable = false)
+	@Convert(converter = ERowMode.Converter.class)
 	private ERowMode rowMode;
 
 	@NotAudited

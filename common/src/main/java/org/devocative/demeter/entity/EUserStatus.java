@@ -1,40 +1,25 @@
 package org.devocative.demeter.entity;
 
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import javax.persistence.AttributeConverter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-public class EUserStatus implements Serializable {
-	private static final long serialVersionUID = -5776208676258016175L;
-
-	private static final Map<Integer, EUserStatus> ID_TO_LIT = new LinkedHashMap<>();
-
-	// ------------------------------
-
-	public static final EUserStatus ENABLED = new EUserStatus(1, "Enabled");
-	public static final EUserStatus DISABLED = new EUserStatus(2, "Disabled");
-	public static final EUserStatus LOCKED = new EUserStatus(3, "Locked");
+public enum EUserStatus {
+	ENABLED(1, "Enabled"),
+	DISABLED(2, "Disabled"),
+	LOCKED(3, "Locked");
 
 	// ------------------------------
 
 	private Integer id;
 
-	@Transient
 	private String name;
 
 	// ------------------------------
 
-	private EUserStatus(Integer id, String name) {
+	EUserStatus(Integer id, String name) {
 		this.id = id;
 		this.name = name;
-
-		ID_TO_LIT.put(id, this);
-	}
-
-	public EUserStatus() {
 	}
 
 	// ------------------------------
@@ -44,28 +29,10 @@ public class EUserStatus implements Serializable {
 	}
 
 	public String getName() {
-		return ID_TO_LIT.get(getId()).name;
+		return name;
 	}
 
-	// ------------------------------
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof EUserStatus)) return false;
-
-		EUserStatus that = (EUserStatus) o;
-
-		return !(
-			getId() != null ? !getId().equals(that.getId()) : that.getId() != null
-		);
-
-	}
-
-	@Override
-	public int hashCode() {
-		return getId() != null ? getId().hashCode() : 0;
-	}
+	// ---------------
 
 	@Override
 	public String toString() {
@@ -75,6 +42,25 @@ public class EUserStatus implements Serializable {
 	// ------------------------------
 
 	public static List<EUserStatus> list() {
-		return new ArrayList<>(ID_TO_LIT.values());
+		return Arrays.asList(values());
+	}
+
+	// ------------------------------
+
+	public static class Converter implements AttributeConverter<EUserStatus, Integer> {
+		@Override
+		public Integer convertToDatabaseColumn(EUserStatus eUserStatus) {
+			return eUserStatus != null ? eUserStatus.getId() : null;
+		}
+
+		@Override
+		public EUserStatus convertToEntityAttribute(Integer integer) {
+			for (EUserStatus literal : values()) {
+				if (literal.getId().equals(integer)) {
+					return literal;
+				}
+			}
+			return null;
+		}
 	}
 }

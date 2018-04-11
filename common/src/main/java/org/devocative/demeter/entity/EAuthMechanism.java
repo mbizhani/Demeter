@@ -1,40 +1,25 @@
 package org.devocative.demeter.entity;
 
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import javax.persistence.AttributeConverter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-public class EAuthMechanism implements Serializable {
-	private static final long serialVersionUID = -6830228264271054817L;
-
-	private static final Map<Integer, EAuthMechanism> ID_TO_LIT = new LinkedHashMap<>();
-
-	// ------------------------------
-
-	public static final EAuthMechanism DATABASE = new EAuthMechanism(1, "Database");
-	public static final EAuthMechanism LDAP = new EAuthMechanism(2, "LDAP");
-	public static final EAuthMechanism OTHER = new EAuthMechanism(10, "Other");
+public enum EAuthMechanism {
+	DATABASE(1, "Database"),
+	LDAP(2, "LDAP"),
+	OTHER(10, "Other");
 
 	// ------------------------------
 
 	private Integer id;
 
-	@Transient
 	private String name;
 
 	// ------------------------------
 
-	private EAuthMechanism(Integer id, String name) {
+	EAuthMechanism(Integer id, String name) {
 		this.id = id;
 		this.name = name;
-
-		ID_TO_LIT.put(id, this);
-	}
-
-	public EAuthMechanism() {
 	}
 
 	// ------------------------------
@@ -44,26 +29,10 @@ public class EAuthMechanism implements Serializable {
 	}
 
 	public String getName() {
-		return ID_TO_LIT.get(getId()).name;
+		return name;
 	}
 
-	// ------------------------------
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof EAuthMechanism)) return false;
-
-		EAuthMechanism that = (EAuthMechanism) o;
-
-		return !(getId() != null ? !getId().equals(that.getId()) : that.getId() != null);
-
-	}
-
-	@Override
-	public int hashCode() {
-		return getId() != null ? getId().hashCode() : 0;
-	}
+	// ---------------
 
 	@Override
 	public String toString() {
@@ -73,6 +42,25 @@ public class EAuthMechanism implements Serializable {
 	// ------------------------------
 
 	public static List<EAuthMechanism> list() {
-		return new ArrayList<>(ID_TO_LIT.values());
+		return Arrays.asList(values());
+	}
+
+	// ------------------------------
+
+	public static class Converter implements AttributeConverter<EAuthMechanism, Integer> {
+		@Override
+		public Integer convertToDatabaseColumn(EAuthMechanism eAuthMechanism) {
+			return eAuthMechanism != null ? eAuthMechanism.getId() : null;
+		}
+
+		@Override
+		public EAuthMechanism convertToEntityAttribute(Integer integer) {
+			for (EAuthMechanism literal : values()) {
+				if (literal.getId().equals(integer)) {
+					return literal;
+				}
+			}
+			return null;
+		}
 	}
 }

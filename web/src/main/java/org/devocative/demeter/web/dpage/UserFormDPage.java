@@ -42,7 +42,7 @@ public class UserFormDPage extends DPage {
 
 	// Main Constructor - For Ajax Call
 	public UserFormDPage(String id, User entity) {
-		super(id, Collections.<String>emptyList());
+		super(id, Collections.emptyList());
 
 		this.entity = entity;
 	}

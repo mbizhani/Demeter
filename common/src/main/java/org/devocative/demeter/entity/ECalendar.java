@@ -2,39 +2,26 @@ package org.devocative.demeter.entity;
 
 import org.devocative.adroit.CalendarUtil;
 
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.util.*;
+import javax.persistence.AttributeConverter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
-public class ECalendar implements Serializable {
-	private static final long serialVersionUID = -8563152792867832546L;
-
-	private static final Map<Integer, ECalendar> ID_TO_LIT = new LinkedHashMap<>();
-	private static final int PERSIAN_ID = 1;
-	private static final int GREGORIAN_ID = 2;
-
-	// ------------------------------
-
-	public static final ECalendar PERSIAN = new ECalendar(PERSIAN_ID, "Persian");
-	public static final ECalendar GREGORIAN = new ECalendar(GREGORIAN_ID, "Gregorian");
+public enum ECalendar {
+	PERSIAN(1, "Persian"),
+	GREGORIAN(2, "Gregorian");
 
 	// ------------------------------
 
 	private Integer id;
 
-	@Transient
 	private String name;
 
 	// ------------------------------
 
-	private ECalendar(Integer id, String name) {
+	ECalendar(Integer id, String name) {
 		this.id = id;
 		this.name = name;
-
-		ID_TO_LIT.put(id, this);
-	}
-
-	public ECalendar() {
 	}
 
 	// ------------------------------
@@ -44,17 +31,17 @@ public class ECalendar implements Serializable {
 	}
 
 	public String getName() {
-		return ID_TO_LIT.get(getId()).name;
+		return name;
 	}
 
 	// ---------------
 
 	public String convertToString(Date dt, String pattern) {
-		switch (getId()) {
-			case PERSIAN_ID:
+		switch (this) {
+			case PERSIAN:
 				return CalendarUtil.toPersian(dt, pattern);
 
-			case GREGORIAN_ID:
+			case GREGORIAN:
 				return CalendarUtil.formatDate(dt, pattern);
 		}
 
@@ -64,23 +51,6 @@ public class ECalendar implements Serializable {
 	// ---------------
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ECalendar)) return false;
-
-		ECalendar eCalendar = (ECalendar) o;
-
-		if (getId() != null ? !getId().equals(eCalendar.getId()) : eCalendar.getId() != null) return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return getId() != null ? getId().hashCode() : 0;
-	}
-
-	@Override
 	public String toString() {
 		return getName();
 	}
@@ -88,17 +58,36 @@ public class ECalendar implements Serializable {
 	// ------------------------------
 
 	public static List<ECalendar> list() {
-		return new ArrayList<>(ID_TO_LIT.values());
+		return Arrays.asList(values());
 	}
 
 	public static ECalendar findByName(String name) {
 		ECalendar result = null;
-		for (ECalendar calendar : ID_TO_LIT.values()) {
+		for (ECalendar calendar : values()) {
 			if (calendar.getName().equals(name)) {
 				result = calendar;
 				break;
 			}
 		}
 		return result;
+	}
+
+	// ------------------------------
+
+	public static class Converter implements AttributeConverter<ECalendar, Integer> {
+		@Override
+		public Integer convertToDatabaseColumn(ECalendar eCalendar) {
+			return eCalendar != null ? eCalendar.getId() : null;
+		}
+
+		@Override
+		public ECalendar convertToEntityAttribute(Integer integer) {
+			for (ECalendar literal : values()) {
+				if (literal.getId().equals(integer)) {
+					return literal;
+				}
+			}
+			return null;
+		}
 	}
 }

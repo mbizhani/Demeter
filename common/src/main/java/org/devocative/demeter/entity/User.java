@@ -27,29 +27,29 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	@Column(name = "c_password")
 	private String password;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_auth_mech", nullable = false))
+	@Column(name = "e_auth_mech", nullable = false)
+	@Convert(converter = EAuthMechanism.Converter.class)
 	private EAuthMechanism authMechanism = EAuthMechanism.DATABASE;
 
 	//@NotNull
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_status", nullable = false))
+	@Column(name = "e_status", nullable = false)
+	@Convert(converter = EUserStatus.Converter.class)
 	private EUserStatus status = EUserStatus.ENABLED;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_locale"))
+	@Column(name = "e_locale")
+	@Convert(converter = ELocale.Converter.class)
 	private ELocale locale;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_cal_type"))
+	@Column(name = "e_cal_type")
+	@Convert(converter = ECalendar.Converter.class)
 	private ECalendar calendarType;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_date_pattern"))
+	@Column(name = "e_date_pattern")
+	@Convert(converter = EDatePatternType.Converter.class)
 	private EDatePatternType datePatternType;
 
-	@Embedded
-	@AttributeOverride(name = "id", column = @Column(name = "e_date_time_pattern"))
+	@Column(name = "e_date_time_pattern")
+	@Convert(converter = EDateTimePatternType.Converter.class)
 	private EDateTimePatternType dateTimePatternType;
 
 	@NotAudited

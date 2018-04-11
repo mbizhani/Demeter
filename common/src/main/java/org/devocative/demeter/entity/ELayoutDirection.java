@@ -1,39 +1,23 @@
 package org.devocative.demeter.entity;
 
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-public class ELayoutDirection implements Serializable {
-	private static final long serialVersionUID = 581360386297611032L;
-
-	private static final Map<Integer, ELayoutDirection> ID_TO_LIT = new LinkedHashMap<>();
-
-	// ------------------------------
-
-	public static final ELayoutDirection LTR = new ELayoutDirection(1, "LTR");
-	public static final ELayoutDirection RTL = new ELayoutDirection(2, "RTL");
+public enum ELayoutDirection {
+	LTR(1, "LTR"),
+	RTL(2, "RTL");
 
 	// ------------------------------
 
 	private Integer id;
 
-	@Transient
 	private String name;
 
 	// ------------------------------
 
-	private ELayoutDirection(Integer id, String name) {
+	ELayoutDirection(Integer id, String name) {
 		this.id = id;
 		this.name = name;
-
-		ID_TO_LIT.put(id, this);
-	}
-
-	public ELayoutDirection() {
 	}
 
 	// ------------------------------
@@ -43,37 +27,20 @@ public class ELayoutDirection implements Serializable {
 	}
 
 	public String getName() {
-		return ID_TO_LIT.get(getId()).name;
+		return name;
 	}
 
 	public String getHtmlDir() {
-		switch (getId()) {
-			case 1:
+		switch (this) {
+			case LTR:
 				return "ltr";
-			case 2:
+			case RTL:
 				return "rtl";
 		}
 		throw new RuntimeException("Invalid Layout Direction: " + getId());
 	}
 
-	// ------------------------------
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ELayoutDirection)) return false;
-
-		ELayoutDirection that = (ELayoutDirection) o;
-
-		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return getId() != null ? getId().hashCode() : 0;
-	}
+	// ---------------
 
 	@Override
 	public String toString() {
@@ -83,12 +50,12 @@ public class ELayoutDirection implements Serializable {
 	// ------------------------------
 
 	public static List<ELayoutDirection> list() {
-		return new ArrayList<>(ID_TO_LIT.values());
+		return Arrays.asList(values());
 	}
 
 	public static ELayoutDirection findByName(String name) {
 		ELayoutDirection result = null;
-		for (ELayoutDirection direction : ID_TO_LIT.values()) {
+		for (ELayoutDirection direction : values()) {
 			if (direction.getName().equals(name)) {
 				result = direction;
 				break;

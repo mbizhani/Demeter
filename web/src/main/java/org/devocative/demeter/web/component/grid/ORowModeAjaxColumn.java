@@ -1,7 +1,6 @@
 package org.devocative.demeter.web.component.grid;
 
 import org.apache.wicket.model.IModel;
-import org.devocative.demeter.entity.ERowMode;
 import org.devocative.demeter.entity.ICreatorUser;
 import org.devocative.demeter.entity.IRoleRowAccess;
 import org.devocative.demeter.entity.IRowMode;
@@ -41,27 +40,27 @@ public abstract class ORowModeAjaxColumn<T> extends OAjaxLinkColumn<T> {
 			}
 
 			UserVO currentUser = DemeterWebSession.get().getUserVO();
-			switch (rowMode.getRowMode().getId()) {
-				case ERowMode.SYSTEM_ID:
+			switch (rowMode.getRowMode()) {
+				case SYSTEM:
 					return false;
 
-				case ERowMode.NORMAL_ID:
+				case NORMAL:
 					return true;
 
-				case ERowMode.ROOT_ID:
+				case ROOT:
 					return currentUser.isRoot();
 
-				case ERowMode.ADMIN_ID:
+				case ADMIN:
 					return currentUser.isAdmin();
 
-				case ERowMode.ROLE_ID:
+				case ROLE:
 					if (roleRowAccess == null) {
 						throw new RuntimeException("Invalid Row: row with rowMode=ROLE must implements IRoleRowAccess");
 					}
 					return currentUser.isAdmin() ||
 						!Collections.disjoint(currentUser.getRoles(), roleRowAccess.getAllowedRoles());
 
-				case ERowMode.CREATOR_ID:
+				case CREATOR:
 					if (creatorUser == null) {
 						throw new RuntimeException("Invalid Row: row with rowMode=CREATOR must implements ICreatorUser");
 					}

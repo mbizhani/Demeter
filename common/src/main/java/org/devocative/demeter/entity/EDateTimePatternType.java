@@ -1,62 +1,67 @@
 package org.devocative.demeter.entity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.persistence.AttributeConverter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-public class EDateTimePatternType implements Serializable {
-	private static final long serialVersionUID = 3708198951457435525L;
+public enum EDateTimePatternType {
+	P01(1, "yyyy/MM/dd HH:mm:ss"),
+	P02(2, "yyyy-MM-dd HH:mm:ss"),
+	P03(3, "MM/dd/yyyy HH:mm:ss"),
+	P04(4, "MM-dd-yyyy HH:mm:ss");
 
-	private static final Map<Integer, String> FORMATS_MAP = new HashMap<>();
-	private static final List<EDateTimePatternType> LITERALS = new ArrayList<>();
-
-	public static final EDateTimePatternType P01 = new EDateTimePatternType(1, "yyyy/MM/dd HH:mm:ss");
-	public static final EDateTimePatternType P02 = new EDateTimePatternType(2, "yyyy-MM-dd HH:mm:ss");
-	public static final EDateTimePatternType P03 = new EDateTimePatternType(3, "MM/dd/yyyy HH:mm:ss");
-	public static final EDateTimePatternType P04 = new EDateTimePatternType(4, "MM-dd-yyyy HH:mm:ss");
-
+	// ------------------------------
 
 	private Integer id;
 
-	public EDateTimePatternType() {
+	private String format;
+
+	// ------------------------------
+
+	EDateTimePatternType(Integer id, String format) {
+		this.id = id;
+		this.format = format;
 	}
 
-	public EDateTimePatternType(Integer id, String format) {
-		this.id = id;
-		FORMATS_MAP.put(id, format);
-		LITERALS.add(this);
-	}
+	// ------------------------------
 
 	public Integer getId() {
 		return id;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof EDateTimePatternType)) return false;
-
-		EDateTimePatternType that = (EDateTimePatternType) o;
-
-		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-
-		return true;
+	public String getFormat() {
+		return format;
 	}
 
-	@Override
-	public int hashCode() {
-		return getId() != null ? getId().hashCode() : 0;
-	}
+	// ---------------
 
 	@Override
 	public String toString() {
-		return FORMATS_MAP.get(id);
+		return getFormat();
 	}
+
+	// ------------------------------
 
 	public static List<EDateTimePatternType> list() {
-		return new ArrayList<EDateTimePatternType>(LITERALS);
+		return Arrays.asList(values());
 	}
 
+	// ------------------------------
+
+	public static class Converter implements AttributeConverter<EDateTimePatternType, Integer> {
+		@Override
+		public Integer convertToDatabaseColumn(EDateTimePatternType eDateTimePatternType) {
+			return eDateTimePatternType != null ? eDateTimePatternType.getId() : null;
+		}
+
+		@Override
+		public EDateTimePatternType convertToEntityAttribute(Integer integer) {
+			for (EDateTimePatternType literal : values()) {
+				if (literal.getId().equals(integer)) {
+					return literal;
+				}
+			}
+			return null;
+		}
+	}
 }
