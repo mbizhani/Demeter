@@ -430,7 +430,7 @@ public class DemeterCore {
 			} else {*/
 			if (module.getEntities() != null && module.getEntities().size() > 0) {
 				dmtPersistorServiceEntities.addAll(loadEntities(module.getEntities()));
-				logger.info("Module has {} entities.", module.getEntities().size());
+				logger.info("Module '{}' has {} entities.", module.getShortName(), module.getEntities().size());
 			}
 			//}
 		}

@@ -2,7 +2,6 @@ package org.devocative.demeter.service.hibernate;
 
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.vo.RangeVO;
-import org.devocative.demeter.DBConstraintViolationException;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.filter.CollectionUtil;
 import org.devocative.demeter.filter.IFilterEvent;
@@ -10,11 +9,11 @@ import org.devocative.demeter.iservice.persistor.EJoinMode;
 import org.devocative.demeter.iservice.persistor.IQueryBuilder;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.PersistenceException;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.*;
@@ -203,13 +202,12 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 	@Override
 	public int update() {
-		final int result;
+		int result = -1;
 
-		persistorService.assertActiveTrx();
+		persistorService.startTrx();
 
 		try {
 			final Session session = persistorService.getCurrentSession();
-			//boolean chk = persistorService.checkTransaction(session);
 
 			buildQuery();
 			applyParams();
@@ -220,10 +218,13 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 
 			result = query.executeUpdate();
 			session.flush();
-			//persistorService.processTransaction(chk);
-		} catch (ConstraintViolationException e) {
-			//persistorService.rollback();
-			throw new DBConstraintViolationException(persistorService.getConstraintName(e));
+
+			persistorService.commitOrRollback();
+		} catch (PersistenceException e) {
+			persistorService.rollback();
+			persistorService.processPersistenceException(e);
+		} catch (Exception e) {
+			persistorService.rollback();
 		}
 
 		return result;

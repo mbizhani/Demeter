@@ -546,6 +546,15 @@ public class HibernatePersistorService implements IPersistorService {
 		return null;
 	}
 
+	void processPersistenceException(PersistenceException e) throws PersistenceException {
+		if (e.getCause() instanceof ConstraintViolationException) {
+			ConstraintViolationException cve = (ConstraintViolationException) e.getCause();
+			throw new DBConstraintViolationException(getConstraintName(cve));
+		}
+
+		throw e;
+	}
+
 	// ------------------------------
 
 	private Session getSession() {
@@ -586,15 +595,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
-	}
-
-	private void processPersistenceException(PersistenceException e) throws PersistenceException {
-		if (e.getCause() instanceof ConstraintViolationException) {
-			ConstraintViolationException cve = (ConstraintViolationException) e.getCause();
-			throw new DBConstraintViolationException(getConstraintName(cve));
-		}
-
-		throw e;
 	}
 
 	private void copyProperties(Object src, Object dest) {
