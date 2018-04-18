@@ -36,7 +36,7 @@ public class RoleService implements IRoleService {
 		try {
 			persistorService.saveOrUpdate(entity);
 		} catch (DBConstraintViolationException e) {
-			if (e.isConstraint("uk_dmt_role_name")) {
+			if (e.isConstraint(Role.UQ_CONST)) {
 				throw new DemeterException(DemeterErrorCode.DuplicateRoleName);
 			}
 		}

@@ -11,9 +11,11 @@ import java.util.List;
 @Audited
 @Entity
 @Table(name = "t_dmt_user", uniqueConstraints = {
-	@UniqueConstraint(name = "uk_dmt_user_username", columnNames = {"c_username"})
+	@UniqueConstraint(name = User.UQ_CONST, columnNames = {"c_username"})
 })
 public class User implements IRowMode, ICreationDate, ICreatorUser, IModificationDate, IModifierUser {
+	public static final String UQ_CONST = "uk_dmt_user_username";
+
 	private static final long serialVersionUID = 1580426811623477680L;
 
 	@Id
