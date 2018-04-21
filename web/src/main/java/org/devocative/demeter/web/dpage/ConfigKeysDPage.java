@@ -77,7 +77,7 @@ public class ConfigKeysDPage extends DPage {
 		});
 
 
-		add(new ListView<KeyValueVO<Object, Object>>("properties", KeyValueVO.fromMap(System.getProperties())) {
+		add(new ListView<KeyValueVO<Object, Object>>("properties", KeyValueVO.fromMap(new TreeMap<>(System.getProperties()))) {
 			private static final long serialVersionUID = -157046053543529923L;
 
 			@Override
@@ -86,6 +86,18 @@ public class ConfigKeysDPage extends DPage {
 
 				item.add(new Label("key", keyValueVO.getKey().toString()));
 				item.add(new Label("value", keyValueVO.getValue().toString()));
+			}
+		});
+
+		add(new ListView<KeyValueVO<String, String>>("variables", KeyValueVO.fromMap(new TreeMap<>(System.getenv()))) {
+			private static final long serialVersionUID = -1570460531143529923L;
+
+			@Override
+			protected void populateItem(ListItem<KeyValueVO<String, String>> item) {
+				KeyValueVO<String, String> keyValueVO = item.getModelObject();
+
+				item.add(new Label("key", keyValueVO.getKey()));
+				item.add(new Label("value", keyValueVO.getValue()));
 			}
 		});
 	}
