@@ -533,23 +533,15 @@ public class HibernatePersistorService implements IPersistorService {
 		return session;
 	}
 
-	String getConstraintName(ConstraintViolationException e) {
-		if (e.getConstraintName() != null) {
-			return e.getConstraintName();
-		} else {
-			Matcher matcher = HSQLDB_CONSTRAINT_NAME.matcher(e.getSQLException().getMessage());
-			if (matcher.find()) {
-				return matcher.group(1);
-			}
-		}
-
-		return null;
-	}
-
 	void processPersistenceException(PersistenceException e) throws PersistenceException {
 		if (e.getCause() instanceof ConstraintViolationException) {
 			ConstraintViolationException cve = (ConstraintViolationException) e.getCause();
-			throw new DBConstraintViolationException(getConstraintName(cve));
+			final String constraintName = getConstraintName(cve);
+			if (constraintName != null) {
+				throw new DBConstraintViolationException(constraintName);
+			} else {
+				throw e;
+			}
 		}
 
 		throw e;
@@ -625,5 +617,18 @@ public class HibernatePersistorService implements IPersistorService {
 			result.put(p.getName(), p);
 		}
 		return result;
+	}
+
+	private String getConstraintName(ConstraintViolationException e) {
+		if (e.getConstraintName() != null) {
+			return e.getConstraintName();
+		} else {
+			Matcher matcher = HSQLDB_CONSTRAINT_NAME.matcher(e.getSQLException().getMessage());
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
+		}
+
+		return null;
 	}
 }
