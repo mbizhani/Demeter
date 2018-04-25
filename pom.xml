@@ -57,7 +57,7 @@
 
 		<d.adroit.ver>1.6</d.adroit.ver>
 		<d.wickomp.ver>2.11-SNAPSHOT</d.wickomp.ver>
-		<d.diadem.ver>1.2</d.diadem.ver>
+		<d.diadem.ver>1.3-SNAPSHOT</d.diadem.ver>
 
 		<d.hibernate.ver>5.2.16.Final</d.hibernate.ver>
 		<d.spring.ver>5.0.5.RELEASE</d.spring.ver>

@@ -31,22 +31,27 @@ public class SimpleDTask extends DTask<String> {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws Exception {
 		logger.info("SimpleDTask.execute: user={}", getCurrentUser());
 
-		try {
-			int idx = 1;
-			int i = (int) (Math.random() * 10000);
-			final int max = i + 30;
-			for (; i <= max && cont.get(); i++) {
-				Thread.sleep(((i % 3) + 1) * 1000);
-				sendResult(String.format("counter = %02d | idx= %02d | user=%s", i, idx++, securityService.getCurrentUser()));
+		Thread th = new Thread(() -> {
+			try {
+				int idx = 1;
+				for (int i = 1; i <= 200 && cont.get(); i += 5) {
+					logger.debug("SimpleDTask: i = {}", i);
+
+					Thread.sleep(i * 1000);
+
+					sendResult(String.format("counter = %02d | idx= %02d | user=%s", i, idx++, securityService.getCurrentUser()));
+				}
+				logger.info("SimpleDTask.executed: {}", getCurrentUser());
+				sendResult("SimpleDTask.executed: " + getCurrentUser());
+			} catch (InterruptedException e) {
+				logger.warn("SimpleDTask Sleep Interrupted");
 			}
-			logger.info("SimpleDTask.executed: {}", getCurrentUser());
-			sendResult("SimpleDTask.executed: " + getCurrentUser());
-		} catch (InterruptedException e) {
-			logger.warn("SimpleDTask Sleep Interrupted");
-		}
+		});
+		th.start();
+		th.join();
 	}
 
 	@Override
