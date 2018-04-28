@@ -326,7 +326,7 @@ public class Index extends WebPage {
 				OMenuItem moduleEntry = new OMenuItem(new Model<>(entry.getKey()));
 				List<OMenuItem> subMenus = new ArrayList<>();
 				for (DPageInstance pageInstance : entry.getValue()) {
-					subMenus.add(new OMenuItem(UrlUtil.createUri(pageInstance, true), getDPageTitle(pageInstance)));
+					subMenus.add(new OMenuItem(UrlUtil.createUri(pageInstance, true), getDPageTitle(pageInstance), pageInstance.getIcon()));
 				}
 				moduleEntry.setSubMenus(subMenus);
 				oMenuItems.add(moduleEntry);

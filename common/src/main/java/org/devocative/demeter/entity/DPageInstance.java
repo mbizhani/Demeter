@@ -57,6 +57,11 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	// ---------------
 
+	@Transient
+	private String icon;
+
+	// ---------------
+
 	@NotAudited
 	@Column(name = "d_creation", nullable = false, columnDefinition = "date")
 	private Date creationDate;
@@ -143,6 +148,16 @@ public class DPageInstance implements ICreationDate, ICreatorUser, IModification
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	// ---------------
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 	// ---------------

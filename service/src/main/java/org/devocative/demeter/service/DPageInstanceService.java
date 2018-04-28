@@ -27,11 +27,21 @@ import java.util.*;
 public class DPageInstanceService implements IDPageInstanceService, IApplicationLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(DPageInstanceService.class);
 
+	private ICache<String, DPageInstance> pageInstCache;
+	private ICache<Class, String> uriCache;
+	private Map<Long, DPageInfoVO> pageInfoId_2_DPageInfoVO = new HashMap<>();
+
 	@Autowired
 	private IPersistorService persistorService;
 
 	@Autowired
 	private IDemeterCoreService demeterCoreService;
+
+	@Autowired
+	private ICacheService cacheService;
+
+	@Autowired
+	private IRoleService roleService;
 
 	// ------------------------------
 
@@ -101,15 +111,6 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	// ==============================
 
-	private ICache<String, DPageInstance> pageInstCache;
-	private ICache<Class, String> uriCache;
-
-	@Autowired
-	private ICacheService cacheService;
-
-	@Autowired
-	private IRoleService roleService;
-
 	// ------------------------------ IApplicationLifecycle methods
 
 	@Override
@@ -119,12 +120,14 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		int totalDPageSize = 0;
 		List<Long> validIds = new ArrayList<>();
 		List<DModuleInfoVO> modules = demeterCoreService.getModules();
-		for (DModuleInfoVO xModule : modules) {
-			List<DPageInfoVO> dPages = xModule.getDPages();
+		for (DModuleInfoVO dModule : modules) {
+			List<DPageInfoVO> dPages = dModule.getDPages();
 			if (dPages != null) {
 				for (DPageInfoVO dPage : dPages) {
-					DPageInfo pageInfo = addOrUpdatePageInfo(xModule.getShortName().toLowerCase(), dPage);
+					DPageInfo pageInfo = addOrUpdatePageInfo(dModule.getShortName().toLowerCase(), dPage);
 					validIds.add(pageInfo.getId());
+
+					pageInfoId_2_DPageInfoVO.put(pageInfo.getId(), dPage);
 				}
 				totalDPageSize += dPages.size();
 			}
@@ -205,6 +208,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
+			pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
 
 			String module = pageInfo.getModule();
 			if (!menuEntries.containsKey(module)) {
@@ -246,6 +250,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
+			pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
 
 			String module = pageInfo.getModule();
 			if (pageInstance.getInMenu()) {
@@ -263,27 +268,27 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 	// ------------------------------
 
-	private DPageInfo addOrUpdatePageInfo(String module, DPageInfoVO xdPage) {
+	private DPageInfo addOrUpdatePageInfo(String module, DPageInfoVO dPage) {
 		String baseUri;
-		if (xdPage.getUri().startsWith("/")) {
-			baseUri = String.format("/%s%s", module, xdPage.getUri());
+		if (dPage.getUri().startsWith("/")) {
+			baseUri = String.format("/%s%s", module, dPage.getUri());
 		} else {
-			baseUri = String.format("/%s/%s", module, xdPage.getUri());
+			baseUri = String.format("/%s/%s", module, dPage.getUri());
 		}
 
 		DPageInfo pageInfo = persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInfo.class, "ent")
 			.addWhere("and (ent.type = :type or ent.typeAlt = :type or ent.baseUri = :uri)")
-			.addParam("type", xdPage.getType())
+			.addParam("type", dPage.getType())
 			.addParam("uri", baseUri)
 			.object();
 
 		if (pageInfo == null) {
 			pageInfo = new DPageInfo();
-			pageInfo.setType(xdPage.getType());
-		} else if (!pageInfo.getType().equals(xdPage.getType())) {
-			pageInfo.setTypeAlt(xdPage.getType());
+			pageInfo.setType(dPage.getType());
+		} else if (!pageInfo.getType().equals(dPage.getType())) {
+			pageInfo.setTypeAlt(dPage.getType());
 		}
 		pageInfo.setModule(module);
 		pageInfo.setEnabled(true);
@@ -300,18 +305,18 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 		if (pageInstance == null) {
 			pageInstance = new DPageInstance();
 		}
-		if (xdPage.getTitle() != null && xdPage.getTitle().startsWith(D_PAGE_RESOURCE_KEY_PREFIX)) {
+		if (dPage.getTitle() != null && dPage.getTitle().startsWith(D_PAGE_RESOURCE_KEY_PREFIX)) {
 			String prefix = String.format("%sdPage.%s.", D_PAGE_RESOURCE_KEY_PREFIX, module);
-			if (!xdPage.getTitle().startsWith(prefix)) {
-				throw new DSystemException("Invalid DPage title key: " + xdPage.getTitle());
+			if (!dPage.getTitle().startsWith(prefix)) {
+				throw new DSystemException("Invalid DPage title key: " + dPage.getTitle());
 			}
 		}
-		pageInstance.setTitle(xdPage.getTitle());
-		pageInstance.setInMenu(xdPage.getInMenu());
+		pageInstance.setTitle(dPage.getTitle());
+		pageInstance.setInMenu(dPage.getInMenu());
 		pageInstance.setPageInfo(pageInfo);
 		pageInstance.setUri(pageInfo.getBaseUri()); //Duplicated for performance issue
 
-		if (xdPage.getRoles() != null && !xdPage.getRoles().isEmpty()) {
+		if (dPage.getRoles() != null && !dPage.getRoles().isEmpty()) {
 			List<Role> roles;
 			if (ConfigUtil.getBoolean(DemeterConfigKey.DPageInstRolesByXML) || pageInstance.getRoles() == null) {
 				roles = new ArrayList<>();
@@ -319,7 +324,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 				roles = pageInstance.getRoles();
 			}
 
-			String[] roleNames = xdPage.getRoles().split("[,]");
+			String[] roleNames = dPage.getRoles().split("[,]");
 			for (String roleName : roleNames) {
 				Role role = roleService.loadByName(roleName.trim());
 

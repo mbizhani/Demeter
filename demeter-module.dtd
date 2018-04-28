@@ -20,6 +20,7 @@
 				type CDATA #REQUIRED
 				title CDATA #REQUIRED
 				uri CDATA #REQUIRED
+				icon CDATA
 				roles CDATA
 				>
 		<!ELEMENT tasks (task)*>

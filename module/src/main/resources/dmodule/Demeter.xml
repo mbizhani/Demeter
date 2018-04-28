@@ -45,6 +45,7 @@
 			   uri="/persons"
 			   inMenu="true"
 			   roles="Admin,UserAdmin"
+			   icon="fa fa-male"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.UserListDPage"
@@ -52,6 +53,7 @@
 			   uri="/users"
 			   inMenu="true"
 			   roles="Admin,UserAdmin"
+			   icon="fa fa-user"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.RoleListDPage"
@@ -59,6 +61,7 @@
 			   uri="/roles"
 			   inMenu="true"
 			   roles="Admin,UserAdmin"
+			   icon="fa fa-users"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.DPageInstanceListDPage"
@@ -66,6 +69,7 @@
 			   uri="/pages"
 			   inMenu="true"
 			   roles="Admin,UserAdmin"
+			   icon="fa fa-window-maximize"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.InfoDPage"
@@ -73,6 +77,7 @@
 			   uri="/info"
 			   inMenu="true"
 			   roles="Root"
+			   icon="fa fa-info-circle"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.LoginDPage"
@@ -86,6 +91,7 @@
 			   uri="/config"
 			   inMenu="true"
 			   roles="Root"
+			   icon="fa fa-key"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.CacheManagementDPage"
@@ -93,6 +99,7 @@
 			   uri="/cache"
 			   inMenu="true"
 			   roles="Admin"
+			   icon="fa fa-retweet"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.TaskInfoDPage"
@@ -100,6 +107,7 @@
 			   uri="/tasks"
 			   inMenu="true"
 			   roles="Admin"
+			   icon="fa fa-tasks"
 				/>
 
 		<dPage type="org.devocative.demeter.web.dpage.FileStoreListDPage"
@@ -107,6 +115,7 @@
 			   uri="/files"
 			   inMenu="true"
 			   roles="Admin"
+			   icon="fa fa-download"
 				/>
 
 	</dPages>

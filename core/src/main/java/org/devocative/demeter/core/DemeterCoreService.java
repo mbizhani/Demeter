@@ -25,7 +25,14 @@ public class DemeterCoreService implements IDemeterCoreService {
 				List<DPageInfoVO> pages = new ArrayList<>();
 				if (xModule.getDPages() != null) {
 					for (XDPage xdPage : xModule.getDPages()) {
-						pages.add(new DPageInfoVO(xdPage.getType(), xdPage.getTitle(), xdPage.getUri(), xdPage.getInMenu(), xdPage.getRoles()));
+						pages.add(new DPageInfoVO(
+							xdPage.getType(),
+							xdPage.getTitle(),
+							xdPage.getUri(),
+							xdPage.getInMenu(),
+							xdPage.getRoles(),
+							xdPage.getIcon())
+						);
 					}
 				}
 

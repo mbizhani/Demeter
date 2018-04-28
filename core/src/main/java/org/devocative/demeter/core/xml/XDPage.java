@@ -20,6 +20,9 @@ public class XDPage {
 	@XStreamAsAttribute
 	private String roles;
 
+	@XStreamAsAttribute
+	private String icon;
+
 	// ------------------------------
 
 	public Boolean getInMenu() {
@@ -64,6 +67,15 @@ public class XDPage {
 
 	public XDPage setRoles(String roles) {
 		this.roles = roles;
+		return this;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public XDPage setIcon(String icon) {
+		this.icon = icon;
 		return this;
 	}
 }
