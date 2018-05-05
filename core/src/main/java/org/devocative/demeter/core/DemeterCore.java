@@ -508,8 +508,12 @@ public class DemeterCore {
 			if (APP_LIFECYCLE_BEANS.containsKey(priority)) {
 				Map<String, IApplicationLifecycle> lifecycleMap = APP_LIFECYCLE_BEANS.get(priority);
 				for (Map.Entry<String, IApplicationLifecycle> entry : lifecycleMap.entrySet()) {
-					entry.getValue().shutdown();
-					logger.info("Application Lifecycle Priority [{}] shutdown(): bean=[{}]", priority, entry.getKey());
+					try {
+						entry.getValue().shutdown();
+						logger.info("Application Lifecycle Priority [{}] shutdown(): bean=[{}]", priority, entry.getKey());
+					} catch (Exception e) {
+						logger.error("Exception for Application Lifecycle Priority [{}] shutdown(): bean=[{}]", e);
+					}
 				}
 			}
 		}

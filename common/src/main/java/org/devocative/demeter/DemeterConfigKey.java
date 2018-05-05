@@ -10,6 +10,12 @@ public enum DemeterConfigKey implements IConfigKey {
 	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
 	DatabaseDiffHandler("dmt.db.diff.handler", "script", Arrays.asList("script", "auto", "hbm2ddl", "none")),
+	DatabaseCheckTimeoutEnabled("dmt.db.check.timeout.enabled", true, Arrays.asList(true, false)),
+	DatabaseCheckTimeoutDur("dmt.db.check.timeout.dur", 15),
+	DatabaseCheckTimeoutMin("dmt.db.check.timeout.min", 5),
+	DatabaseCheckTimeoutMax("dmt.db.check.timeout.max", 10),
+	DatabaseCheckTimeoutList("dmt.db.check.timeout.list", 10),
+	DatabaseCheckTimeoutAlive("dmt.db.check.timeout.alive", 10), //minutes
 
 	EnabledSecurity("dmt.security.enabled", true, Arrays.asList(true, false)),
 	//SecurityRealm(true, "dmt.security.realm"),
@@ -75,7 +81,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	TaskEnabled("dmt.task.enabled", true, Arrays.asList(true, false)),
 	TaskPoolSize("dmt.task.pool.size", 5),
 	TaskPoolMax("dmt.task.pool.max", 10),
-	TaskPoolAliveTime("dmt.task.pool.alive.time", 0),
+	TaskPoolAliveTime("dmt.task.pool.alive.time", 10), //minutes
 
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", Arrays.asList("Persian", "Gregorian")),

@@ -7,7 +7,9 @@ public enum DemeterErrorCode implements DErrorCode {
 	InvalidCurrentPassword("Invalid current password"),
 	UserLocked("User is locked"),
 	UserDisabled("User is disabled"),
+
 	DBConstraintViolation("DB Constraint Violated"),
+	DBGetConnectionFailure("DB Get Connection Failure:\n1.Please Check DB Connection!\n2.Just Try Again!\n"),
 
 	TrxInvalidPropagation("Invalid trx propagation"),
 	TrxAlreadyActiveNoForce("Can'nt force new trx on active trx"),

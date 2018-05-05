@@ -6,14 +6,16 @@
 
 <hibernate-configuration>
 	<session-factory>
-		<property name="connection.autocommit">false</property>
-		<property name="connection.isolation">2</property>
-		<property name="connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</property>
+		<property name="hibernate.connection.autocommit">false</property>
+		<property name="hibernate.connection.isolation">2</property>
+		<property name="hibernate.connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider
+		</property>
 		<property name="javax.persistence.validation.mode">NONE</property>
 
-		<property name="jdbc.batch_size">5</property>
-		<property name="jdbc.fetch_size">100</property>
-		<property name="jdbc.wrap_result_sets">true</property>
+		<property name="hibernate.jdbc.batch_size">5</property>
+		<property name="hibernate.jdbc.fetch_size">100</property>
+		<property name="hibernate.jdbc.wrap_result_sets">true</property>
+		<property name="hibernate.c3p0.timeout"></property>
 
 		<property name="org.hibernate.envers.audit_table_prefix">a_</property>
 		<property name="org.hibernate.envers.audit_table_suffix"/>

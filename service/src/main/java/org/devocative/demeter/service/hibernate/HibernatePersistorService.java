@@ -4,10 +4,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.ObjectUtil;
 import org.devocative.adroit.obuilder.MapBuilder;
-import org.devocative.demeter.DBConstraintViolationException;
-import org.devocative.demeter.DSystemException;
-import org.devocative.demeter.DemeterErrorCode;
-import org.devocative.demeter.DemeterException;
+import org.devocative.demeter.*;
 import org.devocative.demeter.iservice.ApplicationLifecyclePriority;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.iservice.persistor.ELockMode;
@@ -39,6 +36,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +49,7 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private static final Pattern HSQLDB_CONSTRAINT_NAME = Pattern.compile("unique constraint or index violation; (.+?) table:");
 
+	private ThreadPoolExecutor timeOutExecutor;
 	private List<Class> entities;
 	private String prefix;
 
@@ -117,6 +116,16 @@ public class HibernatePersistorService implements IPersistorService {
 				logger.error("Executing script file: ", e);
 			}
 		}
+
+		if (ConfigUtil.getBoolean(DemeterConfigKey.DatabaseCheckTimeoutEnabled)) {
+			timeOutExecutor = new ThreadPoolExecutor(
+				ConfigUtil.getInteger(DemeterConfigKey.DatabaseCheckTimeoutMin),
+				ConfigUtil.getInteger(DemeterConfigKey.DatabaseCheckTimeoutMax),
+				1, TimeUnit.MINUTES,
+				new ArrayBlockingQueue<>(ConfigUtil.getInteger(DemeterConfigKey.DatabaseCheckTimeoutList)));
+
+			logger.info("HibernatePersistorService -> TimeOutExecutor Created.");
+		}
 	}
 
 	@Override
@@ -134,6 +143,10 @@ public class HibernatePersistorService implements IPersistorService {
 		}
 
 		currentSession.remove();
+
+		if (timeOutExecutor != null) {
+			timeOutExecutor.shutdown();
+		}
 	}
 
 	@Override
@@ -267,10 +280,8 @@ public class HibernatePersistorService implements IPersistorService {
 
 		try {
 			final Session session = getCurrentSession();
-			final Object result = session.merge(obj);
+			session.saveOrUpdate(obj);
 			session.flush();
-
-			copyProperties(result, obj);
 		} catch (PersistenceException e) {
 			processPersistenceException(e);
 		}
@@ -523,7 +534,9 @@ public class HibernatePersistorService implements IPersistorService {
 			currentTrxLevel.set(new AtomicInteger(0));
 		} else {
 			try {
-				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+				session
+					.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query")))
+					.uniqueResult();
 			} catch (HibernateException e) {
 				logger.warn("Check current session error", e);
 				currentSession.remove();
@@ -551,22 +564,38 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private Session getSession() {
 		int noOfRetry = 0;
+
 		while (true) {
 			try {
 				Session session = sessionFactory.openSession();
-				session.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query"))).uniqueResult();
+
+				if (ConfigUtil.getBoolean(DemeterConfigKey.DatabaseCheckTimeoutEnabled)) {
+					final Future<Boolean> submit = timeOutExecutor.submit(new TimeOut(session));
+					final Boolean result = submit.get(ConfigUtil.getInteger(DemeterConfigKey.DatabaseCheckTimeoutDur), TimeUnit.SECONDS);
+					if (!result) {
+						throw new RuntimeException("Checking-Query Timeout!");
+					}
+				} else {
+					session
+						.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query")))
+						.uniqueResult();
+				}
+
 				return session;
-			} catch (HibernateException e) {
+			} catch (Exception e) {
 				logger.error("Problem getting new session", e);
+
 				try {
 					sessionFactory.close();
 				} catch (HibernateException e1) {
 					logger.warn("Problem closing SessionFactory", e);
 				}
+
 				noOfRetry++;
+
 				if (noOfRetry > 3) {
 					//TODO SMSUtil.sendSMS("hibernate.connection");
-					throw e;
+					throw new DemeterException(DemeterErrorCode.DBGetConnectionFailure, "Hint: " + e.getMessage());
 				}
 
 				init();
@@ -587,27 +616,6 @@ public class HibernatePersistorService implements IPersistorService {
 
 	private String getConfig(String key) {
 		return String.format("%s.%s", prefix, key);
-	}
-
-	private void copyProperties(Object src, Object dest) {
-		try {
-			Map<String, PropertyDescriptor> srcProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(src));
-			Map<String, PropertyDescriptor> destProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(dest));
-
-			for (Map.Entry<String, PropertyDescriptor> entry : srcProps.entrySet()) {
-				final String srcPropName = entry.getKey();
-
-				final PropertyDescriptor srcProp = entry.getValue();
-				final PropertyDescriptor destProp = destProps.get(srcPropName);
-
-				if (destProp != null && destProp.getWriteMethod() != null) {
-					final Object srcValue = srcProp.getReadMethod().invoke(src);
-					destProp.getWriteMethod().invoke(dest, srcValue);
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	private Map<String, PropertyDescriptor> getPropertyDescriptorsAsMap(Class cls) {
@@ -631,4 +639,51 @@ public class HibernatePersistorService implements IPersistorService {
 
 		return null;
 	}
+
+	// ------------------------------
+
+	private class TimeOut implements Callable<Boolean> {
+		private Session session;
+
+		private TimeOut(Session session) {
+			this.session = session;
+		}
+
+		@Override
+		public Boolean call() {
+			try {
+				session
+					.createNativeQuery(ConfigUtil.getString(true, getConfig("db.connection.check.query")))
+					.uniqueResult();
+				return true;
+			} catch (Exception e) {
+				logger.error("Check-Query Timeout Thread Exception: {}", e.getMessage());
+			}
+
+			return false;
+		}
+	}
+
+	/*
+	 private void copyProperties(Object src, Object dest) {
+		try {
+			Map<String, PropertyDescriptor> srcProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(src));
+			Map<String, PropertyDescriptor> destProps = getPropertyDescriptorsAsMap(HibernateProxyHelper.getClassWithoutInitializingProxy(dest));
+
+			for (Map.Entry<String, PropertyDescriptor> entry : srcProps.entrySet()) {
+				final String srcPropName = entry.getKey();
+
+				final PropertyDescriptor srcProp = entry.getValue();
+				final PropertyDescriptor destProp = destProps.get(srcPropName);
+
+				if (destProp != null && destProp.getWriteMethod() != null) {
+					final Object srcValue = srcProp.getReadMethod().invoke(src);
+					destProp.getWriteMethod().invoke(dest, srcValue);
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	*/
 }

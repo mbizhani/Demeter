@@ -99,7 +99,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolSize),
 			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolMax),
 			ConfigUtil.getInteger(DemeterConfigKey.TaskPoolAliveTime),
-			TimeUnit.MILLISECONDS,
+			TimeUnit.MINUTES,
 			new LinkedBlockingQueue<>());
 
 		threadPoolExecutor.setRejectedExecutionHandler(this);
