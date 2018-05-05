@@ -1,34 +1,53 @@
-package org.devocative.demeter.web;
+package org.devocative.demeter.web.page;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.devocative.demeter.core.DbDiffVO;
 import org.devocative.demeter.core.DemeterCore;
+import org.devocative.demeter.core.EStartupStep;
 import org.devocative.demeter.core.StepResultVO;
-import org.devocative.wickomp.html.WAjaxLink;
+import org.devocative.demeter.web.Index;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StartupHandlerPage extends WebPage {
 	private static final long serialVersionUID = -283332983407600664L;
 
-	public StartupHandlerPage(PageParameters pageParameters) {
-		StepResultVO latestStat = DemeterCore.get().getLatestStat();
-		List<DbDiffVO> dbDiffs = DemeterCore.get().getDbDiffs();
+	private static final Logger logger = LoggerFactory.getLogger(StartupHandlerPage.class);
 
-		add(new Label("step", latestStat.getStep()));
-		add(new Label("error", latestStat.getError().getMessage()));
+	private int retry = 0;
+	private StepResultVO latestStat;
+
+	public StartupHandlerPage(PageParameters pageParameters) {
+		latestStat = DemeterCore.get().getLatestStat();
+
+		final List<DbDiffVO> dbDiffs = new ArrayList<>();
+		if (latestStat.getStep() == EStartupStep.Database) {
+			try {
+				dbDiffs.addAll(DemeterCore.get().getDbDiffs());
+			} catch (Exception e) {
+				logger.warn("StartupHandlerPage: DemeterCore.get().getDbDiffs(): {}", e.getMessage());
+			}
+		}
+
+		add(new Label("step", new PropertyModel<>(latestStat, "step")));
+		add(new Label("error", new PropertyModel<>(latestStat, "error")));
+		add(new Label("retry", new PropertyModel<>(this, "retry")));
 
 		Form<Void> form = new Form<>("form");
-		form.setVisible(!dbDiffs.isEmpty());
+		//form.setVisible(!dbDiffs.isEmpty());
 		form.add(new ListView<DbDiffVO>("diffs", dbDiffs) {
 			private static final long serialVersionUID = 2909592281545402814L;
 
@@ -41,6 +60,7 @@ public class StartupHandlerPage extends WebPage {
 				item.add(new TextArea<>("sql", new Model<>(diffVO.getSql())));
 			}
 		});
+
 		form.add(new Button("apply") {
 			private static final long serialVersionUID = -2417464048199954007L;
 
@@ -50,14 +70,20 @@ public class StartupHandlerPage extends WebPage {
 				DemeterCore.get().resume();
 				setResponsePage(Index.class, pageParameters);
 			}
-		});
-		form.add(new WAjaxLink("resume") {
+		}.setVisible(!dbDiffs.isEmpty()));
+
+		form.add(new Link("resume") {
 			private static final long serialVersionUID = 7843257940731113723L;
 
 			@Override
-			public void onClick(AjaxRequestTarget ajaxRequestTarget) {
+			public void onClick() {
 				DemeterCore.get().resume();
-				setResponsePage(Index.class, pageParameters);
+				latestStat = DemeterCore.get().getLatestStat();
+				retry++;
+
+				if (latestStat.getStep() == EStartupStep.End) {
+					setResponsePage(Index.class, pageParameters);
+				}
 			}
 		});
 		add(form);

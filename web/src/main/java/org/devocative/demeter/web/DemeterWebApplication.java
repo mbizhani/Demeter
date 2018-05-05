@@ -23,6 +23,7 @@ import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.web.page.StartupHandlerPage;
 import org.devocative.wickomp.WDefaults;
 import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
@@ -178,7 +179,7 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 	// ------------------------------
 
-	public List<String> getModulesRelatedCSS() {
+	List<String> getModulesRelatedCSS() {
 		return modulesRelatedCSS;
 	}
 

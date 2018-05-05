@@ -53,7 +53,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {
-		logger.debug("DemeterWebListener.requestInitialized");
+		logger.trace("DemeterWebListener.requestInitialized");
 
 		for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 			try {
@@ -67,7 +67,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 	@Override
 	public void requestDestroyed(ServletRequestEvent sre) {
-		logger.debug("DemeterWebListener.requestDestroyed");
+		logger.trace("DemeterWebListener.requestDestroyed");
 
 		for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 			try {

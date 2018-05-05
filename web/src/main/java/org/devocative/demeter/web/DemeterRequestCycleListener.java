@@ -1,11 +1,14 @@
 package org.devocative.demeter.web;
 
+import org.apache.wicket.core.request.handler.PageProvider;
+import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.devocative.demeter.iservice.IRequestLifecycle;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.vo.UserVO;
+import org.devocative.demeter.web.page.ErrorPage;
 import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +35,7 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	@Override
 	public void onBeginRequest(RequestCycle cycle) {
 		boolean isWSRq = WebUtil.isWebSocketRequest(cycle);
-		logger.debug("DemeterRequestCycleListener.onBeginRequest: IsWSRq={}", isWSRq);
+		logger.trace("DemeterRequestCycleListener.onBeginRequest: IsWSRq={}", isWSRq);
 
 		try {
 			UserVO currentUser = DemeterWebSession.get().getUserVO();
@@ -61,7 +64,7 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	@Override
 	public void onEndRequest(RequestCycle cycle) {
 		boolean isWSRs = WebUtil.isWebSocketResponse(cycle);
-		logger.debug("DemeterRequestCycleListener.onEndRequest: IsWSRs={}", isWSRs);
+		logger.trace("DemeterRequestCycleListener.onEndRequest: IsWSRs={}", isWSRs);
 
 		try {
 			UserVO currentUser = securityService.getCurrentUser();
@@ -90,8 +93,7 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 
 		onEndRequest(cycle);
 
-		//TODO an Exception Page
-		return super.onException(cycle, ex);
+		return new RenderPageRequestHandler(new PageProvider(new ErrorPage(ex)));
 	}
 
 	// ------------------------------
