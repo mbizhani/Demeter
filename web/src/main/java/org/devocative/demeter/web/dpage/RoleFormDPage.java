@@ -7,6 +7,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.entity.ERoleMode;
 import org.devocative.demeter.entity.Role;
 import org.devocative.demeter.iservice.IRoleService;
+import org.devocative.demeter.vo.input.RoleIVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
 import org.devocative.demeter.web.UrlUtil;
@@ -27,7 +28,7 @@ public class RoleFormDPage extends DPage {
 	@Inject
 	private IRoleService roleService;
 
-	private Role entity;
+	private RoleIVO entity;
 
 	// ------------------------------
 
@@ -37,9 +38,9 @@ public class RoleFormDPage extends DPage {
 
 	// Main Constructor - For Ajax Call
 	public RoleFormDPage(String id, Role entity) {
-		super(id, Collections.<String>emptyList());
+		super(id, Collections.emptyList());
 
-		this.entity = entity;
+		this.entity = new RoleIVO(entity);
 	}
 
 	// ---------------
@@ -49,8 +50,8 @@ public class RoleFormDPage extends DPage {
 		super(id, params);
 
 		this.entity = params != null && !params.isEmpty() ?
-			roleService.load(Long.valueOf(params.get(0))) :
-			new Role();
+			new RoleIVO(roleService.load(Long.valueOf(params.get(0)))) :
+			new RoleIVO();
 	}
 
 	// ------------------------------
@@ -63,7 +64,7 @@ public class RoleFormDPage extends DPage {
 		floatTable.add(new WTextInput("name")
 			.setRequired(true)
 			.setLabel(new ResourceModel("Role.name", "name"))
-			.add(new  WAsciiIdentifierValidator())
+			.add(new WAsciiIdentifierValidator())
 		);
 		floatTable.add(new WSelectionInput("roleMode", ERoleMode.list(), false)
 			.setRequired(true)
@@ -73,7 +74,7 @@ public class RoleFormDPage extends DPage {
 		floatTable.add(new WSelectionInput("denials", roleService.getDenialsList(), true)
 			.setLabel(new ResourceModel("Role.denials", "denials")));
 
-		Form<Role> form = new Form<>("form", new CompoundPropertyModel<>(entity));
+		Form<RoleIVO> form = new Form<>("form", new CompoundPropertyModel<>(entity));
 		form.add(floatTable);
 
 		form.add(new DAjaxButton("save", new ResourceModel("label.save"), DemeterIcon.SAVE) {

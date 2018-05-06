@@ -70,7 +70,7 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	@NotAudited
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "f_creator_user", insertable = false, updatable = false,
+	@JoinColumn(name = "f_creator_user", nullable = false, insertable = false, updatable = false,
 		foreignKey = @ForeignKey(name = "role_crtrusr2user"))
 	private User creatorUser;
 
@@ -162,10 +162,6 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 		return creatorUser;
 	}
 
-	public void setCreatorUser(User creatorUser) {
-		this.creatorUser = creatorUser;
-	}
-
 	@Override
 	public Long getCreatorUserId() {
 		return creatorUserId;
@@ -188,10 +184,6 @@ public class Role implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	public User getModifierUser() {
 		return modifierUser;
-	}
-
-	public void setModifierUser(User modifierUser) {
-		this.modifierUser = modifierUser;
 	}
 
 	@Override

@@ -2,11 +2,14 @@ package org.devocative.demeter.iservice;
 
 import org.devocative.demeter.entity.*;
 import org.devocative.demeter.vo.filter.RoleFVO;
+import org.devocative.demeter.vo.input.RoleIVO;
 
 import java.util.List;
 
 public interface IRoleService {
 	void saveOrUpdate(Role entity);
+
+	void saveOrUpdate(RoleIVO vo);
 
 	Role load(Long id);
 

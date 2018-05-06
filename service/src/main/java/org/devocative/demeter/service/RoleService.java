@@ -7,6 +7,7 @@ import org.devocative.demeter.entity.*;
 import org.devocative.demeter.iservice.IRoleService;
 import org.devocative.demeter.iservice.persistor.IPersistorService;
 import org.devocative.demeter.vo.filter.RoleFVO;
+import org.devocative.demeter.vo.input.RoleIVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,15 @@ public class RoleService implements IRoleService {
 				throw new DemeterException(DemeterErrorCode.DuplicateRoleName);
 			}
 		}
+	}
+
+	@Override
+	public void saveOrUpdate(RoleIVO vo) {
+		Role entity = vo.toRole();
+
+		saveOrUpdate(entity);
+
+		vo.fromRole(entity);
 	}
 
 	@Override
