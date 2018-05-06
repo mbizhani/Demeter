@@ -5,8 +5,6 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.Request;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
-import org.devocative.demeter.entity.ECalendar;
-import org.devocative.demeter.entity.ELayoutDirection;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.wickomp.opt.OCalendar;
 import org.devocative.wickomp.opt.OLayoutDirection;
@@ -79,11 +77,15 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	@Override
 	public OCalendar getCalendar() {
-		OCalendar result = OCalendar.Gregorian;
-		if (ECalendar.PERSIAN.equals(userVO.getCalendar())) {
-			result = OCalendar.Persian;
+		switch (userVO.getCalendar()) {
+			case PERSIAN:
+				return OCalendar.Persian;
+
+			case GREGORIAN:
+				return OCalendar.Gregorian;
 		}
-		return result;
+
+		return OCalendar.Gregorian;
 	}
 
 	@Override
@@ -103,11 +105,15 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 
 	@Override
 	public OLayoutDirection getLayoutDirection() {
-		OLayoutDirection result = OLayoutDirection.LTR;
-		if (ELayoutDirection.RTL.equals(userVO.getLayoutDirection())) {
-			result = OLayoutDirection.RTL;
+		switch (userVO.getLayoutDirection()) {
+			case LTR:
+				return OLayoutDirection.LTR;
+
+			case RTL:
+				return OLayoutDirection.RTL;
 		}
-		return result;
+
+		return OLayoutDirection.LTR;
 	}
 
 	@Override

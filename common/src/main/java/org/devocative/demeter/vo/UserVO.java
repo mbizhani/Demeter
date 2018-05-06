@@ -176,7 +176,7 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
-	// ------------------------------
+	// ---------------
 
 	public ELocale getLocale() {
 		return locale;
@@ -232,7 +232,19 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
-	// ------------------------------
+	// ---------------
+
+	public String formatDate(Date date) {
+		return formatDate(date, getDatePatternType().getFormat());
+	}
+
+	public String formatDate(Date date, String pattern) {
+		return getCalendar().convertToString(date, pattern);
+	}
+
+	public String formatDateTime(Date date) {
+		return getCalendar().convertToString(date, getDateTimePatternType().getFormat());
+	}
 
 	public UserVO addOtherProfileInfo(String key, Object info) {
 		otherProfileInfo.put(key, info);
@@ -249,7 +261,7 @@ public class UserVO implements Serializable {
 		return user;
 	}
 
-	// ------------------------------
+	// ---------------
 
 	@Override
 	public String toString() {
