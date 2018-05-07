@@ -1,6 +1,10 @@
 package org.devocative.demeter.core;
 
-public class StepResultVO {
+import java.io.Serializable;
+
+public class StepResultVO implements Serializable {
+	private static final long serialVersionUID = 4320860876760332286L;
+
 	private EStartupStep step;
 	private Exception error;
 
