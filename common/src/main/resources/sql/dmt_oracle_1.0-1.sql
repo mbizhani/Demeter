@@ -47,12 +47,12 @@ CREATE TABLE mt_dmt_prvlg_user_perm (
 ----------------------------------
 
 ALTER TABLE a_mt_dmt_prvlg_user_deny
-	ADD CONSTRAINT FK_3knmjfe81yklpk0k7i6vw29j7
+	ADD CONSTRAINT FKku4j3tk30eowve9q7nf406aln
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_user_perm
-	ADD CONSTRAINT FK_kyqy7cjc782ctdko74hshhexc
+	ADD CONSTRAINT FK20l0ho8iplbwhaxmgtclo18ck
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 

@@ -305,17 +305,17 @@ ALTER TABLE t_dmt_user
 ----------------------------------
 
 ALTER TABLE a_mt_dmt_pageinst_role
-	ADD CONSTRAINT FK_tlf8x1usn0dug9sf5jaq077sr
+	ADD CONSTRAINT FKi9129tc6i2fhowwm1uyhaas1f
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_role_deny
-	ADD CONSTRAINT FK_mqwhogdldx9juleqmc9c185xr
+	ADD CONSTRAINT FKdc2b74yxn9mwiapgm9saiir7t
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_prvlg_role_perm
-	ADD CONSTRAINT FK_s7m14y23jw3ohc1orsge2ahiu
+	ADD CONSTRAINT FKiqpgakqemycfgs42u2wmpqehh
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
@@ -325,27 +325,27 @@ FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_mt_dmt_user_role
-	ADD CONSTRAINT FK_mqjoupr478iv6jchf7be9w2kf
+	ADD CONSTRAINT FKj59vhgmntchwelhw7ppofwo1v
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_d_page_inst
-	ADD CONSTRAINT FK_sarg1peou92ejerqwwav35ej1
+	ADD CONSTRAINT FK9tvhlvjf6tsubwim3w0t4hdpu
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_person
-	ADD CONSTRAINT FK_g9l38x2ycntsvmn84wl6aqsa9
+	add constraint FK392kcbfcj1oksdbhesxmr9cik
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_role
-	ADD CONSTRAINT FK_l9yemywu9lnbr39qyvstwnget
+	add constraint FKpbo95aydyna28b0gsdoh420x9
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
 ALTER TABLE a_t_dmt_user
-	ADD CONSTRAINT FK_hkcebwdtmgqd01r4qpw95ebxe
+	add constraint FKpn2jyq4hge738epuevb4auord
 FOREIGN KEY (r_num)
 REFERENCES REVINFO;
 
