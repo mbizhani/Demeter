@@ -56,6 +56,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	FileBaseDir(true, "dmt.service.file.base.dir"),
 	//TODO ServiceRemoteHost("dmt.service.remote.host"),
 
+	WebAppName("dmt.web.app.name"),
 	WebRequestTimeout("dmt.web.request.timeout", 10),
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
 	WebReplaceCharForString("dmt.web.replace.char", "{\"fa\":[{\"from\":\"ي\",\"to\":\"ی\"}, {\"from\":\"ك\",\"to\":\"ک\"}]}"),

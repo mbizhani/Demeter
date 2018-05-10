@@ -136,8 +136,11 @@ public class Index extends WebPage {
 
 		boolean printable = !pageParameters.get(DemeterWebParam.PRINTABLE).isNull();
 
+		final String appName = ConfigUtil.getString(DemeterConfigKey.WebAppName);
+
 		WebMarkupContainer header = new WebMarkupContainer("header");
 		header.add(new WMenuBar("menu", oMenuItems));
+		header.add(new Label("appName", appName != null ? appName : new ResourceModel("label.APP")));
 		header.setVisible(!printable);
 		html.add(header);
 
