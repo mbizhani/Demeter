@@ -140,7 +140,7 @@ public class Index extends WebPage {
 
 		WebMarkupContainer header = new WebMarkupContainer("header");
 		header.add(new WMenuBar("menu", oMenuItems));
-		header.add(new Label("appName", appName != null ? appName : new ResourceModel("label.APP")));
+		header.add(new Label("appName", appName != null ? new Model<>(appName) : new ResourceModel("label.APP")));
 		header.setVisible(!printable);
 		html.add(header);
 
