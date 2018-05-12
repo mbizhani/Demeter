@@ -46,12 +46,20 @@ public class FileStoreService implements IFileStoreService {
 
 	@Override
 	public FileStore loadByFileId(String fileId) {
-		return persistorService
+		FileStore result = persistorService
 			.createQueryBuilder()
 			.addFrom(FileStore.class, "ent")
-			.addWhere("and ent.fileId = :fileId")
-			.addParam("fileId", fileId)
+			.addWhere("and ent.fileId = :fileId", "fileId", fileId)
 			.object();
+
+		if (result.getStatus() == EFileStatus.VALID) {
+			if (result.getStorage() == EFileStorage.DISK && !new File(result.getPath()).exists()) {
+				result.setStatus(EFileStatus.DELETED);
+				saveOrUpdate(result);
+			}
+		}
+
+		return result;
 	}
 
 	@Override

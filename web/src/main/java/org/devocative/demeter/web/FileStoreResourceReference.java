@@ -4,6 +4,8 @@ import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.time.Duration;
+import org.devocative.demeter.entity.EFileStatus;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.entity.FileStore;
 import org.devocative.demeter.iservice.IFileStoreService;
@@ -20,7 +22,7 @@ public class FileStoreResourceReference extends ResourceReference {
 
 	private final IFileStoreService fileStoreService;
 
-	public FileStoreResourceReference(IFileStoreService fileStoreService) {
+	FileStoreResourceReference(IFileStoreService fileStoreService) {
 		super("FileStoreResourceReference");
 
 		this.fileStoreService = fileStoreService;
@@ -34,41 +36,50 @@ public class FileStoreResourceReference extends ResourceReference {
 
 			@Override
 			protected ResourceResponse newResourceResponse(Attributes attributes) {
-				final String fileid = attributes.getParameters().get("fileid").toString();
-
-				final FileStore fileStore = fileStoreService.loadByFileId(fileid);
+				final String fileId = attributes.getParameters().get("fileId").toString();
+				final FileStore fileStore = fileStoreService.loadByFileId(fileId);
 
 				ResourceResponse resourceResponse = new ResourceResponse();
 
-				// TODO: check authorization, e.g. currentUser=fileStore.creatorUser
-
 				if (fileStore != null) {
-					logger.info("Download file: fileid={} filename={}", fileid, fileStore.getName());
+					logger.info("Download file: fileId={} filename={}", fileId, fileStore.getName());
 
-					resourceResponse.setContentDisposition(ContentDisposition.ATTACHMENT);
-					resourceResponse.setFileName(fileStore.getName());
-					resourceResponse.setContentType(fileStore.getMimeType().getType());
-					resourceResponse.disableCaching();
+					if (fileStore.getStatus() == EFileStatus.VALID) {
+						resourceResponse.setContentDisposition(ContentDisposition.ATTACHMENT);
+						resourceResponse.setFileName(fileStore.getName());
+						resourceResponse.setContentType(fileStore.getMimeType().getType());
+						resourceResponse.disableCaching();
 
-					resourceResponse.setWriteCallback(new WriteCallback() {
-						@Override
-						public void writeData(Attributes attributes) throws IOException {
-							OutputStream out = attributes.getResponse().getOutputStream();
-							fileStoreService.writeFile(fileStore, out);
-						}
-					});
+						resourceResponse.setWriteCallback(new WriteCallback() {
+							@Override
+							public void writeData(Attributes attributes) {
+								OutputStream out = attributes.getResponse().getOutputStream();
+								fileStoreService.writeFile(fileStore, out);
+							}
+						});
+					} else {
+						writeError(resourceResponse, "Invalid FileStore State: " + fileStore.getStatus());
+					}
 				} else {
-					resourceResponse.setContentDisposition(ContentDisposition.INLINE);
-					resourceResponse.setContentType(EMimeType.TEXT.getType());
-					resourceResponse.setWriteCallback(new WriteCallback() {
-						@Override
-						public void writeData(Attributes attributes) throws IOException {
-							OutputStream out = attributes.getResponse().getOutputStream();
-							out.write(String.format("File not found: %s", fileid).getBytes());
-						}
-					});
+					writeError(resourceResponse, "FileStore Not Found: " + fileId);
 				}
 				return resourceResponse;
+			}
+
+			private void writeError(ResourceResponse resourceResponse, String msg) {
+				resourceResponse.setContentDisposition(ContentDisposition.INLINE);
+				resourceResponse.setContentType(EMimeType.HTML.getType());
+				resourceResponse.setCacheDuration(Duration.NONE);
+				resourceResponse.setWriteCallback(new WriteCallback() {
+					@Override
+					public void writeData(Attributes attributes) throws IOException {
+						String finalMsg = String.format(
+							"<html><body><script>window.close();alert('%s');</script></body></html>",
+							msg);
+						OutputStream out = attributes.getResponse().getOutputStream();
+						out.write(finalMsg.getBytes());
+					}
+				});
 			}
 		};
 	}

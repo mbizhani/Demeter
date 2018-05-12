@@ -4,7 +4,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.devocative.demeter.DemeterPrivilegeKey;
 import org.devocative.demeter.entity.EFileStatus;
@@ -15,8 +14,8 @@ import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.vo.filter.FileStoreFVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.DemeterIcon;
-import org.devocative.demeter.web.UrlUtil;
 import org.devocative.demeter.web.component.DAjaxButton;
+import org.devocative.demeter.web.component.grid.DownloadFSLinkColumn;
 import org.devocative.demeter.web.component.grid.OEditAjaxColumn;
 import org.devocative.wickomp.WModel;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -28,7 +27,6 @@ import org.devocative.wickomp.grid.IGridDataSource;
 import org.devocative.wickomp.grid.OGrid;
 import org.devocative.wickomp.grid.WDataGrid;
 import org.devocative.wickomp.grid.WSortField;
-import org.devocative.wickomp.grid.column.OColumn;
 import org.devocative.wickomp.grid.column.OColumnList;
 import org.devocative.wickomp.grid.column.OPropertyColumn;
 import org.devocative.wickomp.html.WAjaxLink;
@@ -175,18 +173,12 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 			});
 		}
 
-		columnList.add(new OColumn<FileStore>(new Model<>(), "DOWNLOAD") {
+		columnList.add(new DownloadFSLinkColumn<FileStore>() {
 			private static final long serialVersionUID = -501065240513534269L;
 
 			@Override
-			public String cellValue(FileStore bean, String id, int colNo, String url) {
-				return String.format("<a href=\"%s\" target=\"_blank\">%s</a>",
-					UrlUtil.getFileUri(bean.getFileId()), DemeterIcon.DOWNLOAD.toString());
-			}
-
-			@Override
-			public String footerCellValue(Object bean, int colNo, String url) {
-				return null;
+			protected String getFileId(FileStore bean) {
+				return bean.getFileId();
 			}
 		});
 

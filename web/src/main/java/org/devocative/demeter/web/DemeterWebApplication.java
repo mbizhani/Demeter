@@ -73,7 +73,9 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 		mountPage(DemeterWebParam.APP_INNER_CTX, Index.class);
 
 		IFileStoreService fileStoreService = applicationContext.getBean(IFileStoreService.class);
-		mountResource(String.format("%s/dmt/getfile/${fileid}", DemeterWebParam.APP_INNER_CTX), new FileStoreResourceReference(fileStoreService));
+		mountResource(
+			String.format("%s/dmt/getfile/${fileId}", DemeterWebParam.APP_INNER_CTX),
+			new FileStoreResourceReference(fileStoreService));
 
 		initModulesForWeb();
 
