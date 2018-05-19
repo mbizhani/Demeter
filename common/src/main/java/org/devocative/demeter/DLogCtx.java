@@ -17,9 +17,14 @@ public final class DLogCtx {
 
 	public static DLogCtx put(String key, Object val) {
 		Boolean enabled = ConfigUtil.getBoolean(DemeterConfigKey.LogMDCEnabled);
-		if (enabled && key != null && val != null) {
+
+		if (enabled && key != null) {
 			try {
-				MDC.put(key, val);
+				if (val != null) {
+					MDC.put(key, val);
+				} else {
+					MDC.remove(key);
+				}
 			} catch (Exception e) {
 				logger.warn("MDC.put: key=[{}] val=[{}]", key, val, e);
 			}
