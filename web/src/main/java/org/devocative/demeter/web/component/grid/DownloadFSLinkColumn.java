@@ -25,9 +25,4 @@ public abstract class DownloadFSLinkColumn<T> extends OColumn<T> {
 		return String.format("<a href=\"%s\" target=\"_blank\">%s</a>",
 			UrlUtil.getFileUri(getFileId(bean)), DemeterIcon.DOWNLOAD.toString());
 	}
-
-	@Override
-	public final String footerCellValue(Object bean, int colNo, String url) {
-		return null;
-	}
 }
