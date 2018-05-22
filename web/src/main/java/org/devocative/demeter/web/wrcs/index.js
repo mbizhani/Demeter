@@ -22,24 +22,22 @@ Wicket.Event.subscribe("/ajax/call/failure", function (attributes, jqXHR, errorT
 Wicket.Event.subscribe("/websocket/open", function (jqEvent) {
 	wLog.info("Demeter: websocket/open");
 
+	Wicket.WebSocket.send("W::OPEN");
+
 	if (WebSocketPingInterval) {
 		wsPingHandler = setInterval(pingWebSocket, WebSocketPingInterval * 1000);
 	}
 });
 Wicket.Event.subscribe("/websocket/closed", function (jqEvent) {
 	wLog.warn("Demeter: websocket/closed", jqEvent);
+
 	clearInterval(wsPingHandler);
 });
 Wicket.Event.subscribe("/websocket/error", function (jqEvent) {
 	wLog.error("Demeter: websocket/error", jqEvent);
 });
 Wicket.Event.subscribe("/websocket/message", function (jqEvent, message) {
-	if (message && message != "W.R_PING") {
-		if (sessionTO > 0 && idleSessionCounter > (sessionTO - 35)) {
-			wLog.info("Demeter: resend ajax on ws response, reset idle");
-			Wicket.Ajax.get({u: ajaxUrl});
-		}
-	}
+	wLog.info("Demeter: websocket/message", message);
 });
 
 if (sessionTO > 0) {
@@ -55,7 +53,7 @@ function showBusySign() {
 }
 
 function pingWebSocket() {
-	Wicket.WebSocket.send("W.PING");
+	Wicket.WebSocket.send("W::PING");
 }
 
 function processIdleSession() {

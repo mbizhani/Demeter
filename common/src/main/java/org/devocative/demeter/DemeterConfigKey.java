@@ -42,7 +42,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	//STO: Session Time Out
 	STO_Database("dmt.security.sto.database", 60),
 	STO_LDAP("dmt.security.sto.ldap", 40),
-	STO_Other("dmt.security.sto.other", 5),
+	STO_Other("dmt.security.sto.other", 20),
 	STO_Admin("dmt.security.sto.admin", 10),
 
 	CorsEnabled("dmt.security.cors.enabled", false, Arrays.asList(true, false)),
