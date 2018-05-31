@@ -1,6 +1,7 @@
 package org.devocative.demeter.test;
 
-import org.devocative.adroit.CalendarUtil;
+import org.devocative.adroit.date.EUniCalendar;
+import org.devocative.adroit.date.UniDate;
 import org.devocative.adroit.vo.RangeVO;
 import org.devocative.demeter.filter.CollectionUtil;
 import org.devocative.demeter.iservice.persistor.FilterOption;
@@ -16,10 +17,10 @@ public class TestCollectionUtil {
 	@Test
 	public void testFilterCollection() {
 		List<TheVO> list = Arrays.asList(
-			new TheVO("Jack", 1, CalendarUtil.parseDate("2017-01-01", "yyyy-MM-dd")),
-			new TheVO("Joe", 2, CalendarUtil.parseDate("2017-01-02", "yyyy-MM-dd")),
-			new TheVO("Jim", 3, CalendarUtil.parseDate("2017-01-03", "yyyy-MM-dd")),
-			new TheVO("Jade", 3, CalendarUtil.parseDate("2017-01-08", "yyyy-MM-dd"))
+			new TheVO("Jack", 1, UniDate.of(EUniCalendar.Gregorian, "2017-01-01", "yyyy-MM-dd").toDate()),
+			new TheVO("Joe", 2, UniDate.of(EUniCalendar.Gregorian, "2017-01-02", "yyyy-MM-dd").toDate()),
+			new TheVO("Jim", 3, UniDate.of(EUniCalendar.Gregorian, "2017-01-03", "yyyy-MM-dd").toDate()),
+			new TheVO("Jade", 3, UniDate.of(EUniCalendar.Gregorian, "2017-01-08", "yyyy-MM-dd").toDate())
 		);
 
 		List<TheVO> theVOs;
@@ -32,11 +33,11 @@ public class TestCollectionUtil {
 		System.out.println("FVO1.theVOs = " + theVOs);
 		doAssert(theVOs, "Jim", "Jade");
 
-		theVOs = CollectionUtil.filterCollection(list, new TheFVO1(null, 3, CalendarUtil.parseDate("2017-01-01", "yyyy-MM-dd")));
+		theVOs = CollectionUtil.filterCollection(list, new TheFVO1(null, 3, UniDate.of(EUniCalendar.Gregorian, "2017-01-01", "yyyy-MM-dd").toDate()));
 		System.out.println("FVO1.theVOs = " + theVOs);
 		doAssert(theVOs);
 
-		theVOs = CollectionUtil.filterCollection(list, new TheFVO1("Jim", 3, CalendarUtil.parseDate("2017-01-03", "yyyy-MM-dd")));
+		theVOs = CollectionUtil.filterCollection(list, new TheFVO1("Jim", 3, UniDate.of(EUniCalendar.Gregorian, "2017-01-03", "yyyy-MM-dd").toDate()));
 		System.out.println("FVO1.theVOs = " + theVOs);
 		doAssert(theVOs, "Jim");
 
@@ -51,14 +52,14 @@ public class TestCollectionUtil {
 		doAssert(theVOs, "Joe", "Jade");
 
 		theVOs = CollectionUtil.filterCollection(list, new TheFVO2("j", null, new RangeVO<>(
-			CalendarUtil.parseDate("2017-01-03", "yyyy-MM-dd"),
-			CalendarUtil.parseDate("2017-01-08", "yyyy-MM-dd"))
+			UniDate.of(EUniCalendar.Gregorian, "2017-01-03", "yyyy-MM-dd").toDate(),
+			UniDate.of(EUniCalendar.Gregorian, "2017-01-08", "yyyy-MM-dd").toDate())
 		));
 		System.out.println("FVO2.theVOs = " + theVOs);
 		doAssert(theVOs, "Jim");
 
 		theVOs = CollectionUtil.filterCollection(list, new TheFVO2("j", null, new RangeVO<>(
-			CalendarUtil.parseDate("2017-01-03", "yyyy-MM-dd"),
+			UniDate.of(EUniCalendar.Gregorian, "2017-01-03", "yyyy-MM-dd").toDate(),
 			null)
 		));
 		System.out.println("FVO2.theVOs = " + theVOs);
@@ -66,7 +67,7 @@ public class TestCollectionUtil {
 
 		theVOs = CollectionUtil.filterCollection(list, new TheFVO2("j", null, new RangeVO<>(
 			null,
-			CalendarUtil.parseDate("2017-01-03", "yyyy-MM-dd"))
+			UniDate.of(EUniCalendar.Gregorian, "2017-01-03", "yyyy-MM-dd").toDate())
 		));
 		System.out.println("FVO2.theVOs = " + theVOs);
 		doAssert(theVOs, "Jack", "Joe");

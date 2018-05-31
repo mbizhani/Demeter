@@ -23,7 +23,7 @@ public class InfoDPage extends DPage {
 	public InfoDPage(String id, List<String> params) {
 		super(id, params);
 
-		add(new Label("startUp", getCurrentUser().getCalendar().convertToString(
+		add(new Label("startUp", getCurrentUser().formatDate(
 			demeterCoreService.getStartUpDate(),
 			getCurrentUser().getDateTimePatternType().toString()
 		)));
@@ -39,7 +39,7 @@ public class InfoDPage extends DPage {
 				item.add(new Label("module", apply.getModule()));
 				item.add(new Label("version", apply.getVersion()));
 				item.add(new Label("file", apply.getFile()));
-				item.add(new Label("apply", getCurrentUser().getCalendar().convertToString(
+				item.add(new Label("apply", getCurrentUser().formatDate(
 					apply.getApply(),
 					getCurrentUser().getDateTimePatternType().toString()
 				)));

@@ -3,10 +3,10 @@ package org.devocative.demeter.web;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.Request;
+import org.devocative.adroit.date.EUniCalendar;
 import org.devocative.demeter.DemeterErrorCode;
 import org.devocative.demeter.DemeterException;
 import org.devocative.demeter.vo.UserVO;
-import org.devocative.wickomp.opt.OCalendar;
 import org.devocative.wickomp.opt.OLayoutDirection;
 import org.devocative.wickomp.opt.OUserPreference;
 import org.slf4j.Logger;
@@ -76,21 +76,13 @@ public class DemeterWebSession extends WebSession implements OUserPreference {
 	// ---------------
 
 	@Override
-	public OCalendar getCalendar() {
-		switch (userVO.getCalendar()) {
-			case PERSIAN:
-				return OCalendar.Persian;
-
-			case GREGORIAN:
-				return OCalendar.Gregorian;
-		}
-
-		return OCalendar.Gregorian;
+	public EUniCalendar getCalendar() {
+		return userVO.getCalendar().getCalendar();
 	}
 
 	@Override
 	public TimeZone getTimeZone() {
-		throw new RuntimeException("Not Implemented!");
+		return userVO.getTimeZone();
 	}
 
 	@Override

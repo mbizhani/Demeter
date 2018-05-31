@@ -1,15 +1,16 @@
 package org.devocative.demeter.entity;
 
-import org.devocative.adroit.CalendarUtil;
+import org.devocative.adroit.date.EUniCalendar;
 
 import javax.persistence.AttributeConverter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public enum ECalendar {
-	PERSIAN(1, "Persian"),
-	GREGORIAN(2, "Gregorian");
+	PERSIAN(1, "Persian", EUniCalendar.Persian),
+	GREGORIAN(2, "Gregorian", EUniCalendar.Gregorian);
 
 	// ------------------------------
 
@@ -17,11 +18,14 @@ public enum ECalendar {
 
 	private String name;
 
+	private EUniCalendar calendar;
+
 	// ------------------------------
 
-	ECalendar(Integer id, String name) {
+	ECalendar(Integer id, String name, EUniCalendar calendar) {
 		this.id = id;
 		this.name = name;
+		this.calendar = calendar;
 	}
 
 	// ------------------------------
@@ -34,18 +38,14 @@ public enum ECalendar {
 		return name;
 	}
 
+	public EUniCalendar getCalendar() {
+		return calendar;
+	}
+
 	// ---------------
 
-	public String convertToString(Date dt, String pattern) {
-		switch (this) {
-			case PERSIAN:
-				return CalendarUtil.toPersian(dt, pattern);
-
-			case GREGORIAN:
-				return CalendarUtil.formatDate(dt, pattern);
-		}
-
-		return null;
+	public String convertToString(Date dt, String pattern, TimeZone timeZone) {
+		return calendar.convertToString(dt, pattern, timeZone);
 	}
 
 	// ---------------

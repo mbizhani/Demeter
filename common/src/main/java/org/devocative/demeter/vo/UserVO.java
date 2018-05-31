@@ -28,6 +28,7 @@ public class UserVO implements Serializable {
 
 	private ELocale locale;
 	private ECalendar calendar;
+	private TimeZone timeZone;
 	private ELayoutDirection layoutDirection;
 	private EDatePatternType datePatternType;
 	private EDateTimePatternType dateTimePatternType;
@@ -196,6 +197,15 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
+	public TimeZone getTimeZone() {
+		return timeZone;
+	}
+
+	public UserVO setTimeZone(TimeZone timeZone) {
+		this.timeZone = timeZone;
+		return this;
+	}
+
 	public ELayoutDirection getLayoutDirection() {
 		return layoutDirection;
 	}
@@ -239,11 +249,11 @@ public class UserVO implements Serializable {
 	}
 
 	public String formatDate(Date date, String pattern) {
-		return getCalendar().convertToString(date, pattern);
+		return getCalendar().convertToString(date, pattern, getTimeZone());
 	}
 
 	public String formatDateTime(Date date) {
-		return getCalendar().convertToString(date, getDateTimePatternType().getFormat());
+		return getCalendar().convertToString(date, getDateTimePatternType().getFormat(), getTimeZone());
 	}
 
 	public UserVO addOtherProfileInfo(String key, Object info) {

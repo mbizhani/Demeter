@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Service("dmtUserService")
 public class UserService implements IUserService {
@@ -202,8 +203,9 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserVO getUserVO(User user) {
-		ELocale defLocale = ELocale.findByCode(ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
-		ECalendar defCalendar = ECalendar.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultCalendar));
+		final ELocale defLocale = ELocale.findByCode(ConfigUtil.getString(DemeterConfigKey.UserDefaultLocale));
+		final ECalendar defCalendar = ECalendar.findByName(ConfigUtil.getString(DemeterConfigKey.UserDefaultCalendar));
+		final String defTimeZone = ConfigUtil.getString(DemeterConfigKey.UserDefaultTimeZone);
 
 		Integer sto = user.getSessionTimeout();
 		if (sto == null) {
@@ -233,6 +235,8 @@ public class UserService implements IUserService {
 					user.getCalendarType() :
 					defCalendar != null ? defCalendar :
 						userLocale.getDefaultCalendar())
+			.setTimeZone(TimeZone.getTimeZone(
+				user.getTimeZone() != null ? user.getTimeZone() : defTimeZone))
 			.setDatePatternType(user.getDatePatternType() != null ? user.getDatePatternType() : EDatePatternType.P01)
 			.setDateTimePatternType(user.getDateTimePatternType() != null ? user.getDateTimePatternType() : EDateTimePatternType.P01)
 			.setSessionTimeout(sto);

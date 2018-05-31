@@ -4,6 +4,7 @@ import org.devocative.adroit.IConfigKey;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 public enum DemeterConfigKey implements IConfigKey {
 	Modules("dmt.modules"),
@@ -86,6 +87,7 @@ public enum DemeterConfigKey implements IConfigKey {
 
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", Arrays.asList("Persian", "Gregorian")),
+	UserDefaultTimeZone("dmt.user.def.timezone", TimeZone.getDefault().getID()),
 
 	LogMDCEnabled("dmt.log.mdc.enabled", true, Arrays.asList(true, false));
 

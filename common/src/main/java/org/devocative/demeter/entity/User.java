@@ -46,6 +46,10 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 	@Convert(converter = ECalendar.Converter.class)
 	private ECalendar calendarType;
 
+	//TODO
+	@Transient
+	private String timeZone;
+
 	@Column(name = "e_date_pattern")
 	@Convert(converter = EDatePatternType.Converter.class)
 	private EDatePatternType datePatternType;
@@ -157,6 +161,14 @@ public class User implements IRowMode, ICreationDate, ICreatorUser, IModificatio
 
 	public void setCalendarType(ECalendar calendarType) {
 		this.calendarType = calendarType;
+	}
+
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 
 	public EDatePatternType getDatePatternType() {

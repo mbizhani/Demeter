@@ -6,7 +6,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.devocative.adroit.CalendarUtil;
+import org.devocative.adroit.date.UniDate;
 import org.devocative.demeter.entity.EFileStorage;
 import org.devocative.demeter.entity.EMimeType;
 import org.devocative.demeter.iservice.FileStoreHandler;
@@ -19,8 +19,6 @@ import org.devocative.wickomp.form.WSelectionInput;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 
 public class FileStoreUploadPanel extends WLabeledFormInputPanel {
 	private static final long serialVersionUID = 2952229703389252184L;
@@ -85,12 +83,16 @@ public class FileStoreUploadPanel extends WLabeledFormInputPanel {
 			protected void onSubmit(AjaxRequestTarget target) {
 				FileUpload fileUpload = file.getFileUpload();
 				if (fileUpload != null) {
-					FileStoreHandler fileStoreHandler = fileStoreService.create(fileUpload.getClientFileName(), EFileStorage.DISK, EMimeType.BINARY, CalendarUtil.add(new Date(), Calendar.DATE, 3));
+					FileStoreHandler fileStoreHandler = fileStoreService.create(
+						fileUpload.getClientFileName(),
+						EFileStorage.DISK,
+						EMimeType.BINARY,
+						UniDate.now().updateDay(3).toDate());
 					try {
 						IOUtils.copy(fileUpload.getInputStream(), fileStoreHandler);
 						fileStoreHandler.close();
 
-						fileStoreSelection.setModel(new Model(fileStoreHandler.getFileStore()));
+						fileStoreSelection.setModel(new Model<>(fileStoreHandler.getFileStore()));
 						fileStoreSelection.updateChoices(target, fileStoreService.listByCurrentUserAsCreator());
 					} catch (IOException e) {
 						throw new RuntimeException(e);
