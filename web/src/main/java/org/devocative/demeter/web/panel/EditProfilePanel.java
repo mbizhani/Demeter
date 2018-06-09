@@ -53,6 +53,7 @@ public class EditProfilePanel extends DPanel {
 		userInfo.add(new Label("permissions"));
 		userInfo.add(new Label("denials"));
 		userInfo.add(new Label("calendar"));
+		userInfo.add(new Label("timeZone", currentUser.getTimeZone() != null ? currentUser.getTimeZone().getID() : "-"));
 		userInfo.add(new Label("sessionTimeout"));
 
 
