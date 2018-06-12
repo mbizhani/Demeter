@@ -1,6 +1,7 @@
 package org.devocative.demeter.service;
 
 import org.devocative.adroit.cache.ICache;
+import org.devocative.adroit.cache.IMissedHitHandler;
 import org.devocative.adroit.cache.LRUCache;
 import org.devocative.demeter.iservice.ICacheService;
 import org.devocative.demeter.iservice.ISecurityService;
@@ -28,8 +29,12 @@ public class CacheService implements ICacheService {
 
 	@Override
 	public <K, V> ICache<K, V> create(String id, int capacity) {
+		return create(id, capacity, null);
+	}
+
+	public <K, V> ICache<K, V> create(String id, int capacity, IMissedHitHandler<K, V> missedHitHandler) {
 		logger.info("ICache created: {}, capacity = {}", id, capacity);
-		ICache<K, V> cache = new LRUCache<>(capacity);
+		ICache<K, V> cache = new LRUCache<>(capacity, missedHitHandler);
 		ALL_CACHES.put(id, cache);
 		return cache;
 	}

@@ -146,15 +146,13 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		persistorService.commitOrRollback();
 
-		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2);
-		pageInstCache.setMissedHitHandler(key -> persistorService
+		pageInstCache = cacheService.create("DMT_D_PAGE_INST", totalDPageSize * 2, key -> persistorService
 			.createQueryBuilder()
 			.addFrom(DPageInstance.class, "ent")
 			.addWhere("and ent.uri = :uri", "uri", key)
 			.object());
 
-		uriCache = cacheService.create("DMT_D_PAGE_URI", totalDPageSize * 2);
-		uriCache.setMissedHitHandler(key -> {
+		uriCache = cacheService.create("DMT_D_PAGE_URI", totalDPageSize * 2, key -> {
 			DPageInfo pageInfo = persistorService
 				.createQueryBuilder()
 				.addFrom(DPageInfo.class, "ent")
