@@ -3,8 +3,8 @@ package org.devocative.demeter.core;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.devocative.adroit.ConfigUtil;
-import org.devocative.adroit.sql.plugin.EDatabaseType;
-import org.devocative.adroit.sql.plugin.PaginationPlugin;
+import org.devocative.adroit.sql.DatabaseType;
+import org.devocative.adroit.sql.info.IDatabaseInfo;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.slf4j.Logger;
@@ -18,18 +18,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DemeterCoreHelper {
+class DemeterCoreHelper {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterCoreHelper.class);
 
-	public static void initDatabase(List<String> modules, boolean force) {
+	static void initDatabase(List<String> modules, boolean force) {
 		final String handler = ConfigUtil.getString(DemeterConfigKey.DatabaseDiffHandler).toLowerCase();
 		logger.info("Init Database, Handler=[{}]", handler);
 
 		if ("script".equals(handler) || "auto".equals(handler)) {
 			try (Connection connection = createConnection()) {
-				EDatabaseType databaseType = PaginationPlugin.findDatabaseType(connection);
-				if (databaseType != EDatabaseType.Unknown) {
-					List<DbDiffVO> diffs = findDiffs(connection, modules, databaseType.toString().toLowerCase());
+				String dbType = findDBType(connection);
+				if (dbType != null) {
+					List<DbDiffVO> diffs = findDiffs(connection, modules, dbType);
 					logger.info("Database Found Diff(s): no = [{}]", diffs.size());
 
 					if (!diffs.isEmpty()) {
@@ -50,15 +50,15 @@ public class DemeterCoreHelper {
 		}
 	}
 
-	public static List<DbDiffVO> getDbDiffs(List<String> modules) {
+	static List<DbDiffVO> getDbDiffs(List<String> modules) {
 		try (Connection connection = createConnection()) {
-			return findDiffs(connection, modules, PaginationPlugin.findDatabaseType(connection).toString().toLowerCase());
+			return findDiffs(connection, modules, findDBType(connection));
 		} catch (IOException | SQLException e) {
 			throw new DSystemException(e);
 		}
 	}
 
-	public static void applyDbDiffs(List<DbDiffVO> dbDiffVOs) {
+	static void applyDbDiffs(List<DbDiffVO> dbDiffVOs) {
 		try (Connection connection = createConnection()) {
 			applyDiffs(connection, dbDiffVOs);
 		} catch (SQLException e) {
@@ -170,5 +170,20 @@ public class DemeterCoreHelper {
 		} catch (Exception e) {
 			throw new DSystemException(e);
 		}
+	}
+
+	private static String findDBType(Connection connection) {
+		String result = null;
+
+		IDatabaseInfo databaseInfo = DatabaseType.find(connection);
+		if (databaseInfo != null) {
+			result = databaseInfo.getName().toLowerCase();
+		}
+
+		if (ConfigUtil.hasKey(DemeterConfigKey.DatabaseType)) {
+			result = ConfigUtil.getString(DemeterConfigKey.DatabaseType).toLowerCase();
+		}
+
+		return result;
 	}
 }

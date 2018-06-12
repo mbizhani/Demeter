@@ -11,6 +11,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	DeploymentMode("dmt.deployment.enabled", true, Arrays.asList(true, false)),
 
 	DatabaseDiffHandler("dmt.db.diff.handler", "script", Arrays.asList("script", "auto", "hbm2ddl", "none")),
+	DatabaseType("dmt.db.type"),
 	DatabaseCheckTimeoutEnabled("dmt.db.check.timeout.enabled", true, Arrays.asList(true, false)),
 	DatabaseCheckTimeoutDur("dmt.db.check.timeout.dur", 15),
 	DatabaseCheckTimeoutMin("dmt.db.check.timeout.min", 5),

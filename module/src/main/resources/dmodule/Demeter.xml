@@ -76,7 +76,7 @@
 			   title="KEY:dPage.dmt.Info"
 			   uri="/info"
 			   inMenu="true"
-			   roles="Root"
+			   roles="Admin,UserAdmin"
 			   icon="fa fa-info-circle"
 				/>
 

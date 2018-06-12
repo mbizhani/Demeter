@@ -27,5 +27,39 @@
 		</tr>
 	</table>
 
+	<br/>
+	<hr/>
+
+	<table cellspacing="0" cellpadding="5" border="1"
+		   style="direction:ltr;width:100%;table-layout:fixed;background-color:aqua;">
+		<caption>System Properties</caption>
+		<tr>
+			<th style="width:300px;">Key</th>
+			<th>Value</th>
+		</tr>
+
+		<tr wicket:id="properties">
+			<td wicket:id="key"></td>
+			<td style="word-wrap:break-word;" wicket:id="value"></td>
+		</tr>
+	</table>
+
+	<br/>
+	<hr/>
+
+	<table cellspacing="0" cellpadding="5" border="1"
+		   style="direction:ltr;width:100%;table-layout:fixed;background-color:beige;">
+		<caption>Environment Variables</caption>
+		<tr>
+			<th style="width:300px;">Key</th>
+			<th>Value</th>
+		</tr>
+
+		<tr wicket:id="variables">
+			<td wicket:id="key"></td>
+			<td style="word-wrap:break-word;" wicket:id="value"></td>
+		</tr>
+	</table>
+
 </wicket:panel>
 </html>

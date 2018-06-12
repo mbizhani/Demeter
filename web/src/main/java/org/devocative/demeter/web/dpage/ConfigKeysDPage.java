@@ -10,7 +10,6 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.devocative.adroit.ConfigUtil;
 import org.devocative.adroit.IConfigKey;
-import org.devocative.adroit.vo.KeyValueVO;
 import org.devocative.demeter.web.DPage;
 import org.devocative.demeter.web.component.DAjaxButton;
 import org.devocative.wickomp.form.WSelectionInput;
@@ -73,31 +72,6 @@ public class ConfigKeysDPage extends DPage {
 					String key = inverseRemappedKeys.get(entry.getKey());
 					ConfigUtil.updateKey(key, entry.getValue());
 				}
-			}
-		});
-
-
-		add(new ListView<KeyValueVO<Object, Object>>("properties", KeyValueVO.fromMap(new TreeMap<>(System.getProperties()))) {
-			private static final long serialVersionUID = -157046053543529923L;
-
-			@Override
-			protected void populateItem(ListItem<KeyValueVO<Object, Object>> item) {
-				KeyValueVO<Object, Object> keyValueVO = item.getModelObject();
-
-				item.add(new Label("key", keyValueVO.getKey().toString()));
-				item.add(new Label("value", keyValueVO.getValue().toString()));
-			}
-		});
-
-		add(new ListView<KeyValueVO<String, String>>("variables", KeyValueVO.fromMap(new TreeMap<>(System.getenv()))) {
-			private static final long serialVersionUID = -1570460531143529923L;
-
-			@Override
-			protected void populateItem(ListItem<KeyValueVO<String, String>> item) {
-				KeyValueVO<String, String> keyValueVO = item.getModelObject();
-
-				item.add(new Label("key", keyValueVO.getKey()));
-				item.add(new Label("value", keyValueVO.getValue()));
 			}
 		});
 	}
