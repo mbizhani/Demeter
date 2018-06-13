@@ -206,7 +206,11 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
-			pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
+
+			//NOTE: it happened when an app has less pages than what has been persisted in DB (app is started with less module)
+			if (pageInfoId_2_DPageInfoVO.containsKey(pageInfo.getId())) {
+				pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
+			}
 
 			String module = pageInfo.getModule();
 			if (!menuEntries.containsKey(module)) {
@@ -248,7 +252,11 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 
 		for (DPageInstance pageInstance : instances) {
 			DPageInfo pageInfo = pageInstance.getPageInfo();
-			pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
+
+			//NOTE: it happened when an app has less pages than what has been persisted in DB (app is started with less module)
+			if (pageInfoId_2_DPageInfoVO.containsKey(pageInfo.getId())) {
+				pageInstance.setIcon(pageInfoId_2_DPageInfoVO.get(pageInfo.getId()).getIcon());
+			}
 
 			String module = pageInfo.getModule();
 			if (pageInstance.getInMenu()) {
@@ -289,7 +297,7 @@ public class DPageInstanceService implements IDPageInstanceService, IApplication
 			pageInfo.setTypeAlt(dPage.getType());
 		}
 		pageInfo.setModule(module);
-		pageInfo.setEnabled(true);
+		//pageInfo.setEnabled(true);
 		pageInfo.setBaseUri(baseUri);
 		persistorService.saveOrUpdate(pageInfo);
 
