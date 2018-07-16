@@ -19,6 +19,7 @@ import org.devocative.wickomp.form.WSelectionInput;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 
 public class FileStoreUploadPanel extends WLabeledFormInputPanel {
 	private static final long serialVersionUID = 2952229703389252184L;
@@ -81,8 +82,10 @@ public class FileStoreUploadPanel extends WLabeledFormInputPanel {
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				FileUpload fileUpload = file.getFileUpload();
-				if (fileUpload != null) {
+				List<FileUpload> fileUploads = file.getFileUpload();
+				if (!fileUploads.isEmpty()) {
+					FileUpload fileUpload = fileUploads.get(0);
+
 					FileStoreHandler fileStoreHandler = fileStoreService.create(
 						fileUpload.getClientFileName(),
 						EFileStorage.DISK,

@@ -41,7 +41,7 @@ public class FileStoreFormDPage extends DPage {
 
 	// Main Constructor - For Ajax Call
 	public FileStoreFormDPage(String id, FileStore entity) {
-		super(id, Collections.<String>emptyList());
+		super(id, Collections.emptyList());
 
 		this.entity = entity;
 	}
@@ -91,8 +91,8 @@ public class FileStoreFormDPage extends DPage {
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				if (file.getFileUpload() != null) {
-					fileStoreService.saveOrUpdate(entity, file.getFileUpload().getBytes());
+				if (!file.getFileUpload().isEmpty()) {
+					fileStoreService.saveOrUpdate(entity, file.getFileUpload().get(0).getBytes());
 				} else {
 					fileStoreService.saveOrUpdate(entity);
 				}
