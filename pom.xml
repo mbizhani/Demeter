@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.devocative</groupId>
 	<artifactId>demeter-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.1-SNAPSHOT</version>
@@ -10,6 +9,13 @@
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>A base web application for DModule</description>
 	<url>https://github.com/mbizhani/Demeter</url>
+
+	<parent>
+		<groupId>org.devocative</groupId>
+		<artifactId>dena</artifactId>
+		<version>sivar</version>
+		<relativePath/>
+	</parent>
 
 	<modules>
 		<module>module</module>
@@ -49,191 +55,26 @@
 	</scm>
 
 	<properties>
-		<lang.level>1.8</lang.level>
-		<jetty.port>8080</jetty.port>
-		<jetty.port.stop>9090</jetty.port.stop>
-		<jetty.context>/ctx</jetty.context>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<d.adroit.ver>2.0</d.adroit.ver>
-		<d.wickomp.ver>2.11-SNAPSHOT</d.wickomp.ver>
 		<d.diadem.ver>1.3-SNAPSHOT</d.diadem.ver>
-
-		<d.hibernate.ver>5.2.16.Final</d.hibernate.ver>
-		<d.spring.ver>5.0.5.RELEASE</d.spring.ver>
-
-		<d.slf4j.ver>1.7.25</d.slf4j.ver>
-		<d.servlet.ver>3.1.0</d.servlet.ver>
-		<d.wicket.ver>7.9.0</d.wicket.ver>
-		<d.groovy.ver>2.4.12</d.groovy.ver>
-		<d.commons.io.ver>2.6</d.commons.io.ver>
-
-		<p.jetty.ver>9.4.6.v20170531</p.jetty.ver>
-		<p.compiler.ver>3.5.1</p.compiler.ver>
-		<p.release.ver>2.5.3</p.release.ver>
-		<p.source.ver>3.0.0</p.source.ver>
-		<p.javadoc.ver>2.10.3</p.javadoc.ver>
-		<p.gpg.ver>1.6</p.gpg.ver>
-		<p.jar.ver>2.6</p.jar.ver>
-
-		<project.owner>Mehdi Bizhani</project.owner>
 	</properties>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${d.slf4j.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${d.slf4j.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
-
-	<build>
-		<plugins>
-			<!-- Compiler -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${p.compiler.ver}</version>
-				<configuration>
-					<source>${lang.level}</source>
-					<target>${lang.level}</target>
-					<encoding>UTF-8</encoding>
-					<debug>true</debug>
-					<optimize>true</optimize>
-				</configuration>
-			</plugin>
-
-			<!-- Source -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>${p.source.ver}</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Jar -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${p.jar.ver}</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Built-By>${project.owner}</Built-By>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-
-			<!-- Release -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>${p.release.ver}</version>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<useReleaseProfile>false</useReleaseProfile>
-					<releaseProfiles>release</releaseProfiles>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>
-
-		</plugins>
-	</build>
-
-	<profiles>
-
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<!-- JavaDoc -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>${p.javadoc.ver}</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- GPG -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${p.gpg.ver}</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>localRelease</id>
-			<distributionManagement>
-				<snapshotRepository>
-					<id>localNexus</id>
-					<url>http://localnexus:8080/nexus/content/repositories/snapshots/</url>
-				</snapshotRepository>
-				<repository>
-					<id>localNexus</id>
-					<url>http://localnexus:8080/nexus/content/repositories/releases/</url>
-				</repository>
-			</distributionManagement>
-		</profile>
-
-	</profiles>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<prerequisites>
-		<maven>3.0</maven>
-	</prerequisites>
-
 </project>

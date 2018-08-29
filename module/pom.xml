@@ -31,8 +31,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>${d.servlet.ver}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!--  TEST -->
@@ -40,7 +38,6 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.4.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -66,20 +63,6 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${p.jetty.ver}</version>
-				<configuration>
-					<useTestScope>true</useTestScope>
-					<webAppSourceDirectory>src/test/webapp</webAppSourceDirectory>
-					<webApp>
-						<contextPath>${jetty.context}</contextPath>
-					</webApp>
-					<httpConnector>
-						<port>${jetty.port}</port>
-					</httpConnector>
-
-					<stopKey>Demeter</stopKey>
-					<stopPort>${jetty.port.stop}</stopPort>
-				</configuration>
 			</plugin>
 
 			<!-- Remote Resource -->
@@ -132,17 +115,16 @@
 			</plugin>
 
 			<!-- Demeter Helper Plugin -->
-			<!--<plugin>
+			<plugin>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-maven-plugin</artifactId>
 				<version>1.1-SNAPSHOT</version>
-			</plugin>-->
+			</plugin>
 
 			<!-- Create JAR of Test Classes -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>${p.jar.ver}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -160,22 +142,5 @@
 
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>Oracle</id>
-
-			<dependencies>
-
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc7</artifactId>
-					<version>12.1.0.2</version>
-					<scope>test</scope>
-				</dependency>
-
-			</dependencies>
-		</profile>
-	</profiles>
 
 </project>

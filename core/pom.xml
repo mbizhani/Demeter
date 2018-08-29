@@ -13,6 +13,7 @@
 	<name>Demeter Core</name>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-common</artifactId>
@@ -22,19 +23,16 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${d.spring.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>${d.groovy.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>${d.commons.io.ver}</version>
 		</dependency>
 
 	</dependencies>

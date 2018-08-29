@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -24,13 +25,11 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>wickomp</artifactId>
-			<version>${d.wickomp.ver}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
 			<artifactId>wicket-spring</artifactId>
-			<version>${d.wicket.ver}</version>
 		</dependency>
 
 		<!--<dependency>
@@ -42,8 +41,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>${d.servlet.ver}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- TEST SCOPED -->
@@ -59,7 +56,7 @@
 
 	<build>
 
-	<resources>
+		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
