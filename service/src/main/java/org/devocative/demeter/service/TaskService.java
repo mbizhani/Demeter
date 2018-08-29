@@ -47,6 +47,9 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 	@Autowired
 	private IDemeterCoreService demeterCoreService;
 
+	@Autowired
+	private IRequestService requestService;
+
 	// ------------------------------ IApplicationLifecycle
 
 	@Override
@@ -368,7 +371,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			.setInputData(inputData)
 			.setTaskResultEvent(this)
 			.addTaskResultCallback(resultCallback)
-			.setCurrentUser(securityService.getCurrentUser());
+			.setCurrentUser(securityService.getCurrentUser())
+			.setCurrentRequest(requestService.getCurrentRequest());
 
 		Future<?> result = null;
 		if (TASKS.containsKey(dTask.getKey())) {
@@ -457,6 +461,7 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			DemeterFutureTask futureTask = (DemeterFutureTask) r;
 			DTask task = futureTask.getDTask();
 			securityService.authenticate(task.getCurrentUser());
+			requestService.set(task.getCurrentRequest());
 
 			if (requestLifecycleBeans != null) {
 				for (IRequestLifecycle requestLifecycle : requestLifecycleBeans.values()) {
@@ -491,6 +496,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 					}
 				}
 			}
+
+			requestService.unset();
 		}
 
 		@Override

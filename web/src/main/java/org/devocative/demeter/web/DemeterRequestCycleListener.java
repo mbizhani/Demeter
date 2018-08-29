@@ -6,7 +6,9 @@ import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.iservice.IRequestService;
 import org.devocative.demeter.iservice.ISecurityService;
+import org.devocative.demeter.vo.RequestVO;
 import org.devocative.demeter.vo.UserVO;
 import org.devocative.demeter.web.page.ErrorPage;
 import org.devocative.wickomp.WebUtil;
@@ -15,19 +17,23 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 	private static final Logger logger = LoggerFactory.getLogger(DemeterRequestCycleListener.class);
 
 	private final List<IRequestLifecycle> requestLifecycleBeans;
 	private final ISecurityService securityService;
+	private final IRequestService requestService;
 
 	// ------------------------------
 
-	public DemeterRequestCycleListener(List<IRequestLifecycle> requestLifecycleBeans, ISecurityService securityService) {
+	DemeterRequestCycleListener(List<IRequestLifecycle> requestLifecycleBeans, ISecurityService securityService, IRequestService requestService) {
 		this.requestLifecycleBeans = requestLifecycleBeans;
 		this.securityService = securityService;
+		this.requestService = requestService;
 	}
 
 	// ------------------------------
@@ -50,6 +56,14 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 
 		// Other request cycles are handled in DemeterWebListener, only WebSocket is handled here!
 		if (isWSRq) {
+			Map<String, List<String>> params = WebUtil.toMap(
+				cycle.getRequest().getRequestParameters(),
+				false,
+				Collections.emptyList(),
+				true,
+				Collections.emptyList());
+			requestService.set(new RequestVO(params));
+
 			for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 				try {
 					requestLifecycle.beforeRequest();
@@ -84,6 +98,8 @@ public class DemeterRequestCycleListener extends AbstractRequestCycleListener {
 						requestLifecycle.getClass().getName(), e);
 				}
 			}
+
+			requestService.unset();
 		}
 	}
 

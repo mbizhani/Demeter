@@ -1,6 +1,7 @@
 package org.devocative.demeter.iservice.task;
 
 import org.devocative.demeter.entity.DTaskState;
+import org.devocative.demeter.vo.RequestVO;
 import org.devocative.demeter.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,9 @@ public abstract class DTask<T> implements Runnable {
 	private Exception exception;
 	private DTaskState state = DTaskState.InQueue;
 	private ITaskResultEvent taskResultEvent;
+
 	private UserVO currentUser;
+	private RequestVO currentRequest;
 
 	private List<ITaskResultCallback> resultCallbacks = new ArrayList<>();
 
@@ -100,6 +103,15 @@ public abstract class DTask<T> implements Runnable {
 
 	public DTask setCurrentUser(UserVO currentUser) {
 		this.currentUser = currentUser;
+		return this;
+	}
+
+	public RequestVO getCurrentRequest() {
+		return currentRequest;
+	}
+
+	public DTask<T> setCurrentRequest(RequestVO currentRequest) {
+		this.currentRequest = currentRequest;
 		return this;
 	}
 

@@ -4,7 +4,10 @@ import org.devocative.adroit.ConfigUtil;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.iservice.IRequestService;
+import org.devocative.demeter.vo.RequestVO;
 import org.devocative.demeter.web.DemeterWebParam;
+import org.devocative.wickomp.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +16,9 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +27,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	private static final Logger logger = LoggerFactory.getLogger(DemeterWebListener.class);
 
 	private List<IRequestLifecycle> requestLifecycleBeans = new ArrayList<>();
+	private IRequestService requestService;
 
 	// ------------------------------
 
@@ -37,6 +43,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 
 		Map<String, IRequestLifecycle> beans = DemeterCore.get().getApplicationContext().getBeansOfType(IRequestLifecycle.class);
 		requestLifecycleBeans.addAll(beans.values());
+		requestService = DemeterCore.get().getApplicationContext().getBean(IRequestService.class);
 		logger.info("DemeterWebListener.RequestLifecycle: No Of Beans = [{}]", beans.size());
 
 		sce.getServletContext().setAttribute(DemeterWebParam.DEMETER_APP_CTX, DemeterCore.get().getApplicationContext());
@@ -54,6 +61,14 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {
 		logger.trace("DemeterWebListener.requestInitialized");
+
+		Map<String, List<String>> params = WebUtil.toMap(
+			(HttpServletRequest) sre.getServletRequest(),
+			false,
+			Collections.emptyList(),
+			true,
+			Collections.emptyList());
+		requestService.set(new RequestVO(params));
 
 		for (IRequestLifecycle requestLifecycle : requestLifecycleBeans) {
 			try {
@@ -77,5 +92,7 @@ public class DemeterWebListener implements ServletContextListener, ServletReques
 					requestLifecycle.getClass().getName(), e);
 			}
 		}
+
+		requestService.unset();
 	}
 }

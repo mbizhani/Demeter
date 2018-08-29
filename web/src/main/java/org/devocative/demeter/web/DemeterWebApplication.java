@@ -22,6 +22,7 @@ import org.devocative.demeter.core.DemeterCore;
 import org.devocative.demeter.core.xml.XModule;
 import org.devocative.demeter.iservice.IFileStoreService;
 import org.devocative.demeter.iservice.IRequestLifecycle;
+import org.devocative.demeter.iservice.IRequestService;
 import org.devocative.demeter.iservice.ISecurityService;
 import org.devocative.demeter.web.page.StartupHandlerPage;
 import org.devocative.wickomp.WDefaults;
@@ -68,7 +69,8 @@ public class DemeterWebApplication extends WebApplication implements IDemeterCor
 
 		Collection<IRequestLifecycle> requestLifecycleCol = applicationContext.getBeansOfType(IRequestLifecycle.class).values();
 		ISecurityService securityService = applicationContext.getBean(ISecurityService.class);
-		getRequestCycleListeners().add(new DemeterRequestCycleListener(new ArrayList<>(requestLifecycleCol), securityService));
+		IRequestService requestService = applicationContext.getBean(IRequestService.class);
+		getRequestCycleListeners().add(new DemeterRequestCycleListener(new ArrayList<>(requestLifecycleCol), securityService, requestService));
 
 		mountPage(DemeterWebParam.APP_INNER_CTX, Index.class);
 
