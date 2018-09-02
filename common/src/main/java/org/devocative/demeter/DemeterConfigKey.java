@@ -63,6 +63,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	WebIgnoreMissedResource("dmt.web.ignore.missed.resource", false, Arrays.asList(true, false)),
 	WebReplaceCharForString("dmt.web.replace.char", "{\"fa\":[{\"from\":\"ي\",\"to\":\"ی\"}, {\"from\":\"ك\",\"to\":\"ک\"}]}"),
 
+	WebUsernameValidRegex("dmt.web.username.valid.regex", "^[A-Za-z0-9]+?[A-Za-z0-9.]*?$"),
 	WebPasswordStrength("dmt.web.password.strength", false, Arrays.asList(true, false)),
 	WebPasswordStrengthDigit("dmt.web.password.strength.digit", true, Arrays.asList(true, false)),
 	WebPasswordStrengthLowerCase("dmt.web.password.strength.lower", true, Arrays.asList(true, false)),

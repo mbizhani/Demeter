@@ -2,6 +2,7 @@ package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -79,10 +80,14 @@ public class UserFormDPage extends DPage {
 			.setLabel(new ResourceModel("Person.email")));
 
 
-		floatTable.add(new WTextInput("username")
+		FormComponent<String> username = new WTextInput("username")
 			.setRequired(true)
-			.setLabel(new ResourceModel("User.username"))
-			.add(new WPatternValidator("^[A-Za-z]+?[A-Za-z0-9.]*?$", "User.username.invalid.format")));
+			.setLabel(new ResourceModel("User.username"));
+		if (ConfigUtil.keyHasValidValue(DemeterConfigKey.WebUsernameValidRegex)) {
+			username.add(new WPatternValidator(ConfigUtil.getString(DemeterConfigKey.WebUsernameValidRegex),
+				"User.username.invalid.format"));
+		}
+		floatTable.add(username);
 		//NOTE: since in LDAP, '.' is acceptable in username, the above pattern must be used (not WAsciiIdentifierValidator)
 
 		password = new WTextInput("password", new Model<>(), true);
@@ -104,24 +109,24 @@ public class UserFormDPage extends DPage {
 		floatTable.add(password2);
 
 		floatTable.add(new WSelectionInput("authMechanism", EAuthMechanism.list(), false)
-				.addToChoices(new WSelectionInputAjaxUpdatingBehavior() {
-					private static final long serialVersionUID = -1053874895135070466L;
+			.addToChoices(new WSelectionInputAjaxUpdatingBehavior() {
+				private static final long serialVersionUID = -1053874895135070466L;
 
-					@Override
-					protected void onUpdate(AjaxRequestTarget target) {
-						EAuthMechanism authMechanism = (EAuthMechanism) getComponent().getDefaultModelObject();
-						boolean isEnabled = EAuthMechanism.DATABASE.equals(authMechanism);
+				@Override
+				protected void onUpdate(AjaxRequestTarget target) {
+					EAuthMechanism authMechanism = (EAuthMechanism) getComponent().getDefaultModelObject();
+					boolean isEnabled = EAuthMechanism.DATABASE.equals(authMechanism);
 
-						if (isEnabled != password.isEnabled()) {
-							password.setEnabled(isEnabled);
-							password2.setEnabled(isEnabled);
+					if (isEnabled != password.isEnabled()) {
+						password.setEnabled(isEnabled);
+						password2.setEnabled(isEnabled);
 
-							target.add(password, password2);
-						}
+						target.add(password, password2);
 					}
-				})
-				.setRequired(true)
-				.setLabel(new ResourceModel("User.authMechanism"))
+				}
+			})
+			.setRequired(true)
+			.setLabel(new ResourceModel("User.authMechanism"))
 		);
 		floatTable.add(new WSelectionInput("status", EUserStatus.list(), false)
 			.setRequired(true)
