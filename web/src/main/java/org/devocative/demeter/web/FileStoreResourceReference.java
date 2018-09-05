@@ -45,7 +45,11 @@ public class FileStoreResourceReference extends ResourceReference {
 					logger.info("Download file: fileId={} filename={}", fileId, fileStore.getName());
 
 					if (fileStore.getStatus() == EFileStatus.VALID) {
-						resourceResponse.setContentDisposition(ContentDisposition.ATTACHMENT);
+						if (fileStore.getMimeType().isInline()) {
+							resourceResponse.setContentDisposition(ContentDisposition.INLINE);
+						} else {
+							resourceResponse.setContentDisposition(ContentDisposition.ATTACHMENT);
+						}
 						resourceResponse.setFileName(fileStore.getName());
 						resourceResponse.setContentType(fileStore.getMimeType().getType());
 						resourceResponse.disableCaching();
