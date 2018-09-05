@@ -46,6 +46,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 
 	private FileStoreFVO filter;
 	private boolean formVisible = true;
+	private boolean addVisible = true;
 	private String[] invisibleFormItems;
 
 	private WDataGrid<FileStore> grid;
@@ -97,7 +98,7 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 				window.setContent(new FileStoreFormDPage(window.getContentId()));
 				window.show(target);
 			}
-		}.setVisible(hasPermission(DemeterPrivilegeKey.FileStoreAdd)));
+		}.setVisible(hasPermission(DemeterPrivilegeKey.FileStoreAdd) && addVisible));
 
 		WFloatTable floatTable = new WFloatTable("floatTable");
 		floatTable.add(new WTextInput("name")
@@ -216,6 +217,11 @@ public class FileStoreListDPage extends DPage implements IGridDataSource<FileSto
 
 	public FileStoreListDPage setFormVisible(boolean formVisible) {
 		this.formVisible = formVisible;
+		return this;
+	}
+
+	public FileStoreListDPage setAddVisible(boolean addVisible) {
+		this.addVisible = addVisible;
 		return this;
 	}
 

@@ -74,6 +74,7 @@ public class FileStoreService implements IFileStoreService {
 			.addSelect("select ent")
 			.addFrom(FileStore.class, "ent")
 			.applyFilter(FileStore.class, "ent", filter)
+			.setOrderBy("ent.creationDate desc")
 			.list((pageIndex - 1) * pageSize, pageSize);
 	}
 
@@ -126,11 +127,11 @@ public class FileStoreService implements IFileStoreService {
 		fileStore.setMimeType(mimeType);
 		fileStore.setExpiration(expiration);
 		if (tags != null && tags.length > 0) {
-			String tag = tags[0];
+			StringBuilder tag = new StringBuilder(tags[0]);
 			for (int i = 1; i < tags.length; i++) {
-				tag += "," + tags[i];
+				tag.append(",").append(tags[i]);
 			}
-			fileStore.setTag(tag);
+			fileStore.setTag(tag.toString());
 		}
 
 		OutputStream outputStream = createOutputStream(fileStore);
