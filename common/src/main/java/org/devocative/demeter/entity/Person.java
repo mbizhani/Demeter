@@ -254,6 +254,8 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 
 	@Override
 	public String toString() {
-		return String.format("%s/%s", getFirstName(), getLastName());
+		return String.format("%s / %s",
+			getFirstName() != null ? getFirstName() : "-",
+			getLastName() != null ? getLastName() : "-");
 	}
 }

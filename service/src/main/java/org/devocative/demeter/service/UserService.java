@@ -189,7 +189,8 @@ public class UserService implements IUserService {
 		}
 
 		return getUserVO(user)
-			.setOtherId(userInputVO.getOtherId());
+			.setOtherId(userInputVO.getOtherId())
+			.updateOtherData(userInputVO.getOtherData());
 	}
 
 	@Override

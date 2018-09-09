@@ -6,6 +6,7 @@ import org.devocative.demeter.entity.EUserStatus;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class UserInputVO implements Serializable {
@@ -23,6 +24,7 @@ public class UserInputVO implements Serializable {
 	private Set<String> roles = new HashSet<>();
 
 	private String otherId;
+	private Map<String, Object> otherData;
 
 	// ------------------------------
 
@@ -119,6 +121,15 @@ public class UserInputVO implements Serializable {
 
 	public UserInputVO setOtherId(String otherId) {
 		this.otherId = otherId;
+		return this;
+	}
+
+	public Map<String, Object> getOtherData() {
+		return otherData;
+	}
+
+	public UserInputVO setOtherData(Map<String, Object> otherData) {
+		this.otherData = otherData;
 		return this;
 	}
 }

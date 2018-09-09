@@ -22,7 +22,7 @@ public class UserVO implements Serializable {
 	private Set<String> denials = new HashSet<>();
 
 	private PageVO pageVO;
-	private Map<String, Object> otherProfileInfo = new HashMap<>();
+	private Map<String, Object> otherData = new HashMap<>();
 
 	private String otherId;
 
@@ -164,8 +164,19 @@ public class UserVO implements Serializable {
 		return this;
 	}
 
-	public Object getOtherProfileInfo(String key) {
-		return otherProfileInfo.get(key);
+	public Object getOtherDataByKey(String key) {
+		return otherData.get(key);
+	}
+
+	public Map<String, Object> getOtherData() {
+		return new HashMap<>(otherData);
+	}
+
+	public UserVO updateOtherData(Map<String, Object> otherData) {
+		if (otherData != null) {
+			this.otherData.putAll(otherData);
+		}
+		return this;
 	}
 
 	public String getOtherId() {
@@ -257,12 +268,12 @@ public class UserVO implements Serializable {
 	}
 
 	public UserVO addOtherProfileInfo(String key, Object info) {
-		otherProfileInfo.put(key, info);
+		otherData.put(key, info);
 		return this;
 	}
 
 	public Object removeOtherProfileInfo(String key) {
-		return otherProfileInfo.remove(key);
+		return otherData.remove(key);
 	}
 
 	public User toUser() {
