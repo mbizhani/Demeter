@@ -18,15 +18,20 @@ class CollectionFilterEvent<T> implements IFilterEvent {
 	}
 
 	@Override
-	public void ifString(String propName, String value, boolean useLike) {
+	public void ifString(String propName, String value, boolean useLike, boolean caseInsensitive) {
 		stream = stream.filter(t -> {
 			Object beanValue = ObjectUtil.getPropertyValue(t, propName, false);
+
 			if (beanValue != null) {
 				String beanValueStr = beanValue.toString();
-				if (useLike) {
+				if (useLike && caseInsensitive) {
 					return beanValueStr.toLowerCase().contains(value.toLowerCase());
+				} else if (useLike) {
+					return beanValueStr.contains(value);
+				} else if (caseInsensitive) {
+					return beanValueStr.equalsIgnoreCase(value);
 				} else {
-					return value.equals(beanValueStr);
+					return beanValueStr.equals(value);
 				}
 			}
 			return true;
@@ -37,7 +42,7 @@ class CollectionFilterEvent<T> implements IFilterEvent {
 	public void ifRange(String propName, RangeVO rangeVO) {
 		stream = stream.filter(t -> {
 			Object beanValue = ObjectUtil.getPropertyValue(t, propName, false);
-			if (beanValue != null && beanValue instanceof Comparable) {
+			if (beanValue instanceof Comparable) {
 				boolean result = true;
 				Comparable beanValueComp = (Comparable) beanValue;
 				if (rangeVO.getLower() != null) {

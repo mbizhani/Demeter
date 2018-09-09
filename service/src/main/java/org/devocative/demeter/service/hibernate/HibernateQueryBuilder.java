@@ -236,13 +236,19 @@ public class HibernateQueryBuilder implements IQueryBuilder {
 	public IQueryBuilder applyFilter(final Class entity, final String alias, final Serializable filter, String... ignoreProperties) {
 		CollectionUtil.filter(new IFilterEvent() {
 			@Override
-			public void ifString(String propName, String value, boolean useLike) {
-				if (!useLike) {
-					addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
-					addParam(propName + "_", value);
-				} else {
+			public void ifString(String propName, String value, boolean useLike, boolean caseInsensitive) {
+				if (useLike && caseInsensitive) {
+					addWhere(String.format("and lower(%1$s.%2$s) like lower(:%2$s_)", alias, propName));
+					addParam(propName + "_", "%" + value + "%");
+				} else if (useLike) {
 					addWhere(String.format("and %1$s.%2$s like :%2$s_", alias, propName));
 					addParam(propName + "_", "%" + value + "%");
+				} else if (caseInsensitive) {
+					addWhere(String.format("and %1$s.%2$s like :%2$s_", alias, propName));
+					addParam(propName + "_", value);
+				} else {
+					addWhere(String.format("and %1$s.%2$s = :%2$s_", alias, propName));
+					addParam(propName + "_", value);
 				}
 			}
 

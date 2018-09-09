@@ -8,5 +8,7 @@ import java.lang.annotation.*;
 public @interface FilterOption {
 	boolean useLike() default true;
 
+	boolean caseInsensitive() default true;
+
 	String property() default "";
 }

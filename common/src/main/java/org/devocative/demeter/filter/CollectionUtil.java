@@ -43,7 +43,11 @@ public class CollectionUtil {
 
 				// ---------- Property: String
 				if (value instanceof String) {
-					filterEvent.ifString(propName, (String) value, search == null || search.useLike());
+					filterEvent.ifString(
+						propName,
+						(String) value,
+						search == null || search.useLike(),
+						search == null || search.caseInsensitive());
 				}
 
 				// ---------- Property: RangeVO

@@ -5,7 +5,7 @@ import org.devocative.adroit.vo.RangeVO;
 import java.util.Collection;
 
 public interface IFilterEvent {
-	void ifString(String propName, String value, boolean useLike);
+	void ifString(String propName, String value, boolean useLike, boolean caseInsensitive);
 
 	void ifRange(String propName, RangeVO value);
 
