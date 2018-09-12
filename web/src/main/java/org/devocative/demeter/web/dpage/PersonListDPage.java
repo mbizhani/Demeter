@@ -1,4 +1,3 @@
-//overwrite
 package org.devocative.demeter.web.dpage;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -154,7 +153,7 @@ public class PersonListDPage extends DPage implements IGridDataSource<Person> {
 		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.systemNumber"), "systemNumber"));
 		columnList.add(new OPropertyColumn<Person>(new ResourceModel("Person.hasUser"), "hasUser")
 			.setFormatter(OBooleanFormatter.bool()));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("Person.user"), "user"));
+		//columnList.add(new OPropertyColumn<>(new ResourceModel("Person.user"), "user"));
 		if (getCurrentUser().isRoot()) {
 			columnList.add(new OPropertyColumn<>(new ResourceModel("entity.rowMode"), "rowMode"));
 		}

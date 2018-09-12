@@ -50,8 +50,8 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 	@Column(name = "b_has_user", nullable = false)
 	private Boolean hasUser = false;
 
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "person")
-	private User user;
+	//@OneToOne(fetch = FetchType.LAZY, mappedBy = "person")
+	//private User user;
 
 	//----------------------------- CREATE / MODIFY
 
@@ -155,13 +155,13 @@ public class Person implements IRowMode, ICreationDate, ICreatorUser, IModificat
 		this.hasUser = hasUser;
 	}
 
-	public User getUser() {
+	/*public User getUser() {
 		return user;
 	}
 
 	public void setUser(User user) {
 		this.user = user;
-	}
+	}*/
 
 	// ---------------
 
