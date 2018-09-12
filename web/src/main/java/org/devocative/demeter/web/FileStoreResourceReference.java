@@ -39,13 +39,23 @@ public class FileStoreResourceReference extends ResourceReference {
 				final String fileId = attributes.getParameters().get("fileId").toString();
 				final FileStore fileStore = fileStoreService.loadByFileId(fileId);
 
+				ContentDisposition sentDisposition = null;
+				String dis = attributes.getParameters().get("dis").toOptionalString();
+				if ("a".equals(dis)) {
+					sentDisposition = ContentDisposition.ATTACHMENT;
+				} else if ("i".equals(dis)) {
+					sentDisposition = ContentDisposition.INLINE;
+				}
+
 				ResourceResponse resourceResponse = new ResourceResponse();
 
 				if (fileStore != null) {
 					logger.info("Download file: fileId={} filename={}", fileId, fileStore.getName());
 
 					if (fileStore.getStatus() == EFileStatus.VALID) {
-						if (fileStore.getMimeType().isInline()) {
+						if (sentDisposition != null) {
+							resourceResponse.setContentDisposition(sentDisposition);
+						} else if (fileStore.getMimeType().isInline()) {
 							resourceResponse.setContentDisposition(ContentDisposition.INLINE);
 						} else {
 							resourceResponse.setContentDisposition(ContentDisposition.ATTACHMENT);

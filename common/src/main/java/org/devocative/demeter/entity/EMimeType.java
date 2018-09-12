@@ -10,6 +10,8 @@ public enum EMimeType {
 
 	// Microsoft
 	EXCEL(10, "Microsoft Excel", "application/vnd.ms-excel"),
+	WORD(12, "Microsoft Word", "application/msword"),
+	POWER_POINT(14, "Microsoft Power Point", "application/vnd.ms-powerpoint"),
 
 	// Text
 	TEXT(30, "Text", "text/plain", true),
@@ -17,10 +19,10 @@ public enum EMimeType {
 	XML(32, "XML", "text/xml", true),
 
 	// IMAGE
-	IMAGE(50, "Image", "image"),
-	IMAGE_PNG(51, "PNG Image", "image/png"),
-	IMAGE_JPEG(52, "JPEG Image", "image/jpeg"),
-	IMAGE_GIF(53, "GIF Image", "image/gif"),
+	IMAGE(50, "Image", "image", true),
+	IMAGE_PNG(51, "PNG Image", "image/png", true),
+	IMAGE_JPEG(52, "JPEG Image", "image/jpeg", true),
+	IMAGE_GIF(53, "GIF Image", "image/gif", true),
 
 	// VIDEO
 	VIDEO(70, "Video", "video"),

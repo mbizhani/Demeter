@@ -4,6 +4,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
+import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.string.StringValue;
 import org.devocative.demeter.entity.DPageInstance;
 import org.devocative.demeter.iservice.IDPageInstanceService;
@@ -96,7 +97,25 @@ public class UrlUtil {
 	// ---------------
 
 	public static String getFileUri(String fileId) {
-		return createUri(String.format("/dmt/getfile/%s", fileId), true);
+		return getFileUri(fileId, null);
+	}
+
+	public static String getFileUri(String fileId, ContentDisposition disposition) {
+		String uri = String.format("/dmt/getfile/%s", fileId);
+
+		if (disposition != null) {
+			uri += "?dis=";
+			switch (disposition) {
+				case INLINE:
+					uri += "i";
+					break;
+				case ATTACHMENT:
+					uri += "a";
+					break;
+			}
+		}
+
+		return createUri(uri, true);
 	}
 
 	// ------------------------------
