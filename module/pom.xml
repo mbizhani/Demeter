@@ -119,6 +119,14 @@
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-maven-plugin</artifactId>
 				<version>1.1-SNAPSHOT</version>
+				<configuration>
+					<!--<keyStoreDir>src/test/resources</keyStoreDir>
+					<key>7Pj9jWTFtDCkSWUNULipT3Y68N2mgvTQzBEsAtnE</key>
+					<keyEntry>Demeter</keyEntry>
+					<keyStorePass>bueLvZGng8Mzxw9uR2i7FLr8pCpazbK67jYfXpAA</keyStorePass>
+					<protectionParam>Fg7c3wRxaQwpoVJDcSgBk6kg9oD7DCh8tw2k4mza</protectionParam>
+					<keyLength>L128</keyLength>-->
+				</configuration>
 			</plugin>
 
 			<!-- Create JAR of Test Classes -->
