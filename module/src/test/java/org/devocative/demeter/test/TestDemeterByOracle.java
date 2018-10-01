@@ -26,11 +26,12 @@ public class TestDemeterByOracle {
 
 	@Test
 	public void c00testDemeterByOracle() {
-		InputStream config = TestDemeterByOracle.class.getResourceAsStream("/config_oracle.properties");
-		ConfigUtil.load(config);
-
 		boolean isOracleOk = true;
+
 		try {
+			InputStream config = TestDemeterByOracle.class.getResourceAsStream("/config_oracle.properties");
+			ConfigUtil.load(config);
+
 			Class.forName(ConfigUtil.getString(true, "dmt.db.driver"));
 			Connection connection = DriverManager.getConnection(
 				ConfigUtil.getString(true, "dmt.db.url"),
