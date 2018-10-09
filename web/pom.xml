@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.devocative</groupId>
-		<artifactId>demeter-parent</artifactId>
+		<artifactId>demeter</artifactId>
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>demeter-web</artifactId>
@@ -19,7 +19,6 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-core</artifactId>
-			<version>1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

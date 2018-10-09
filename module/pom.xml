@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.devocative</groupId>
-		<artifactId>demeter-parent</artifactId>
+		<artifactId>demeter</artifactId>
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>demeter-module</artifactId>
@@ -19,13 +19,11 @@
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-service</artifactId>
-			<version>1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.devocative</groupId>
 			<artifactId>demeter-web</artifactId>
-			<version>1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -115,19 +113,19 @@
 			</plugin>
 
 			<!-- Demeter Helper Plugin -->
-			<plugin>
+			<!--<plugin>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-maven-plugin</artifactId>
 				<version>1.1-SNAPSHOT</version>
 				<configuration>
-					<!--<keyStoreDir>src/test/resources</keyStoreDir>
+					&lt;!&ndash;<keyStoreDir>src/test/resources</keyStoreDir>
 					<key>7Pj9jWTFtDCkSWUNULipT3Y68N2mgvTQzBEsAtnE</key>
 					<keyEntry>Demeter</keyEntry>
 					<keyStorePass>bueLvZGng8Mzxw9uR2i7FLr8pCpazbK67jYfXpAA</keyStorePass>
 					<protectionParam>Fg7c3wRxaQwpoVJDcSgBk6kg9oD7DCh8tw2k4mza</protectionParam>
-					<keyLength>L128</keyLength>-->
+					<keyLength>L128</keyLength>&ndash;&gt;
 				</configuration>
-			</plugin>
+			</plugin>-->
 
 			<!-- Create JAR of Test Classes -->
 			<plugin>
