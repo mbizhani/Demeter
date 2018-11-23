@@ -32,6 +32,8 @@ Wicket.Event.subscribe("/websocket/closed", function (jqEvent) {
 	wLog.warn("Demeter: websocket/closed", jqEvent);
 
 	clearInterval(wsPingHandler);
+
+	$("#wsDisconnected").css("display", "inline");
 });
 Wicket.Event.subscribe("/websocket/error", function (jqEvent) {
 	wLog.error("Demeter: websocket/error", jqEvent);
