@@ -6,6 +6,16 @@ wLog.info("Demeter Init: WebSocketPing=[" + WebSocketPingInterval + "] SessionTO
 
 hideBusySign();
 
+var wClient = {
+	isChrome: function () {
+		return navigator.userAgent.indexOf("Chrome") !== -1;
+	},
+
+	isMozilla: function () {
+		return navigator.userAgent.indexOf("Firefox") !== -1;
+	}
+};
+
 Wicket.Event.subscribe("/ajax/call/beforeSend", function (attributes, jqXHR, settings) {
 	showBusySign();
 	confirmDlg = null;
@@ -33,10 +43,18 @@ Wicket.Event.subscribe("/websocket/closed", function (jqEvent) {
 
 	clearInterval(wsPingHandler);
 
-	$("#wsDisconnected").css("display", "inline");
+	if (wClient.isChrome()) {
+		$("#wsDisconnected").css("display", "inline");
+	}
 });
 Wicket.Event.subscribe("/websocket/error", function (jqEvent) {
 	wLog.error("Demeter: websocket/error", jqEvent);
+
+	clearInterval(wsPingHandler);
+
+	if (wClient.isMozilla()) {
+		$("#wsDisconnected").css("display", "inline");
+	}
 });
 Wicket.Event.subscribe("/websocket/message", function (jqEvent, message) {
 	wLog.info("Demeter: websocket/message", message);
