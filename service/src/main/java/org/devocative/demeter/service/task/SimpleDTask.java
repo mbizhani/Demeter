@@ -8,14 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Scope("prototype")
 @Component("dmtSimpleDTask")
 public class SimpleDTask extends DTask<String> {
-	private static Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SimpleDTask.class);
 
 	private AtomicBoolean cont = new AtomicBoolean(true);
+	private int MAX;
 
 	@Autowired
 	private ISecurityService securityService;
@@ -23,6 +25,9 @@ public class SimpleDTask extends DTask<String> {
 	@Override
 	public void init() {
 		logger.info("SimpleDTask.init");
+
+		MAX = new Random().nextInt(100) + 1;
+		setDetail(String.valueOf(MAX));
 	}
 
 	@Override
@@ -36,15 +41,17 @@ public class SimpleDTask extends DTask<String> {
 
 		Thread th = new Thread(() -> {
 			try {
-				int idx = 1;
-				for (int i = 1; i <= 200 && cont.get(); i += 5) {
+
+				for (int i = 1; i <= MAX && cont.get(); i++) {
 					logger.debug("SimpleDTask: i = {}", i);
 
-					Thread.sleep(i * 1000);
+					Thread.sleep(1000);
 
-					sendResult(String.format("counter = %02d | idx= %02d | user=%s", i, idx++, securityService.getCurrentUser()));
+					sendResult(String.format("counter = %02d | user=%s", i, securityService.getCurrentUser()));
 				}
+
 				logger.info("SimpleDTask.executed: {}", getCurrentUser());
+
 				sendResult("SimpleDTask.executed: " + getCurrentUser());
 			} catch (InterruptedException e) {
 				logger.warn("SimpleDTask Sleep Interrupted");
@@ -55,7 +62,7 @@ public class SimpleDTask extends DTask<String> {
 	}
 
 	@Override
-	public void cancel() throws Exception {
+	public void cancel() {
 		logger.info("SimpleDTask.cancel: {}", getCurrentUser());
 		cont.set(false);
 	}

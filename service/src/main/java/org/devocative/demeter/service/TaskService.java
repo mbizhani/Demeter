@@ -1,6 +1,8 @@
 package org.devocative.demeter.service;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.devocative.adroit.ConfigUtil;
+import org.devocative.adroit.date.UniPeriod;
 import org.devocative.demeter.DSystemException;
 import org.devocative.demeter.DemeterConfigKey;
 import org.devocative.demeter.entity.DTaskInfo;
@@ -20,9 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static org.quartz.JobBuilder.newJob;
@@ -30,13 +30,15 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 @Service("dmtTaskService")
 public class TaskService implements ITaskService, IApplicationLifecycle, RejectedExecutionHandler, ITaskResultEvent {
-	private static Logger logger = LoggerFactory.getLogger(TaskService.class);
+	private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
 
 	private boolean enabled;
 	private final Map<String, DTask> TASKS = new ConcurrentHashMap<>();
 	private Scheduler scheduler;
 	private ThreadPoolExecutor threadPoolExecutor;
 	private Map<String, IRequestLifecycle> requestLifecycleBeans;
+
+	private Collection<DTaskVO> FINISHED;
 
 	@Autowired
 	private ISecurityService securityService;
@@ -126,6 +128,8 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		for (DTaskSchedule schedule : list) {
 			schedule(schedule);
 		}
+
+		FINISHED = Collections.synchronizedCollection(new CircularFifoQueue<>(ConfigUtil.getInteger(DemeterConfigKey.TaskFinishedQueueSize)));
 	}
 
 	@Override
@@ -256,14 +260,14 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	@Override
 	public List<DTaskVO> search(DTaskFVO dTaskFVO, long pageIndex, long pageSize) {
-		List<DTaskVO> dTaskVOs = CollectionUtil.filterCollection(getRunningTasks(), dTaskFVO);
+		List<DTaskVO> dTaskVOs = CollectionUtil.filterCollection(getTaskInstances(), dTaskFVO);
 		int toIndex = (int) (pageIndex * pageSize);
 		return dTaskVOs.subList((int) ((pageIndex - 1) * pageIndex), Math.min(toIndex, dTaskVOs.size()));
 	}
 
 	@Override
 	public long count(DTaskFVO dTaskFVO) {
-		return CollectionUtil.filterCollection(getRunningTasks(), dTaskFVO).size();
+		return CollectionUtil.filterCollection(getTaskInstances(), dTaskFVO).size();
 	}
 
 	@Override
@@ -326,16 +330,15 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 
 	// ------------------------------ Private
 
-	private List<DTaskVO> getRunningTasks() {
+	private List<DTaskVO> getTaskInstances() {
 		List<DTaskVO> result = new ArrayList<>(TASKS.size());
-		for (DTask dTask : TASKS.values()) {
-			result.add(new DTaskVO(
-				dTask.getId().toString(),
-				dTask.getClass().getName(),
-				dTask.getStartDate(),
-				dTask.getState(),
-				dTask.getCurrentUser().getUsername()
-			));
+		TASKS.values().forEach(dTask -> result.add(createFromDTask(dTask)));
+		try {
+			synchronized (FINISHED) {
+				result.addAll(FINISHED);
+			}
+		} catch (Exception e) {
+			logger.warn("getTaskInstances.Finished", e);
 		}
 		return result;
 	}
@@ -448,6 +451,24 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 		}
 	}
 
+	private DTaskVO createFromDTask(DTask dTask) {
+		final DTaskVO dTaskVO = new DTaskVO(
+			dTask.getId().toString(),
+			dTask.getClass().getName(),
+			dTask.getStartDate(),
+			dTask.getState(),
+			dTask.getDetail(),
+			dTask.getCurrentUser().getUsername()
+		);
+
+		if (dTask.getDuration() != null) {
+			final UniPeriod period = UniPeriod.of(dTask.getDuration(), 0);
+			dTaskVO.setDuration(period.format("H:M:S"));
+		}
+
+		return dTaskVO;
+	}
+
 	// ------------------------------ Demeter ThreadPoolExecutor & DemeterFutureTask
 
 	private class DemeterThreadPoolExecutor extends ThreadPoolExecutor {
@@ -498,6 +519,12 @@ public class TaskService implements ITaskService, IApplicationLifecycle, Rejecte
 			}
 
 			requestService.unset();
+
+			try {
+				FINISHED.add(createFromDTask(dTask));
+			} catch (Exception e) {
+				logger.warn("DemeterThreadPoolExecutor.afterExecute, adding to FINISHED", e);
+			}
 		}
 
 		@Override

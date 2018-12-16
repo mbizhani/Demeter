@@ -27,6 +27,8 @@ public abstract class DTask<T> implements Runnable {
 
 	private List<ITaskResultCallback> resultCallbacks = new ArrayList<>();
 
+	private String detail;
+
 	// ------------------------------ ABSTRACT METHODS
 
 	public abstract void init() throws Exception;
@@ -115,6 +117,14 @@ public abstract class DTask<T> implements Runnable {
 		return this;
 	}
 
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+
 	// ------------------------------ PUBLIC
 
 	@Override
@@ -130,14 +140,18 @@ public abstract class DTask<T> implements Runnable {
 		logger.info("Executing DTask: key=[{}]", key);
 
 		try {
-			init();
-			if (canStart()) {
-				startDate = new Date();
-				state = DTaskState.Running;
-				execute();
-				state = DTaskState.Finished;
-			} else {
-				state = DTaskState.Invalid;
+			if (state == DTaskState.InQueue) {
+				init();
+				if (canStart()) {
+					startDate = new Date();
+					state = DTaskState.Running;
+					execute();
+					if (state == DTaskState.Running) {
+						state = DTaskState.Finished;
+					}
+				} else {
+					state = DTaskState.Invalid;
+				}
 			}
 		} catch (Exception e) {
 			logger.error("DTask error: " + key, e);
@@ -152,8 +166,8 @@ public abstract class DTask<T> implements Runnable {
 	}
 
 	public final void stop() throws Exception {
-		state = DTaskState.Interrupted;
 		cancel();
+		state = DTaskState.Interrupted;
 	}
 
 	// ------------------------------ PROTECTED

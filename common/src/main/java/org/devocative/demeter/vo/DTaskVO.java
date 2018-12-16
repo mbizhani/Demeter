@@ -12,18 +12,21 @@ public class DTaskVO implements Serializable {
 	private String type;
 	private Date startDate;
 	private DTaskState state;
+	private String detail;
 	private String currentUser;
+	private String duration;
 
 	// ------------------------------
 
 	public DTaskVO() {
 	}
 
-	public DTaskVO(String id, String type, Date startDate, DTaskState state, String currentUser) {
+	public DTaskVO(String id, String type, Date startDate, DTaskState state, String detail, String currentUser) {
 		this.id = id;
 		this.type = type;
 		this.startDate = startDate;
 		this.state = state;
+		this.detail = detail;
 		this.currentUser = currentUser;
 	}
 
@@ -61,12 +64,28 @@ public class DTaskVO implements Serializable {
 		this.state = state;
 	}
 
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+
 	public String getCurrentUser() {
 		return currentUser;
 	}
 
 	public void setCurrentUser(String currentUser) {
 		this.currentUser = currentUser;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public void setDuration(String duration) {
+		this.duration = duration;
 	}
 
 	// ---------------

@@ -106,6 +106,8 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse<Object> {
 			.setLabel(new ResourceModel("DTaskVO.id")));
 		floatTable.add(new WTextInput("type")
 			.setLabel(new ResourceModel("DTaskVO.type")));
+		floatTable.add(new WTextInput("detail")
+			.setLabel(new ResourceModel("DTaskVO.detail")));
 		floatTable.add(new WDateRangeInput("startDate")
 			.setTimePartVisible(true)
 			.setLabel(new ResourceModel("DTaskVO.startDate")));
@@ -129,13 +131,16 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse<Object> {
 
 		OColumnList<DTaskVO> columnList = new OColumnList<>();
 		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.id"), "id"));
-		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.type"), "type"));
+		columnList.add(new OPropertyColumn<DTaskVO>(new ResourceModel("DTaskVO.type"), "type")
+			.setWidth(OSize.fixed(100)));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.detail"), "detail"));
 		columnList.add(new OPropertyColumn<DTaskVO>(new ResourceModel("DTaskVO.startDate"), "startDate")
 			.setFormatter(ODateFormatter.getDateTimeByUserPreference())
 			.setStyle("direction:ltr"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.state"), "state"));
+		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.duration"), "duration"));
 		columnList.add(new OPropertyColumn<>(new ResourceModel("DTaskVO.currentUser"), "currentUser"));
-		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.STOP_CIRCLE) {
+		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.STOP_CIRCLE.setTooltip(new Model<>("Stop Instance"))) {
 			private static final long serialVersionUID = 1830759784L;
 
 			@Override
@@ -143,8 +148,13 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse<Object> {
 				String key = rowData.getObject().getKey();
 				taskService.stop(key);
 			}
+
+			@Override
+			public boolean onCellRender(DTaskVO bean, String id) {
+				return bean.getState() == DTaskState.Running || bean.getState() == DTaskState.InQueue;
+			}
 		}.setConfirmMessage(getString("label.confirm")));
-		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.DOT_CIRCLE_O) {
+		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.DOT_CIRCLE_O.setTooltip(new Model<>("Attach Result to Console"))) {
 			private static final long serialVersionUID = 1830759784L;
 
 			@Override
@@ -152,14 +162,24 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse<Object> {
 				String key = rowData.getObject().getKey();
 				taskService.attachToCallback(key, taskBehavior);
 			}
+
+			@Override
+			public boolean onCellRender(DTaskVO bean, String id) {
+				return bean.getState() == DTaskState.Running;
+			}
 		});
-		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.CIRCLE_O) {
+		columnList.add(new OAjaxLinkColumn<DTaskVO>(new Model<>(), DemeterIcon.CIRCLE_O.setTooltip(new Model<>("Detach Result from Console"))) {
 			private static final long serialVersionUID = 1830759784L;
 
 			@Override
 			public void onClick(AjaxRequestTarget target, IModel<DTaskVO> rowData) {
 				String key = rowData.getObject().getKey();
 				taskService.detachFromCallback(key, taskBehavior);
+			}
+
+			@Override
+			public boolean onCellRender(DTaskVO bean, String id) {
+				return bean.getState() == DTaskState.Running;
 			}
 		});
 
@@ -222,7 +242,7 @@ public class TaskInfoDPage extends DPage implements IAsyncResponse<Object> {
 		oGrid
 			.setColumns(columnList)
 			.setMultiSort(false)
-			.setHeight(OSize.fixed(300));
+			.setFit(true);
 
 
 		add(new WDataGrid<>("tasks", oGrid, new IGridDataSource<DTaskInfo>() {

@@ -14,6 +14,7 @@ public class DTaskFVO implements Serializable {
 	private String type;
 	private RangeVO<Date> startDate;
 	private List<DTaskState> state;
+	private String detail;
 	private String currentUser;
 
 	// ------------------------------
@@ -48,6 +49,14 @@ public class DTaskFVO implements Serializable {
 
 	public void setState(List<DTaskState> state) {
 		this.state = state;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
 	}
 
 	public String getCurrentUser() {

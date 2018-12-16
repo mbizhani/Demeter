@@ -86,6 +86,7 @@ public enum DemeterConfigKey implements IConfigKey {
 	TaskPoolSize("dmt.task.pool.size", 5),
 	TaskPoolMax("dmt.task.pool.max", 10),
 	TaskPoolAliveTime("dmt.task.pool.alive.time", 10), //minutes
+	TaskFinishedQueueSize("dmt.task.finished.queue.size", 1000),
 
 	UserDefaultLocale("dmt.user.def.locale", "fa", Arrays.asList("fa", "en")),
 	UserDefaultCalendar("dmt.user.def.calendar", Arrays.asList("Persian", "Gregorian")),
