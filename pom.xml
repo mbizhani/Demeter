@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>demeter</artifactId>
 	<packaging>pom</packaging>
-	<version>1.1</version>
+	<version>1.1-SNAPSHOT</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>A base web application for DModule</description>
@@ -15,7 +16,7 @@
 		<groupId>org.devocative</groupId>
 		<artifactId>dena</artifactId>
 		<version>001</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 
 	<modules>
@@ -52,7 +53,7 @@
 		<connection>scm:git:https://github.com/mbizhani/Demeter.git</connection>
 		<developerConnection>scm:git:https://github.com/mbizhani/Demeter.git</developerConnection>
 		<url>https://github.com/mbizhani/Demeter</url>
-		<tag>demeter-1.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<properties>
@@ -97,37 +98,37 @@
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-common</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-service</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-web</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-core</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-module</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-module</artifactId>
-				<version>1.1</version>
+				<version>1.1-SNAPSHOT</version>
 				<type>test-jar</type>
 				<scope>test</scope>
 			</dependency>
