@@ -5,7 +5,7 @@
 
 	<artifactId>demeter</artifactId>
 	<packaging>pom</packaging>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>A base web application for DModule</description>
@@ -52,7 +52,7 @@
 		<connection>scm:git:https://github.com/mbizhani/Demeter.git</connection>
 		<developerConnection>scm:git:https://github.com/mbizhani/Demeter.git</developerConnection>
 		<url>https://github.com/mbizhani/Demeter</url>
-		<tag>HEAD</tag>
+		<tag>demeter-1.1</tag>
 	</scm>
 
 	<properties>
@@ -97,37 +97,37 @@
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-common</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-service</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-web</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-core</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-module</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.devocative</groupId>
 				<artifactId>demeter-module</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 				<type>test-jar</type>
 				<scope>test</scope>
 			</dependency>
