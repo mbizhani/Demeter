@@ -72,6 +72,16 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
+		<!--
+		This dependency is added due to following error and solution:
+		https://stackoverflow.com/questions/27808734/jdk8-error-class-file-for-javax-interceptor-interceptorbinding-not-found-whe
+		-->
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
 		<!-- TEST SCOPED -->
 
 		<dependency>
